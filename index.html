@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Коррекция цвета и контроль производства — принцип работы</title>
+<meta name="description" content="Как система подсказывает, какой колорант и в каком количестве добавить по замеру спектрофотометра, и как строится контроль производства.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314202e'/%3E%3Cpath d='M16 5v22M5 16h22' stroke='%23fff' stroke-width='2'/%3E%3Ccircle cx='21' cy='11' r='3.5' fill='%23f2b705'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14202e; --ink2:#4a5868; --paper:#f5f6f8; --card:#ffffff; --line:#dde2e8;
+  --y:#f2b705; --b:#1f5fbf; --g:#2e9e5b; --r:#d6342c; --k:#2b2f36; --w:#c9ced6;
+  --maxw:1120px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--ink:#eef1f5; --ink2:#a9b4c2; --paper:#0f1722; --card:#17212e; --line:#2a3646}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 "Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+h1,h2,h3{line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800}
+h1{font-size:clamp(34px,6vw,60px)}
+h2{font-size:clamp(26px,4vw,40px);margin-bottom:14px}
+h3{font-size:20px;letter-spacing:-.01em;margin-bottom:6px}
+p{margin:0 0 14px;max-width:62ch}
+.lead{font-size:clamp(18px,2.2vw,21px);color:var(--ink2)}
+section{padding:72px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+
+/* nav */
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
+.brand{font-weight:800;letter-spacing:-.01em;text-decoration:none;display:flex;gap:10px;align-items:center}
+.brand i{width:22px;height:22px;border-radius:6px;background:var(--ink);position:relative;display:block}
+.brand i:before,.brand i:after{content:"";position:absolute;background:var(--paper)}
+.brand i:before{left:10.5px;top:4px;bottom:4px;width:1.5px}
+.brand i:after{top:10.5px;left:4px;right:4px;height:1.5px}
+nav{display:flex;gap:18px;font-size:15px;overflow-x:auto;white-space:nowrap}
+nav a{text-decoration:none;color:var(--ink2)}
+nav a:hover{color:var(--ink)}
+@media(max-width:700px){nav{display:none}}
+
+/* hero */
+.hero{padding:48px 0 64px}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1 span.ax{display:inline-block;width:.62em;height:.62em;vertical-align:-.04em;margin-right:.12em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--ink2)}
+.cta{display:inline-block;margin-top:22px;background:var(--ink);color:var(--paper);text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:700}
+
+/* demo */
+.demo{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.demo-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+.demo-head b{font-size:15px}
+.demo-head small{color:var(--ink2);font-size:13px}
+#plot{width:100%;height:auto;display:block;touch-action:none;cursor:grab;border-radius:12px;user-select:none;-webkit-user-select:none}
+#plot:active{cursor:grabbing}
+.sw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.sw div{height:56px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:flex-end;padding:6px 10px;font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.row{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink2);margin:8px 0}
+.row input{flex:1;accent-color:var(--ink)}
+.de{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:var(--paper);margin:10px 0;font-weight:700}
+.de .v{font-size:26px;letter-spacing:-.02em}
+.badge{font-size:13px;padding:4px 10px;border-radius:999px;color:#fff;background:var(--r)}
+.badge.ok{background:var(--g)}
+.rec{margin:0;padding:0;list-style:none}
+.rec li{display:grid;grid-template-columns:12px 1fr auto;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.rec .dot{width:12px;height:12px;border-radius:50%}
+.rec .pct{font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.rec .bar{grid-column:2/4;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:-2px}
+.rec .bar i{display:block;height:100%}
+.note{font-size:13px;color:var(--ink2);margin:10px 0 0}
+
+/* steps */
+.steps{display:grid;gap:56px;margin-top:40px}
+.step{display:grid;grid-template-columns:1fr 1.15fr;gap:36px;align-items:center}
+.step:nth-child(even){grid-template-columns:1.15fr 1fr}
+.step:nth-child(even) .txt{order:2}
+@media(max-width:860px){.step,.step:nth-child(even){grid-template-columns:1fr;gap:18px}.step:nth-child(even) .txt{order:0}}
+.shot{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)}
+.shot figcaption{font-size:13px;color:var(--ink2);padding:8px 14px;border-top:1px solid var(--line)}
+figure{margin:0}
+.n{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--paper);font-weight:800;margin-bottom:12px}
+
+/* axes */
+.axes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:28px}
+.ax{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;border-top-width:5px}
+.ax p{margin:0;color:var(--ink2);font-size:15px}
+.ax b{font-size:19px}
+
+/* grids */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:28px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.box p{margin:0;color:var(--ink2);font-size:15.5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:28px}
+@media(max-width:900px){.three{grid-template-columns:1fr}}
+.phones{display:grid;grid-template-columns:minmax(0,.55fr) minmax(0,1fr);gap:20px;margin-top:20px;align-items:start}
+@media(max-width:700px){.phones{grid-template-columns:1fr}}
+.tag{display:inline-block;font-size:13px;color:var(--ink2);border:1px dashed var(--line);border-radius:6px;padding:2px 8px;margin-top:8px}
+
+/* timeline */
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;margin-top:30px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.tl div{padding:20px;border-right:1px solid var(--line)}
+.tl div:last-child{border-right:0}
+.tl b{display:block;font-size:26px;letter-spacing:-.02em;margin-bottom:4px}
+.tl span{color:var(--ink2);font-size:15px}
+@media(max-width:700px){.tl div{border-right:0;border-bottom:1px solid var(--line)}.tl div:last-child{border-bottom:0}}
+
+footer{padding:64px 0;border-top:1px solid var(--line)}
+.contact{display:grid;grid-template-columns:1.2fr 1fr;gap:30px;align-items:start}
+@media(max-width:760px){.contact{grid-template-columns:1fr}}
+.contact a.big{display:block;font-size:clamp(22px,3.4vw,30px);font-weight:800;text-decoration:none;letter-spacing:-.01em;margin:4px 0}
+.small{font-size:13px;color:var(--ink2)}
+@media print{header.top{display:none}section{padding:28px 0;break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><i></i>Цвет и контроль</a>
+    <nav>
+      <a href="#how">Как это работает</a>
+      <a href="#axes">Оси L*a*b*</a>
+      <a href="#device">Прибор и планшет</a>
+      <a href="#control">Контроль производства</a>
+      <a href="#terms">Сроки и формат</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Какой колорант добавить&nbsp;— и сколько процентов</h1>
+      <p class="lead" style="margin-top:18px">Технолог замеряет эталон и образец спектрофотометром. Система показывает на графике, куда сместился цвет, и подсказывает коррекцию. Попробуйте справа: возьмите точку и сдвиньте её.</p>
+      <div class="chips">
+        <span class="chip">Порошковые краски</span>
+        <span class="chip">Карты RAL</span>
+        <span class="chip">Планшет у линии</span>
+        <span class="chip">От 0,0001%</span>
+      </div>
+      <a class="cta" href="#how">Смотреть принцип работы</a>
+    </div>
+
+    <div class="demo" aria-label="Интерактивный график a*b*">
+      <div class="demo-head"><b>График a*b*: эталон в центре</b><small>двигайте точку образца</small></div>
+      <svg id="plot" viewBox="0 0 400 400" role="img" aria-label="Цветовая плоскость a* b*, эталон в центре, образец перетаскивается"></svg>
+      <div class="sw"><div id="swStd">Эталон</div><div id="swSmp">Образец</div></div>
+      <div class="row">Светлее / темнее (ΔL*) <input id="dL" type="range" min="-10" max="10" step="0.1" value="1.2" aria-label="Разница по яркости ΔL"> <b id="dLv" style="min-width:44px;text-align:right;color:var(--ink)"></b></div>
+      <div class="de"><span>Цветовое отклонение ΔE*ab</span><span class="v" id="de">—</span><span class="badge" id="badge">—</span></div>
+      <ul class="rec" id="rec"></ul>
+      <p class="note">Демонстрация принципа: коэффициенты учебные. В рабочей версии дозировка считается по вашей базе колорантов, вашему прибору и вашей рецептуре.</p>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2>Как это работает: четыре шага</h2>
+    <p class="lead">От замера до подтверждённого результата. Технологу не нужно считать в уме: он видит цвет, график и готовую подсказку.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="txt">
+          <span class="n">1</span>
+          <h3>Замер эталона и образца</h3>
+          <p>Прибор снимает эталон, затем образец порошковой краски. Эталон встаёт в центр графика, а точка образца показывает, в какую сторону цвет ушёл: к жёлтому или синему, к красному или зелёному, светлее или темнее.</p>
+        </div>
+        <figure class="shot"><img src="img/step1-measure.webp" alt="Замер эталона и образца и цветовое пространство L*a*b*" loading="lazy"><figcaption>Иллюстрация: замер и положение образца относительно эталона</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <span class="n">2</span>
+          <h3>Показать пальцем на графике</h3>
+          <p>На планшете график a*b* крупный и наглядный. Технолог касается точки или двигает её, и сразу видит направление и величину отклонения. Это ускоряет понимание: не таблица цифр, а картинка.</p>
+        </div>
+        <figure class="shot"><img src="img/step2-finger.webp" alt="Интерактивный график a*b* на планшете с рекомендацией" loading="lazy"><figcaption>Иллюстрация: интерактивный график и рекомендация по колорату</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <span class="n">3</span>
+          <h3>Рекомендация: что и сколько</h3>
+          <p>Система показывает колорант и дозировку, например «жёлтый 0,35%». Шаг дозы очень мелкий, от 0,0001%, и при необходимости до 100% и выше. Для каждого колоранта учитывается влияние на цвет и на яркость.</p>
+        </div>
+        <figure class="shot"><img src="img/tablet-portrait.webp" alt="Планшет с рекомендацией жёлтого оксида 0,35% рядом с каталогом RAL" loading="lazy"><figcaption>Иллюстрация: планшет, каталог RAL и порошковые образцы</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <span class="n">4</span>
+          <h3>Добавили, замерили, повторили</h3>
+          <p>После добавления колоранта в смеситель делается повторный замер. Если ΔE*ab в допуске, цвет соответствует эталону и отчёт сохраняется. Если нет, цикл повторяется с уточнённой дозой.</p>
+        </div>
+        <figure class="shot"><img src="img/step3-repeat.webp" alt="Добавили колорант, замерили, повторили: результат в допуске" loading="lazy"><figcaption>Иллюстрация: цикл «добавили → замерили → повторили»</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="axes">
+  <div class="wrap">
+    <h2>Как читать график L*a*b*</h2>
+    <p class="lead">Три оси описывают любой цвет. Эталон всегда в центре, а образец показывает, куда он сместился.</p>
+    <div class="axes">
+      <div class="ax" style="border-top-color:var(--y)"><b>Вверх: жёлтый</b><p>+b*. Образец жёлтее эталона. Чтобы вернуть цвет, нужен синий колорант или меньше жёлтого.</p></div>
+      <div class="ax" style="border-top-color:var(--b)"><b>Вниз: синий</b><p>−b*. Образец синее эталона. Чтобы вернуть цвет, нужен жёлтый колорант.</p></div>
+      <div class="ax" style="border-top-color:var(--g)"><b>Влево: зелёный</b><p>−a*. Образец зеленее эталона. Чтобы вернуть цвет, нужен красный колорант.</p></div>
+      <div class="ax" style="border-top-color:var(--r)"><b>Вправо: красный</b><p>+a*. Образец краснее эталона. Чтобы вернуть цвет, нужен зелёный колорант.</p></div>
+      <div class="ax" style="border-top-color:var(--w)"><b>Светлее: L*</b><p>Образец светлее эталона: добавляется тёмный колорант (чёрный).</p></div>
+      <div class="ax" style="border-top-color:var(--k)"><b>Темнее: L*</b><p>Образец темнее эталона: добавляется светлый колорант (белый).</p></div>
+    </div>
+    <p style="margin-top:22px"><b>ΔE*ab</b> — одно число, которое объединяет все три отклонения. Чем оно меньше, тем ближе образец к эталону. Допуск задаёт предприятие под свой продукт и заказчика.</p>
+  </div>
+</section>
+
+<section id="device">
+  <div class="wrap">
+    <h2>Прибор, планшет и RAL в одной связке</h2>
+    <p class="lead">Система проектируется под прибор класса BYK spectro-guide и под приборы, которые уже стоят у вас в лаборатории. Каталоги RAL подключены как цели для подбора.</p>
+    <figure class="shot" style="margin-top:28px">
+      <img src="img/byk-desk.webp" alt="Спектрофотометр, порошковые краски RAL и планшет с коррекцией цвета" loading="lazy">
+      <figcaption>Иллюстрация: спектрофотометр, образцы порошковых красок RAL и планшет технолога</figcaption>
+    </figure>
+    <div class="three">
+      <figure class="shot"><img src="img/dark-concept.webp" alt="Тёмный интерфейс L*a*b* Color Assistant с рекомендацией дозировки" loading="lazy"><figcaption>Иллюстрация: цветовое пространство, ΔE* и рекомендуемая добавка</figcaption></figure>
+      <figure class="shot"><img src="img/line-oven.webp" alt="Технолог с планшетом у линии порошковой окраски" loading="lazy"><figcaption>Иллюстрация: технолог у линии, сравнение цвета на месте</figcaption></figure>
+      <div class="box" style="align-self:stretch">
+        <h3>Что получает технолог</h3>
+        <p>Одно рабочее место у линии: замер, график, подсказка по колоранту, история правок. Меньше проб «на глаз», быстрее выход на цвет и меньше повторных переделок.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="value">
+  <div class="wrap">
+    <h2>Что это даёт предприятию</h2>
+    <div class="cols">
+      <div class="box"><h3>Быстрее запуск</h3><p>Цвет подбирается за меньшее число итераций, партия выходит на линию раньше.</p></div>
+      <div class="box"><h3>Меньше брака</h3><p>Отклонение видно в цифрах и на графике ещё до окраски изделий.</p></div>
+      <div class="box"><h3>Экономия колоранта</h3><p>Доза считается точно, а не «на глаз», поэтому меньше перерасхода и пересортицы.</p></div>
+      <div class="box"><h3>Одинаковый результат</h3><p>Разные технологи и смены работают по одной логике, а история замеров сохраняется.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="control">
+  <div class="wrap">
+    <h2>Контроль производства и журналы</h2>
+    <p class="lead">Вторая часть решения: контроль параметров, отклонения и журналы. Логика универсальная и изначально отработана на реальном производстве. Ниже скриншоты рабочей системы ZHUR, она адаптируется под любое предприятие.</p>
+
+    <div class="two">
+      <figure class="shot"><img src="img/zhur-scheme.webp" alt="Схема ZHUR: датчики, сервер, Wi-Fi цеха, планшеты и терминалы" loading="lazy"><figcaption>Схема: датчики → сервер → Wi-Fi цеха → планшет, телефон, терминал. Данные локально, работает без интернета</figcaption></figure>
+      <figure class="shot"><img src="img/zhur-early.webp" alt="Датчик фиксирует отклонение, агент уведомляет, можно остановить или изменить процесс" loading="lazy"><figcaption>Раньше, чем брак: датчик, уведомление агента, вмешательство</figcaption></figure>
+    </div>
+
+    <figure class="shot" style="margin-top:20px"><img src="img/zhur-dashboard.webp" alt="Дашборд ZHUR Производство сейчас" loading="lazy"><figcaption>Центр управления: тревоги, датчики, партии, оборудование — на одном экране</figcaption></figure>
+
+    <div class="phones">
+      <figure class="shot"><img src="img/zhur-mobile.webp" alt="ZHUR на телефоне: процессы и датчики" loading="lazy"><figcaption>На телефоне</figcaption></figure>
+      <figure class="shot"><img src="img/zhur-kiosk.webp" alt="Режим киоск ZHUR для цеха" loading="lazy"><figcaption>Режим «киоск» для сотрудников цеха: крупные кнопки, ничего лишнего</figcaption></figure>
+    </div>
+
+    <div class="two">
+      <figure class="shot"><img src="img/zhur-summary.webp" alt="Сводки и сравнение периодов" loading="lazy"><figcaption>Сводки и сравнение периодов</figcaption></figure>
+      <figure class="shot"><img src="img/zhur-settings.webp" alt="Настройки производства и вечерний отчёт в Telegram" loading="lazy"><figcaption>Настройки и вечерний отчёт руководителю</figcaption></figure>
+    </div>
+
+    <figure class="shot" style="margin-top:20px"><img src="img/zhur-realtime.webp" alt="Всё в реальном времени: холодильники, линии, отклонения, УФ" loading="lazy"><figcaption>Что контролируется: температура, линии и этапы, отклонения, ресурс ламп. Выгрузка в PDF</figcaption></figure>
+    <span class="tag">Скриншоты ZHUR показывают логику контроля; для вашего предприятия набор параметров настраивается заново (например: печи, температуры, влажность, время цикла).</span>
+  </div>
+</section>
+
+<section id="terms">
+  <div class="wrap">
+    <h2>Сроки и формат работы</h2>
+    <p class="lead">Это не готовый «коробочный» продукт. Программа создаётся индивидуально: под ваши задачи, приборы, линии, базу колорантов и процессы.</p>
+    <div class="tl">
+      <div><b>1–3 мес.</b><span>Разработка и внедрение под вашу площадку</span></div>
+      <div><b>до 2 мес.</b><span>Корректировка интерфейса, адаптация под сотрудников, доработка под реальные процессы</span></div>
+      <div><b>Расширение</b><span>Центр управления с нейросетями: прогноз отклонений, рекомендации, анализ данных. Сроки зависят от объёма</span></div>
+    </div>
+    <p style="margin-top:22px">Работаю с юридическими лицами (ООО, ИП и др.) по договору. Варианты: разработка под ключ или передача прав.</p>
+  </div>
+</section>
+
+</main>
+
+<footer id="contact">
+  <div class="wrap contact">
+    <div>
+      <h2>Обсудим вашу задачу по цвету</h2>
+      <p>Если после просмотра есть интерес, давайте созвонимся и разберём ваши приборы, линии и требования по цвету и контролю процессов.</p>
+    </div>
+    <div>
+      <p class="small" style="margin-bottom:6px">Александр Смолянинов, разработчик</p>
+      <a class="big" href="tel:+79934894429">+7 993 489-44-29</a>
+      <a class="big" href="mailto:smol0901@gmail.com">smol0901@gmail.com</a>
+    </div>
+  </div>
+  <div class="wrap"><p class="small" style="margin-top:28px;max-width:80ch">Изображения интерфейсов, приборов и производства являются иллюстрациями принципа работы. Торговые марки и названия приборов принадлежат их владельцам. Значения на демонстрационном графике условные.</p></div>
+</footer>
+
+<script>
+(function(){
+  var STD={L:72,a:-1,b:20};            // условный эталон (бежево-жёлтый)
+  var R=10, C=200, S=18;               // диапазон ±10, центр, пикселей на единицу
+  var COL={y:'#f2b705',b:'#1f5fbf',g:'#2e9e5b',r:'#d6342c',k:'#2b2f36',w:'#c9ced6'};
+  var K={y:0.035,b:0.040,r:0.030,g:0.045,k:0.050,w:0.060};   // учебные коэффициенты, % на единицу
+  var NAME={y:'Жёлтый',b:'Синий',r:'Красный',g:'Зелёный',k:'Чёрный (темнее)',w:'Белый (светлее)'};
+  var da=4.5, db=6.0, dL=1.2;
+  var svg=document.getElementById('plot'), NS='http://www.w3.org/2000/svg';
+
+  function el(n,at,p){var e=document.createElementNS(NS,n);for(var k in at)e.setAttribute(k,at[k]);(p||svg).appendChild(e);return e}
+  // фон: четыре цветовые зоны
+  var defs=el('defs',{});
+  function grad(id,x1,y1,x2,y2,c){var g=el('linearGradient',{id:id,x1:x1,y1:y1,x2:x2,y2:y2},defs);el('stop',{offset:'0','stop-color':c,'stop-opacity':.0},g);el('stop',{offset:'1','stop-color':c,'stop-opacity':.38},g)}
+  grad('gy',0,1,0,0,COL.y);grad('gb',0,0,0,1,COL.b);grad('gg',1,0,0,0,COL.g);grad('gr',0,0,1,0,COL.r);
+  var bg=el('rect',{x:20,y:20,width:360,height:360,rx:10,fill:'var(--card)',stroke:'var(--line)'});
+  el('rect',{x:20,y:20,width:360,height:180,fill:'url(#gy)'}); el('rect',{x:20,y:200,width:360,height:180,fill:'url(#gb)'});
+  el('rect',{x:20,y:20,width:180,height:360,fill:'url(#gg)'}); el('rect',{x:200,y:20,width:180,height:360,fill:'url(#gr)'});
+  for(var i=-10;i<=10;i+=5){ if(i===0)continue;
+    el('line',{x1:C+i*S,y1:20,x2:C+i*S,y2:380,stroke:'currentColor','stroke-opacity':.14,'stroke-dasharray':'3 4'});
+    el('line',{x1:20,y1:C+i*S,x2:380,y2:C+i*S,stroke:'currentColor','stroke-opacity':.14,'stroke-dasharray':'3 4'});
+    var t=el('text',{x:C+i*S,y:C+14,'text-anchor':'middle','font-size':10,fill:'currentColor','fill-opacity':.6});t.textContent=i;
+    var t2=el('text',{x:C+6,y:C-i*S+3,'font-size':10,fill:'currentColor','fill-opacity':.6});t2.textContent=i;
+  }
+  el('line',{x1:20,y1:C,x2:380,y2:C,stroke:'currentColor','stroke-opacity':.7});
+  el('line',{x1:C,y1:20,x2:C,y2:380,stroke:'currentColor','stroke-opacity':.7});
+  function lab(x,y,t,c,anc){var e=el('text',{x:x,y:y,'text-anchor':anc||'middle','font-size':13,'font-weight':700,fill:c});e.textContent=t}
+  lab(C,15,'+b* жёлтый','#b88a00'); lab(C,396,'−b* синий',COL.b);
+  lab(26,C-8,'−a* зелёный',COL.g,'start'); lab(374,C-8,'+a* красный',COL.r,'end');
+  // допуск ΔE = 1
+  el('circle',{cx:C,cy:C,r:S,fill:'none',stroke:'currentColor','stroke-width':1.5,'stroke-dasharray':'4 3'});
+  var std=el('circle',{cx:C,cy:C,r:9,fill:'var(--card)',stroke:'currentColor','stroke-width':2.2});
+  var tt=el('text',{x:C+13,y:C+26,'font-size':11,'font-weight':700,fill:'currentColor'});tt.textContent='эталон';
+  var line=el('line',{x1:C,y1:C,x2:C,y2:C,stroke:'currentColor','stroke-width':1.5,'stroke-dasharray':'5 4','stroke-opacity':.8});
+  var halo=el('circle',{cx:0,cy:0,r:20,fill:'currentColor','fill-opacity':.1});
+  var pt=el('circle',{cx:0,cy:0,r:11,fill:'#14202e',stroke:'#fff','stroke-width':3});
+  pt.style.filter='drop-shadow(0 2px 4px rgba(0,0,0,.4))';
+
+  function lab2rgb(L,a,b){
+    var fy=(L+16)/116,fx=a/500+fy,fz=fy-b/200;
+    function f(t){return t*t*t>0.008856?t*t*t:(t-16/116)/7.787}
+    var X=f(fx)*.95047,Y=f(fy),Z=f(fz)*1.08883;
+    var r=3.2406*X-1.5372*Y-.4986*Z,g=-.9689*X+1.8758*Y+.0415*Z,bl=.0557*X-.204*Y+1.057*Z;
+    function gm(v){v=Math.max(0,Math.min(1,v));return Math.round(255*(v<=.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-.055))}
+    return 'rgb('+gm(r)+','+gm(g)+','+gm(bl)+')';
+  }
+  function fmt(p){ if(p>=10)return p.toFixed(1); if(p>=1)return p.toFixed(2); if(p>=.1)return p.toFixed(2); if(p>=.01)return p.toFixed(3); return p.toFixed(4)}
+
+  function update(){
+    var x=C+da*S, y=C-db*S;
+    pt.setAttribute('cx',x);pt.setAttribute('cy',y);halo.setAttribute('cx',x);halo.setAttribute('cy',y);
+    line.setAttribute('x2',x);line.setAttribute('y2',y);
+    document.getElementById('swStd').style.background=lab2rgb(STD.L,STD.a,STD.b);
+    document.getElementById('swSmp').style.background=lab2rgb(STD.L+dL,STD.a+da,STD.b+db);
+    document.getElementById('dLv').textContent=(dL>0?'+':'')+dL.toFixed(1);
+    var de=Math.sqrt(da*da+db*db+dL*dL);
+    document.getElementById('de').textContent=de.toFixed(2).replace('.',',');
+    var ok=de<=1, bd=document.getElementById('badge');
+    bd.textContent=ok?'в допуске':'вне допуска'; bd.className='badge'+(ok?' ok':'');
+    var items=[];
+    if(Math.abs(db)>.15) items.push([db>0?'b':'y',Math.abs(db),db>0?'Образец жёлтее эталона':'Образец синее эталона']);
+    if(Math.abs(da)>.15) items.push([da>0?'g':'r',Math.abs(da),da>0?'Образец краснее эталона':'Образец зеленее эталона']);
+    if(Math.abs(dL)>.15) items.push([dL>0?'k':'w',Math.abs(dL),dL>0?'Образец светлее эталона':'Образец темнее эталона']);
+    var ul=document.getElementById('rec');
+    if(ok||!items.length){ul.innerHTML='<li style="grid-template-columns:1fr;font-weight:700">Коррекция не нужна: цвет соответствует эталону.</li>';return}
+    var mx=Math.max.apply(null,items.map(function(i){return i[1]*K[i[0]]}));
+    ul.innerHTML=items.map(function(i){
+      var p=i[1]*K[i[0]];
+      return '<li><span class="dot" style="background:'+COL[i[0]]+'"></span><span>Добавить: <b>'+NAME[i[0]]+'</b><br><small style="color:var(--ink2)">'+i[2]+'</small></span><span class="pct">'+fmt(p).replace('.',',')+'%</span><span class="bar"><i style="width:'+Math.max(6,p/mx*100)+'%;background:'+COL[i[0]]+'"></i></span></li>';
+    }).join('');
+  }
+  function move(e){
+    var r=svg.getBoundingClientRect(), k=400/r.width;
+    var x=(e.clientX-r.left)*k, y=(e.clientY-r.top)*k;
+    da=Math.max(-R,Math.min(R,Math.round((x-C)/S*20)/20));
+    db=Math.max(-R,Math.min(R,Math.round((C-y)/S*20)/20));
+    update();
+  }
+  svg.addEventListener('pointerdown',function(e){svg.setPointerCapture(e.pointerId);move(e);svg.onpointermove=move});
+  svg.addEventListener('pointerup',function(){svg.onpointermove=null});
+  svg.addEventListener('pointercancel',function(){svg.onpointermove=null});
+  document.getElementById('dL').addEventListener('input',function(e){dL=parseFloat(e.target.value);update()});
+  update();
+})();
+</script>
+</body>
+</html>
