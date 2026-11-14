@@ -141,6 +141,140 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
 .ph2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px}
 @media(max-width:760px){.ph2{grid-template-columns:1fr}}
 .list{margin:10px 0 0;padding-left:20px;color:var(--ink2)}.list li{margin:5px 0}
+
+
+
+
+/* chem mixer demo - improved 3D */
+.chem-demo{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:28px;max-width:680px}
+.chem-demo .demo-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}
+.chem-demo .demo-head b{font-size:15px}
+.chem-demo .demo-head small{color:var(--ink2);font-size:13px}
+.chem-layout{display:grid;grid-template-columns:160px 1fr;gap:24px;align-items:center;margin-top:14px}
+@media(max-width:640px){.chem-layout{grid-template-columns:1fr;justify-items:center}}
+.chem-3d{display:flex;flex-direction:column;align-items:center;gap:10px}
+.beaker-scene{width:130px;height:170px;position:relative;perspective:500px}
+.beaker-body{position:absolute;left:50%;top:8px;width:100px;height:150px;margin-left:-50px;transform-style:preserve-3d;transform:rotateY(-18deg) rotateX(6deg)}
+.beaker-glass{position:absolute;inset:0;border-radius:6px 6px 22px 22px;background:linear-gradient(105deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,.05) 28%,rgba(0,0,0,.04) 55%,rgba(255,255,255,.12) 100%);border:2.5px solid rgba(120,140,160,.45);box-shadow:0 16px 32px rgba(0,0,0,.14),inset 0 0 0 1px rgba(255,255,255,.25);overflow:hidden}
+.beaker-glass::before{content:"";position:absolute;left:8%;top:4%;width:14%;height:78%;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.05));border-radius:4px;z-index:4;pointer-events:none}
+.beaker-rim{position:absolute;left:50%;top:0;width:108px;height:12px;margin-left:-54px;border-radius:50%;background:linear-gradient(180deg,#c8d0d8,#a8b4c0);box-shadow:0 2px 4px rgba(0,0,0,.15);z-index:5}
+.liquid{position:absolute;left:3px;right:3px;bottom:3px;height:70%;border-radius:0 0 19px 19px;transition:height .4s cubic-bezier(.4,0,.2,1), background .45s ease;z-index:1;overflow:hidden}
+.liquid-surface{position:absolute;left:-5%;right:-5%;top:-6px;height:14px;border-radius:50%;background:inherit;filter:brightness(1.18) saturate(1.1);opacity:.9;z-index:2}
+.liquid-bubble{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.45);animation:bubble 2.8s ease-in infinite;z-index:3}
+.liquid-bubble:nth-child(2){left:30%;animation-delay:.6s;width:4px;height:4px}
+.liquid-bubble:nth-child(3){left:55%;animation-delay:1.3s;width:5px;height:5px}
+.liquid-bubble:nth-child(4){left:70%;animation-delay:2s;width:3px;height:3px}
+@keyframes bubble{0%{bottom:8%;opacity:0;transform:translateX(0)}20%{opacity:.7}100%{bottom:85%;opacity:0;transform:translateX(8px)}}
+.beaker-base{position:absolute;left:50%;bottom:0;width:90px;height:8px;margin-left:-45px;border-radius:50%;background:rgba(0,0,0,.08);filter:blur(4px)}
+.beaker-label{font-size:12px;color:var(--ink2);letter-spacing:.02em}
+.chem-sliders{display:grid;gap:11px}
+.chem-row{display:grid;grid-template-columns:88px 1fr 50px;align-items:center;gap:8px;font-size:13px}
+.chem-row label{color:var(--ink2);font-weight:500}
+.chem-row input[type=range]{width:100%;accent-color:var(--ink);height:5px}
+.chem-row b{font-variant-numeric:tabular-nums;text-align:right;font-size:13px;font-weight:600}
+.chem-result{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.chem-card{background:var(--paper);border-radius:10px;padding:10px 12px;border:1px solid var(--line)}
+.chem-card .k{font-size:11px;color:var(--ink2);margin-bottom:3px}
+.chem-card .v{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.chem-card .s{font-size:12px;margin-top:3px;color:var(--ink2)}
+.chem-card.ok .v{color:var(--g)}
+.chem-card.warn .v{color:var(--y)}
+.chem-card.bad .v{color:var(--r)}
+.chem-rec{margin-top:12px;padding:11px 13px;border-radius:10px;background:var(--paper);border:1px solid var(--line);font-size:13px;line-height:1.45}
+.chem-rec b{font-weight:700}
+@media(max-width:600px){.chem-result{grid-template-columns:1fr}.chem-row{grid-template-columns:78px 1fr 46px}.beaker-scene{width:110px;height:150px}.beaker-body{width:88px;height:130px;margin-left:-44px}}
+
+/* chem advanced demo */
+.chem-tabs{display:flex;gap:6px;margin:10px 0 14px}
+.chem-tab{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--ink2)}
+.chem-tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chem-panel{display:none}
+.chem-panel.active{display:block}
+.powder-box{position:relative;width:150px;height:150px;border-radius:16px;border:1px solid var(--line);background:radial-gradient(circle at 30% 25%,#1a1f2e,#0d1118);overflow:hidden;box-shadow:inset 0 0 30px rgba(0,0,0,.4)}
+.powder-particle{position:absolute;border-radius:50%;pointer-events:none;opacity:.9}
+.formula-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.formula-card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.formula-card .name{font-size:12px;color:var(--ink2);margin-bottom:4px}
+.formula-card .f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;font-weight:700;letter-spacing:.02em}
+.formula-card .note{font-size:11px;color:var(--ink2);margin-top:4px;line-height:1.35}
+.phys-note{margin-top:14px;padding:12px 14px;border-radius:12px;border:1px dashed var(--line);background:color-mix(in srgb,var(--paper) 80%,var(--card));font-size:13px;line-height:1.5;color:var(--ink2)}
+.phys-note b{color:var(--ink)}
+.phys-note + .phys-note{margin-top:8px}
+@media(max-width:600px){.formula-grid{grid-template-columns:1fr}}
+
+
+/* ---- v2: навигация, прогресс, лайтбокс, режим презентации ---- */
+:root[data-theme="dark"]{--ink:#eef1f5;--ink2:#a9b4c2;--paper:#0f1722;--card:#17212e;--line:#2a3646}
+#prog{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--y),var(--r),var(--b),var(--g));z-index:60}
+header.top .wrap{overflow:visible}
+nav a.act:not(.pres){color:var(--ink);box-shadow:inset 0 -2px 0 var(--y)}
+.tools{display:flex;gap:6px;align-items:center}
+.tbtn{font:600 13px Onest,system-ui,sans-serif;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+.tbtn:hover{border-color:var(--ink2)}
+.tbtn:focus-visible,nav a:focus-visible,#lb button:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.burger{display:none}
+@media(max-width:700px){
+  .burger{display:inline-block}
+  nav.open{display:flex!important;position:absolute;top:56px;left:0;right:0;max-width:none;flex-direction:column;align-items:stretch;gap:0;padding:8px 20px 14px;background:var(--paper);border-bottom:1px solid var(--line);font-size:16px}
+  nav.open a{padding:11px 0;border-top:1px solid var(--line)}
+}
+main img:not(.nozoom){cursor:zoom-in}
+#lb{position:fixed;inset:0;z-index:80;background:rgba(8,12,18,.88);display:none;align-items:center;justify-content:center;padding:24px}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:100%;border-radius:10px;cursor:zoom-out}
+#lb button{position:absolute;top:14px;right:14px}
+#pmbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:70;display:none;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:14px}
+body.pm #pmbar{display:flex}
+body.pm header.top,body.pm footer{display:none}
+body.pm main>section{display:none;min-height:100vh;padding-bottom:96px}
+body.pm main>section.cur{display:block}
+@media print{#prog,#pmbar,.tools,header.top{display:none!important}section{break-inside:avoid-page}}
+
+/* ---- v2.1: блок смешения в стиле демо a*b* ---- */
+.chem-demo{max-width:none;margin-top:36px;padding:16px;border-radius:18px}
+.chem-demo .demo-head{margin-bottom:8px}
+.chem-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.chem3d{aspect-ratio:1/1;width:100%;border-radius:12px;border:1px solid var(--line);background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--card) 70%,var(--paper)),var(--paper));cursor:grab;touch-action:none;overflow:hidden}
+.chem3d:active{cursor:grabbing}
+.chem3d canvas{display:block;width:100%!important;height:100%!important}
+.chem-3d{display:block}
+.beaker-label{text-align:center;font-size:13px;color:var(--ink2);margin-top:8px}
+#chemChart{width:100%;height:auto;display:block;margin-top:14px;color:var(--ink2)}
+#powderBox{width:100%;max-width:100%}
+@media(max-width:820px){.chem-layout{grid-template-columns:1fr;gap:18px}.chem3d{max-height:380px;aspect-ratio:4/3}}
+
+.umeter{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;margin-top:14px;font-size:13px;color:var(--ink2)}
+.umeter b{color:var(--ink);font-size:17px}
+.umeter i{grid-column:1/3;height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:block}
+.umeter u{display:block;height:100%;width:0;background:var(--g);text-decoration:none;transition:width .2s}
+.ann-intro{margin-top:44px}
+.ann-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px;align-items:start;margin-top:28px}
+.ann{position:relative}
+.ann img{border-radius:12px;border:1px solid var(--line)}
+.ann .m,.ann-list .m{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--y);color:#14202e;font:800 13px/1 Onest,sans-serif;flex:none}
+.ann .m{position:absolute;transform:translate(-50%,-50%);box-shadow:0 0 0 3px #fff,0 2px 6px rgba(0,0,0,.35);pointer-events:none}
+.ann-list{list-style:none;margin:0;padding:0;display:grid;gap:12px;font-size:15px}
+.ann-list li{display:flex;gap:10px;align-items:flex-start}
+.ann-list p{margin:0}
+.ann-res{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--g);font-size:15px}
+.ann-res.bad{border-left-color:var(--r)}
+@media(max-width:820px){.ann-row{grid-template-columns:1fr;gap:18px}}
+
+/* ---- v3: 3D-тело L*a*b* ---- */
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:start;margin-top:8px}
+#lab3d{position:relative}
+.lab-tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font-size:12px;padding:4px 8px;border-radius:6px;display:none;white-space:nowrap;z-index:2}
+.lab-q{width:100%;font:inherit;font-size:14px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);margin:10px 0 0}
+.lab-q:focus-visible{outline:2px solid var(--b);outline-offset:1px}
+.lab-sw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.lab-sw div{border-radius:10px;border:1px solid var(--line);padding:8px 10px;font-size:12px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55);min-height:64px;display:flex;flex-direction:column;justify-content:flex-end}
+.lab-sw b{font-size:13px}
+.near{list-style:none;margin:6px 0 0;padding:0}
+.near li{display:grid;grid-template-columns:18px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);cursor:pointer;font-size:14px}
+.near li:hover{color:var(--ink)}
+.near i{width:18px;height:18px;border-radius:5px;border:1px solid var(--line);display:block}
+.near small{color:var(--ink2);font-variant-numeric:tabular-nums}
+@media(max-width:820px){.lab-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -150,6 +284,7 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
     <a class="brand" href="#top"><i></i>Цвет и контроль</a>
     <nav>
       <a href="#how">Как работает</a>
+      <a href="#space">3D-цвет</a>
       <a href="#system">Система</a>
       <a href="#control">Контроль</a>
       <a href="#scale">Масштаб</a>
@@ -157,8 +292,12 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
       <a href="https://street-kitchen.my.canva.site/daha7d4cwg8" target="_blank" rel="noopener" class="pres">Презентация</a>
       <a href="#contact">Контакты</a>
     </nav>
+  <div class="tools"><button class="tbtn" id="pmBtn" type="button" title="Клавиша P">▶ Показ</button><button class="tbtn" id="thBtn" type="button" aria-label="Сменить тему">◐</button><button class="tbtn burger" id="bgBtn" type="button" aria-label="Меню" aria-expanded="false">☰</button></div>
   </div>
 </header>
+<div id="prog"></div>
+<div id="lb" role="dialog" aria-label="Просмотр изображения"><button class="tbtn" type="button">Закрыть ✕</button><img alt=""></div>
+<div id="pmbar"><button class="tbtn" id="pmPrev" type="button" aria-label="Назад">←</button><span id="pmCnt"></span><button class="tbtn" id="pmNext" type="button" aria-label="Вперёд">→</button><button class="tbtn" id="pmEsc" type="button">Выход</button></div>
 
 <main id="top">
 
@@ -266,6 +405,29 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
   </div>
 </section>
 
+<section id="space">
+  <div class="wrap">
+    <h2>Цветовое пространство L*a*b* в 3D</h2>
+    <p class="lead">Каждая точка — цвет RAL Classic. Вправо красный, влево зелёный, к вам жёлтый, от вас синий, вверх светлее. Вращайте тело, задайте эталон и образец и смотрите, как далеко они друг от друга и какой RAL ближе всего к образцу.</p>
+    <div class="demo">
+      <div class="demo-head"><b>Тело цветов: RAL Classic, 190 оттенков</b><small>потяните, чтобы повернуть</small></div>
+      <div class="lab-grid">
+        <div><div class="chem3d" id="lab3d" role="img" aria-label="3D-облако цветов RAL в пространстве L*a*b*. Перетащите, чтобы повернуть, нажмите на точку, чтобы выбрать цвет"><div class="lab-tip" id="labTip"></div></div></div>
+        <div>
+          <div class="chem-tabs" id="labSlots" style="margin:0"><button type="button" class="chem-tab active" data-slot="ref">Задаю эталон</button><button type="button" class="chem-tab" data-slot="smp">Задаю образец</button></div>
+          <input class="lab-q" id="labQ" type="text" inputmode="numeric" placeholder="Код RAL, например 3020, затем Enter" aria-label="Найти цвет по коду RAL">
+          <div class="lab-sw"><div id="labSwR"></div><div id="labSwS"></div></div>
+          <div class="de"><span>Отклонение ΔE*ab</span><span class="v" id="labDE">—</span><span class="badge" id="labBadge">—</span></div>
+          <b style="font-size:14px">Ближайшие RAL к образцу</b>
+          <ul class="near" id="labNear"></ul>
+          <p class="note">Значения L*a*b* взяты из открытого списка RAL Classic, часть цветов оценочная. Цвета на экране приблизительны. Для точной работы нужен замер прибора.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <section id="device">
   <div class="wrap">
     <h2>Прибор, планшет и RAL в одной связке</h2>
@@ -328,8 +490,160 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
       <figure class="shot"><img src="img/system/m-chem.webp" alt="Химический модуль на телефоне" loading="lazy"><figcaption>На телефоне</figcaption></figure>
       <p class="small" style="margin:0">Скриншоты демонстрационной версии: используется учебная модель с условными коэффициентами. В рабочей версии прогноз строится по данным ваших рецептур, режимов и результатов. Точность проверяется на пилоте и зависит от объёма и качества данных.</p>
     </div>
-  </div>
-</section>
+
+    <div class="ann-intro">
+      <h3 style="font-size:26px">Как нейросеть читает состав и предсказывает нагрев</h3>
+      <p class="lead">Два экрана демо с одним составом: в первом меняется рецептура, во втором растёт температура. Цифры считает учебная модель с условными коэффициентами. В рабочей версии её обучают на данных вашего производства.</p>
+      <p>На входе модель получает доли пяти ингредиентов, температуру и время в печи. На выходе: степень отверждения, риск пригорания, сдвиг цвета ΔE, блеск и индекс стойкости плёнки. Эталонную рецептуру модель считает тем же способом, поэтому разница в таблице честная.</p>
+    </div>
+    <div class="ann-row">
+      <div class="ann"><img src="img/system/chem-shift.webp" alt="Экран «Состав и нагрев»: рецептура сдвинута, режим эталонный" loading="lazy"><span class="m" style="left:49%;top:33%">1</span><span class="m" style="left:49%;top:57%">2</span><span class="m" style="left:94%;top:37.5%">3</span><span class="m" style="left:31%;top:79%">4</span><span class="m" style="left:94%;top:75%">5</span></div>
+      <div>
+        <h3>Пример 1. Сдвинули рецептуру, режим не трогали</h3>
+        <ol class="ann-list">
+          <li><span class="m">1</span><p><b>Вход: рецептура.</b> Отвердителя на 0,6 п.п. меньше эталона (4,6 % вместо 5,2 %), наполнителя и пигмента больше на 2,5 и 2,4 п.п. Под каждым ползунком показан эталон.</p></li>
+          <li><span class="m">2</span><p><b>Вход: нагрев.</b> 190 °C и 10 минут. Режим из эталона, поэтому результат объясняется только рецептурой.</p></li>
+          <li><span class="m">3</span><p><b>Выход: сравнение с эталоном.</b> Отверждение 90 % против 99 %, ΔE 0,7, блеск 82 против 86 GU, индекс стойкости 85 против 99. Риск пригорания остался 5 %. Соотношение смола : отвердитель ушло с 11,2 до 12,6.</p></li>
+          <li><span class="m">4</span><p><b>Карта режимов.</b> Модель считает эту же рецептуру для каждой пары «температура × время». Зелёное — рабочее окно, жёлтое — недоотверждение, красное — риск пригорания. Белая точка — выбранный режим, она в зелёной зоне.</p></li>
+          <li><span class="m">5</span><p><b>Рекомендация.</b> Отвердителя меньше расчётного, ориентир около 5,2 % вместо 4,6 %.</p></li>
+        </ol>
+        <div class="ann-res"><b>Результат.</b> Режим безопасен, но плёнка отвердится слабее эталона и будет менее стойкой. Поправить нужно рецептуру, а не температуру.</div>
+      </div>
+    </div>
+    <div class="ann-row">
+      <div class="ann"><img src="img/system/chem-burn.webp" alt="Экран «Состав и нагрев»: эталонная рецептура, температура 212 °C" loading="lazy"><span class="m" style="left:49%;top:30%">1</span><span class="m" style="left:49%;top:58.5%">2</span><span class="m" style="left:94%;top:39.5%">3</span><span class="m" style="left:42%;top:81%">4</span><span class="m" style="left:94%;top:75%">5</span></div>
+      <div>
+        <h3>Пример 2. Рецептура эталонная, температуру подняли</h3>
+        <ol class="ann-list">
+          <li><span class="m">1</span><p><b>Вход: рецептура.</b> Все ползунки на эталоне, разницы по составу нет.</p></li>
+          <li><span class="m">2</span><p><b>Вход: нагрев.</b> 212 °C (на 22 °C выше эталона) и 14 минут.</p></li>
+          <li><span class="m">3</span><p><b>Выход: сравнение с эталоном.</b> Риск пригорания вырос с 5 % до 100 %. Цвет ушёл на ΔE 5,2: темнее на 1,9 по L* и жёлтее на 4,8 по b*. Блеск упал на 10 GU. Отверждение и стойкость по 100 — формально выше эталона, но риск и цвет показывают, что режим вышел за рабочее окно.</p></li>
+          <li><span class="m">4</span><p><b>Карта режимов.</b> Точка попала в красную зону. Зелёная зона для этой рецептуры лежит левее, при меньшей температуре.</p></li>
+          <li><span class="m">5</span><p><b>Рекомендации.</b> Снизить температуру или время, проверить скорость конвейера. Для цвета: вернуть доли пигмента и наполнителя ближе к эталону или подготовить корректировку.</p></li>
+        </ol>
+        <div class="ann-res bad"><b>Результат.</b> Партия вышла бы с пригоранием и жёлтым сдвигом цвета. Система показывает это при подборе режима, до запуска печи.</div>
+      </div>
+    </div>
+
+    <div class="chem-demo" id="chemDemo">
+      <div class="demo-head">
+        <b>Смешение состава — интерактивный пример</b>
+        <small>учебное демо</small>
+      </div>
+      <p style="font-size:13px;color:var(--ink2);margin:0 0 2px">Демонстрация принципов. В рабочей версии — ваши компоненты, допуски и расчётные модели.</p>
+
+      <div class="chem-tabs" id="chemTabs">
+        <button type="button" class="chem-tab active" data-panel="liquid">Жидкое смешение</button>
+        <button type="button" class="chem-tab" data-panel="powder">Порошки</button>
+        <button type="button" class="chem-tab" data-panel="formulas">Формулы</button>
+      </div>
+
+      <!-- LIQUID -->
+      <div class="chem-panel active" id="panel-liquid">
+        <div class="chem-layout">
+          <div class="chem-3d">
+            <div class="chem3d" id="chem3d" role="img" aria-label="3D-модель смесителя: цвет и уровень зависят от состава. Перетащите, чтобы повернуть"></div>
+            <div id="chemLegacy" style="display:none">
+            <div class="beaker-scene">
+              <div class="beaker-rim"></div>
+              <div class="beaker-body">
+                <div class="beaker-glass">
+                  <div class="liquid" id="chemLiquid">
+                    <div class="liquid-surface"></div>
+                    <div class="liquid-bubble" style="left:22%"></div>
+                    <div class="liquid-bubble"></div>
+                    <div class="liquid-bubble"></div>
+                    <div class="liquid-bubble"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="beaker-base"></div>
+            </div>
+            <div class="beaker-label">Смеситель</div></div>
+            <div class="beaker-label" id="chemHint">Потяните, чтобы повернуть по любой оси. Двойной клик возвращает вид</div>
+          </div>
+          <div>
+            <div class="chem-sliders">
+              <div class="chem-row"><label>Смола</label><input type="range" id="c_resin" min="0" max="80" step="0.5" value="62"><b id="c_resin_v">62%</b></div>
+              <div class="chem-row"><label>Отвердитель</label><input type="range" id="c_hard" min="0" max="45" step="0.5" value="28"><b id="c_hard_v">28%</b></div>
+              <div class="chem-row"><label>Пигмент</label><input type="range" id="c_pig" min="0" max="30" step="0.5" value="8"><b id="c_pig_v">8%</b></div>
+              <div class="chem-row"><label>Добавка</label><input type="range" id="c_add" min="0" max="15" step="0.5" value="2"><b id="c_add_v">2%</b></div>
+            </div>
+            <div class="chem-result">
+              <div class="chem-card" id="ratioCard"><div class="k">Смола : отвердитель</div><div class="v" id="ratioVal">2.21 : 1</div><div class="s" id="ratioStatus">Цель: 2.2–2.4 : 1</div></div>
+              <div class="chem-card" id="sumCard"><div class="k">Сумма</div><div class="v" id="sumVal">100%</div><div class="s" id="sumStatus">Норма</div></div>
+            </div>
+            <svg id="chemChart" viewBox="0 0 400 128" role="img" aria-label="Состав смеси и окно допуска по соотношению смола к отвердителю"></svg>
+            <div class="chem-rec" id="chemRec">Состав в допуске.</div>
+          </div>
+        </div>
+        <div class="phys-note"><b>Поверхностное натяжение.</b> На границе жидкость–воздух молекулы притягиваются сильнее внутрь объёма, чем наружу. Из‑за этого поверхность ведёт себя как упругая плёнка. В красках от натяжения зависят смачивание подложки, растекание и образование дефектов (кратеры, апельсиновая корка).</div>
+        <div class="phys-note"><b>Гидродинамика смешения.</b> При перемешивании возникают ламинарные или турбулентные потоки. Для вязких смол важны сдвиговые напряжения: они разрушают агломераты пигмента и выравнивают температуру. Слишком слабый поток — несмешанные зоны; слишком сильный — воздушные включения и пенообразование.</div>
+      </div>
+
+      <!-- POWDER -->
+      <div class="chem-panel" id="panel-powder">
+        <div class="chem-layout">
+          <div class="chem-3d">
+            <div class="powder-box" id="powderBox" aria-label="Анимация смешения порошков"></div>
+            <div class="beaker-label">Камера смешения порошков</div>
+          </div>
+          <div>
+            <div class="chem-sliders">
+              <div class="chem-row"><label>База</label><input type="range" id="p_base" min="0" max="90" step="1" value="70"><b id="p_base_v">70%</b></div>
+              <div class="chem-row"><label>Пигмент</label><input type="range" id="p_pig" min="0" max="35" step="1" value="18"><b id="p_pig_v">18%</b></div>
+              <div class="chem-row"><label>Добавки</label><input type="range" id="p_add" min="0" max="20" step="1" value="12"><b id="p_add_v">8%</b></div>
+              <div class="chem-row"><label>Интенсивность</label><input type="range" id="p_speed" min="1" max="10" step="1" value="5"><b id="p_speed_v">5</b></div>
+            </div>
+            <div class="umeter"><span>Однородность смеси</span><b id="pUni">0%</b><i><u id="pUniBar"></u></i></div>
+            <button type="button" class="chem-tab" id="pRestart" style="margin-top:10px">Засыпать заново</button>
+            <div class="chem-rec" id="powderRec" style="margin-top:12px">Порошки смешиваются. Однородность растёт со временем и интенсивностью.</div>
+          </div>
+        </div>
+        <div class="phys-note"><b>Зачем это нужно.</b> В начале компоненты лежат слоями: база, пигмент, добавки. Пока смесь неоднородна, в одной пробе пигмента больше, в другой меньше, и цвет покрытия плывёт от партии к партии. Шкала однородности показывает, насколько пигмент и добавки уже распределились по камере. Её растят время и интенсивность перемешивания. Доли компонентов можно менять с нуля, шкала не зависит от их суммы.</div>
+        <div class="phys-note"><b>Смешение порошков.</b> Частицы разного размера и плотности сегрегируются при вибрации и течении. Для однородности нужны сдвиг и диффузия: мелкий пигмент заполняет пустоты между крупными гранулами смолы. В демо частицы движутся хаотично — в реальности траектории задаёт геометрия смесителя.</div>
+      </div>
+
+      <!-- FORMULAS -->
+      <div class="chem-panel" id="panel-formulas">
+        <p style="font-size:13px;color:var(--ink2);margin:0 0 10px">Упрощённые обозначения типичных компонентов порошковых и жидких систем. Реальные промышленные рецептуры сложнее и часто являются коммерческой тайной.</p>
+        <div class="formula-grid">
+          <div class="formula-card">
+            <div class="name">Эпоксидная смола (фрагмент)</div>
+            <div class="f">C₂₁H₂₄O₄</div>
+            <div class="note">Диглицидиловый эфир бисфенола A (DGEBA) — основа многих эпоксидных порошковых красок.</div>
+          </div>
+          <div class="formula-card">
+            <div class="name">Отвердитель (пример)</div>
+            <div class="f">C₉H₁₀N₂O</div>
+            <div class="note">Дициандиамид (DICY) и его производные — типичные отвердители для эпоксидных порошков.</div>
+          </div>
+          <div class="formula-card">
+            <div class="name">Пигмент (диоксид титана)</div>
+            <div class="f">TiO₂</div>
+            <div class="note">Белый пигмент, высокая укрывистость. Размер частиц влияет на блеск и рассеяние света.</div>
+          </div>
+          <div class="formula-card">
+            <div class="name">Пигмент (оксид железа)</div>
+            <div class="f">Fe₂O₃</div>
+            <div class="note">Красный / жёлтый железооксидный пигмент. Стабилен при нагреве в печи полимеризации.</div>
+          </div>
+          <div class="formula-card">
+            <div class="name">Полиэфирная смола (звено)</div>
+            <div class="f">–[C(O)–R–C(O)–O–R'–O]ₙ–</div>
+            <div class="note">Карбоксил- или гидроксил-функциональные полиэфиры для гибридных и полиэфирных систем.</div>
+          </div>
+          <div class="formula-card">
+            <div class="name">Добавка (воск, упрощённо)</div>
+            <div class="f">CₙH₂ₙ₊₂</div>
+            <div class="note">Полиэтиленовые / амидные воски регулируют растекание, текстуру и антиблокинг.</div>
+          </div>
+        </div>
+        <div class="phys-note" style="margin-top:12px"><b>Связь с цветом.</b> Спектр отражения пигмента (TiO₂, Fe₂O₃ и др.) вместе с толщиной и блеском плёнки определяет координаты L*a*b*. Смещение соотношения смола/отвердитель меняет степень отверждения и оптику поверхности — поэтому химический и цветовой модули связаны.</div>
+      </div>
+    </div></div>
+
+  </section>
 
 <section id="control">
   <div class="wrap">
@@ -363,6 +677,7 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
     <h2>Система в работе: от заявки до готовой партии</h2>
     <p class="lead">Единая картина для всех участников: заявки, задачи, рецепты, премиксы, корректировки, линии, операторы, отходы, простои, температуры и журналы. Ниже скриншоты демонстрационной версии. Этапы, роли и нормы настраиваются под процессы конкретного предприятия.</p>
     <a class="demo-btn" href="demo/index.html">Открыть интерактивное демо</a>
+    <a class="demo-btn" href="demo/color/index.html" style="margin-left:10px">Открыть демо коррекции цвета</a>
     <a class="demo-btn" href="https://street-kitchen.my.canva.site/daha7d4cwg8" target="_blank" rel="noopener" style="margin-left:10px;background:transparent;color:var(--ink);border:1px solid var(--ink)">Презентация программы</a>
     <p class="small" style="margin-top:10px">В демо можно переключать роли («Работаю как»), двигать заявку по этапам, вносить данные оператора и запускать сценарии отклонений. Данные в демо имитируются.</p>
 
@@ -702,6 +1017,327 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
   svg.addEventListener('pointercancel',function(){svg.onpointermove=null});
   document.getElementById('dL').addEventListener('input',function(e){dL=parseFloat(e.target.value);update()});
   update();
+})();
+</script>
+
+
+
+
+<script>
+(function(){
+  /* tabs */
+  var tabs = document.querySelectorAll('#chemTabs .chem-tab');
+  tabs.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      tabs.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.chem-panel').forEach(function(p){ p.classList.remove('active'); });
+      var panel = document.getElementById('panel-' + btn.getAttribute('data-panel'));
+      if(panel) panel.classList.add('active');
+      if(btn.getAttribute('data-panel') === 'powder') startPowder(); else powderRunning=false;
+    });
+  });
+
+  /* liquid mixer */
+  var resin = document.getElementById('c_resin');
+  var hard = document.getElementById('c_hard');
+  var pig = document.getElementById('c_pig');
+  var add = document.getElementById('c_add');
+  var liquid = document.getElementById('chemLiquid');
+  var TARGET_MIN = 2.2, TARGET_MAX = 2.4;
+
+  function mixColor(r, h, p, a, sum){
+    var nr=r/sum, nh=h/sum, np=p/sum, na=a/sum;
+    var R=Math.round(nr*45+nh*20+np*220+na*150);
+    var G=Math.round(nr*95+nh*160+np*140+na*100);
+    var B=Math.round(nr*180+nh*155+np*40+na*200);
+    return 'linear-gradient(180deg,rgba(255,255,255,.22),transparent 42%),rgb('+Math.min(220,Math.max(40,R))+','+Math.min(200,Math.max(50,G))+','+Math.min(220,Math.max(40,B))+')';
+  }
+
+  function updLiquid(){
+    if(!resin||!liquid) return;
+    var r=+resin.value, h=+hard.value, p=+pig.value, a=+add.value, sum=r+h+p+a;
+    document.getElementById('c_resin_v').textContent=r.toFixed(1)+'%';
+    document.getElementById('c_hard_v').textContent=h.toFixed(1)+'%';
+    document.getElementById('c_pig_v').textContent=p.toFixed(1)+'%';
+    document.getElementById('c_add_v').textContent=a.toFixed(1)+'%';
+    liquid.style.height=(Math.min(100,sum)*0.88)+'%';
+    liquid.style.background=mixColor(r,h,p,a,sum);
+    var ratio=h>0?r/h:0;
+    document.getElementById('ratioVal').textContent=ratio.toFixed(2)+' : 1';
+    document.getElementById('sumVal').textContent=sum.toFixed(1)+'%';
+    var ratioCard=document.getElementById('ratioCard'), sumCard=document.getElementById('sumCard'), rec=document.getElementById('chemRec');
+    var msgs=[], ok=true;
+    if(sum<99.5||sum>100.5){sumCard.className='chem-card warn';document.getElementById('sumStatus').textContent=sum<100?'Недостаёт':'Перебор';ok=false;msgs.push(sum<100?'Сумма < 100%.':'Сумма > 100%.');}
+    else{sumCard.className='chem-card ok';document.getElementById('sumStatus').textContent='Норма';}
+    if(h<=0||r<=0){ratioCard.className='chem-card bad';document.getElementById('ratioStatus').textContent='Нужны смола и отвердитель';ok=false;msgs.push('Добавьте смолу и отвердитель.');}else if(ratio<TARGET_MIN){ratioCard.className='chem-card bad';document.getElementById('ratioStatus').textContent='Мало смолы';ok=false;msgs.push('Рекомендация: +смолы ~'+(TARGET_MIN*h-r).toFixed(1)+'%.');}
+    else if(ratio>TARGET_MAX){ratioCard.className='chem-card bad';document.getElementById('ratioStatus').textContent='Мало отвердителя';ok=false;msgs.push('Рекомендация: +отвердителя ~'+(r/TARGET_MAX-h).toFixed(1)+'%.');}
+    else{ratioCard.className='chem-card ok';document.getElementById('ratioStatus').textContent='Цель: 2.2–2.4 : 1';}
+    rec.innerHTML=(ok&&!msgs.length)?'<b>Состав в допуске.</b> Можно переходить дальше.':msgs.join(' ');
+  }
+  if(resin){[resin,hard,pig,add].forEach(function(el){el.addEventListener('input',updLiquid);});updLiquid();}
+
+  /* powder animation */
+  var powderBox=document.getElementById('powderBox');
+  var particles=[], powderRAF=null, powderRunning=false, off0=0, uni=0, tk=0;
+  function spawnParticles(){
+    if(!powderBox) return;
+    powderBox.innerHTML='';
+    particles=[];
+    var base=+document.getElementById('p_base').value;
+    var pp=+document.getElementById('p_pig').value;
+    var pa=+document.getElementById('p_add').value;
+    var total=(base+pp+pa)||1;
+    var n=90; off0=0; uni=0; tk=0;
+    var colors=['#6b8caf','#c4a35a','#9b7ed9']; // base, pigment, additive
+    var weights=[base/total, pp/total, pa/total];
+    for(var i=0;i<n;i++){
+      var rnd=Math.random(), type=0;
+      if(rnd>weights[0]) type=1;
+      if(rnd>weights[0]+weights[1]) type=2;
+      var el=document.createElement('div');
+      el.className='powder-particle';
+      var size=3+Math.random()*5;
+      el.style.width=size+'px';el.style.height=size+'px';
+      el.style.background=colors[type];
+      var c0=type===0?0:(type===1?weights[0]:weights[0]+weights[1]), c1=c0+weights[type];
+      el.style.left=(8+84*(c0+Math.random()*(c1-c0)))+'%';
+      el.style.top=(8+Math.random()*84)+'%';
+      el.style.boxShadow='0 0 '+(2+size)+'px '+colors[type];
+      powderBox.appendChild(el);
+      particles.push({el:el, x:parseFloat(el.style.left), y:parseFloat(el.style.top), vx:(Math.random()-0.5)*0.6, vy:(Math.random()-0.5)*0.6, type:type});
+    }
+  }
+  function tickPowder(){
+    if(!powderRunning) return;
+    var speed=(+document.getElementById('p_speed').value)/5;
+    var sx=0,px=0,pn=0,ax=0,an=0;
+    particles.forEach(function(pt){
+      sx+=pt.x; if(pt.type===1){px+=pt.x;pn++}else if(pt.type===2){ax+=pt.x;an++}
+      pt.vx+=(Math.random()-0.5)*0.4*speed;
+      pt.vy+=(Math.random()-0.5)*0.4*speed;
+      pt.vx*=0.92; pt.vy*=0.92;
+      pt.x+=pt.vx*speed; pt.y+=pt.vy*speed;
+      if(pt.x<2){pt.x=2;pt.vx*=-1;}
+      if(pt.x>96){pt.x=96;pt.vx*=-1;}
+      if(pt.y<2){pt.y=2;pt.vy*=-1;}
+      if(pt.y>96){pt.y=96;pt.vy*=-1;}
+      pt.el.style.left=pt.x+'%';
+      pt.el.style.top=pt.y+'%';
+    });
+    var mx=sx/particles.length,k=(pn?1:0)+(an?1:0),off=k?((pn?Math.abs(px/pn-mx):0)+(an?Math.abs(ax/an-mx):0))/k:0;
+    if(!off0)off0=off||1;
+    var tu=k?Math.max(0,Math.min(1,(off0-off)/(off0*.85))):1; uni=uni*.97+tu*.03;
+    if(++tk%6===0){var pu=document.getElementById('pUni');if(pu){pu.textContent=Math.round(uni*100)+'%';document.getElementById('pUniBar').style.width=Math.round(uni*100)+'%'}}
+    powderRAF=requestAnimationFrame(tickPowder);
+  }
+  function startPowder(){
+    spawnParticles();
+    powderRunning=true;
+    if(powderRAF) cancelAnimationFrame(powderRAF);
+    tickPowder();
+  }
+  function updPowderLabels(){
+    var b=document.getElementById('p_base'), p=document.getElementById('p_pig'), a=document.getElementById('p_add'), s=document.getElementById('p_speed');
+    if(!b) return;
+    document.getElementById('p_base_v').textContent=b.value+'%';
+    document.getElementById('p_pig_v').textContent=p.value+'%';
+    document.getElementById('p_add_v').textContent=a.value+'%';
+    document.getElementById('p_speed_v').textContent=s.value;
+    var sum=+b.value+(+p.value)+(+a.value);
+    var rec=document.getElementById('powderRec');
+    if(sum<99||sum>101) rec.textContent='Сумма '+sum+'%. Для демо норма ~100%. Перераспределите доли.';
+    else rec.innerHTML='<b>Смешение идёт.</b> Интенсивность влияет на скорость перемешивания частиц. Однородность — ключ к стабильному цвету партии.';
+    if(powderRunning) spawnParticles();
+  }
+  var pr=document.getElementById('pRestart'); if(pr) pr.addEventListener('click',function(){startPowder()});
+  ['p_base','p_pig','p_add','p_speed'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener('input', updPowderLabels);
+  });
+  updPowderLabels();
+})();
+</script>
+
+
+
+
+<script>
+(function(){
+  var $=function(q,c){return (c||document).querySelector(q)}, $$=function(q,c){return [].slice.call((c||document).querySelectorAll(q))};
+  /* прогресс чтения */
+  var prog=$('#prog');
+  function onScroll(){var h=document.documentElement;prog.style.width=(h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight)*100)+'%'}
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+  /* подсветка раздела в меню */
+  var links={};$$('header.top nav a[href^="#"]').forEach(function(a){links[a.getAttribute('href').slice(1)]=a});
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&links[e.target.id]){$$('nav a.act').forEach(function(x){x.classList.remove('act')});links[e.target.id].classList.add('act')}})},{rootMargin:'-45% 0px -50% 0px'});
+    Object.keys(links).forEach(function(id){var t=document.getElementById(id);if(t)io.observe(t)});
+  }
+  /* мобильное меню */
+  var nav=$('header.top nav'),bg=$('#bgBtn');
+  bg.addEventListener('click',function(){var o=nav.classList.toggle('open');bg.setAttribute('aria-expanded',o)});
+  nav.addEventListener('click',function(e){if(e.target.tagName==='A')nav.classList.remove('open')});
+  /* тема */
+  var root=document.documentElement;try{var sv=localStorage.getItem('theme');if(sv)root.setAttribute('data-theme',sv)}catch(e){}
+  $('#thBtn').addEventListener('click',function(){
+    var dark=root.getAttribute('data-theme')==='dark'||(!root.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme:dark)').matches);
+    var n=dark?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('theme',n)}catch(e){}
+  });
+  /* лайтбокс и ленивая загрузка */
+  var lb=$('#lb'),lbi=$('img',lb);
+  $$('img').forEach(function(i){if(!i.hasAttribute('loading')&&!i.closest('.hero'))i.loading='lazy';i.decoding='async'});
+  $$('main img').forEach(function(i){i.addEventListener('click',function(){lbi.src=i.currentSrc||i.src;lbi.alt=i.alt;lb.classList.add('on')})});
+  lb.addEventListener('click',function(){lb.classList.remove('on')});
+  /* режим презентации: разделы как слайды */
+  var secs=$$('main>section'),cur=0,pm=false,cnt=$('#pmCnt');
+  function show(n){cur=Math.max(0,Math.min(secs.length-1,n));secs.forEach(function(s,i){s.classList.toggle('cur',i===cur)});cnt.textContent=(cur+1)+' / '+secs.length;scrollTo(0,0)}
+  function toggle(on){pm=on;document.body.classList.toggle('pm',on);if(on)show(cur);else{secs.forEach(function(s){s.classList.remove('cur')});if(secs[cur])secs[cur].scrollIntoView()}}
+  $('#pmBtn').addEventListener('click',function(){toggle(true)});
+  $('#pmEsc').addEventListener('click',function(){toggle(false)});
+  $('#pmPrev').addEventListener('click',function(){show(cur-1)});
+  $('#pmNext').addEventListener('click',function(){show(cur+1)});
+  addEventListener('keydown',function(e){
+    if(e.target.matches&&e.target.matches('input,textarea,select'))return;
+    if(e.key==='Escape'){if(lb.classList.contains('on'))lb.classList.remove('on');else if(pm)toggle(false);return}
+    if(e.key==='p'||e.key==='P'||e.key==='з'||e.key==='З'){toggle(!pm);return}
+    if(!pm)return;
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(cur+1)}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(cur-1)}
+  });
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  var ids=['c_resin','c_hard','c_pig','c_add'],box=$('chem3d');
+  function val(){return ids.map(function(i){return +$(i).value})}
+  function rgb(v){var s=v[0]+v[1]+v[2]+v[3],n=v.map(function(x){return x/s});
+    var cl=function(x,lo,hi){return Math.round(Math.min(hi,Math.max(lo,x)))};
+    return [cl(n[0]*45+n[1]*20+n[2]*220+n[3]*150,40,220),cl(n[0]*95+n[1]*160+n[2]*140+n[3]*100,50,200),cl(n[0]*180+n[1]*155+n[2]*40+n[3]*200,40,220)]}
+  /* график: состав + окно допуска */
+  var NS='http://www.w3.org/2000/svg',CC=['#1f5fbf','#2e9e5b','#f2b705','#c9ced6'],NM=['Смола','Отвердитель','Пигмент','Добавка'];
+  function chart(){
+    var v=val(),sum=(v[0]+v[1]+v[2]+v[3])||1,ratio=v[1]>0?v[0]/v[1]:3,x=20,o='';
+    o+='<text x="20" y="14" font-size="12" font-weight="700" fill="var(--ink)">Состав, % от суммы</text>';
+    v.forEach(function(q,i){var w=q/sum*360;o+='<rect x="'+x+'" y="22" width="'+w.toFixed(1)+'" height="22" fill="'+CC[i]+'"'+(i===0?' rx="5"':'')+'/>';
+      if(w>34)o+='<text x="'+(x+w/2).toFixed(1)+'" y="37" font-size="11" font-weight="700" text-anchor="middle" fill="#fff" style="paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:2px">'+(q/sum*100).toFixed(0)+'%</text>';x+=w});
+    NM.forEach(function(n,i){o+='<rect x="'+(20+i*92)+'" y="52" width="8" height="8" rx="2" fill="'+CC[i]+'"/><text x="'+(33+i*92)+'" y="60" font-size="10.5" fill="currentColor">'+n+'</text>'});
+    var X=function(r){return 20+(Math.min(3,Math.max(1.6,r))-1.6)/1.4*360};
+    o+='<text x="20" y="84" font-size="12" font-weight="700" fill="var(--ink)">Смола : отвердитель</text>';
+    o+='<rect x="20" y="94" width="360" height="8" rx="4" fill="var(--line)"/><rect x="'+X(2.2)+'" y="90" width="'+(X(2.4)-X(2.2))+'" height="16" rx="4" fill="#2e9e5b" fill-opacity=".35" stroke="#2e9e5b"/>';
+    var ok=ratio>=2.2&&ratio<=2.4;
+    o+='<circle cx="'+X(ratio).toFixed(1)+'" cy="98" r="7" fill="'+(ok?'#2e9e5b':'#d6342c')+'" stroke="var(--card)" stroke-width="2"/>';
+    [1.6,2.2,2.4,3].forEach(function(t){o+='<text x="'+X(t)+'" y="122" font-size="10" text-anchor="middle" fill="currentColor">'+t.toFixed(1)+'</text>'});
+    $('chemChart').innerHTML=o;
+  }
+  ids.forEach(function(i){$(i).addEventListener('input',function(){chart();upd()})});
+  chart();
+  /* 3D-сцена */
+  var upd=function(){};
+  function fb(){box.style.display='none';$('chemLegacy').style.display='block';$('chemHint').style.display='none'}
+  if(!window.THREE){fb();return}
+  var R;try{R=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){fb();return}
+  R.setPixelRatio(Math.min(2,devicePixelRatio||1));box.appendChild(R.domElement);
+  var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,.1,50);cam.position.set(0,1.1,7.2);cam.lookAt(0,.1,0);
+  sc.add(new THREE.AmbientLight(0xffffff,.75));var dl=new THREE.DirectionalLight(0xffffff,.8);dl.position.set(3,5,4);sc.add(dl);
+  var g=new THREE.Group();sc.add(g);g.rotation.x=.12;
+  var H=2.6,glass=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.05,H,56,1,true),new THREE.MeshPhongMaterial({color:0xcfe3f5,transparent:true,opacity:.2,side:THREE.DoubleSide,shininess:90}));g.add(glass);
+  var liq=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.03,1,56),new THREE.MeshPhongMaterial({color:0x888888,shininess:40}));g.add(liq);
+  var base=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.4,.12,56),new THREE.MeshPhongMaterial({color:0x2b2f36}));base.position.y=-H/2-.06;g.add(base);
+  var imp=new THREE.Group();var sh=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,H+.5,12),new THREE.MeshPhongMaterial({color:0xb9c0ca}));imp.add(sh);
+  for(var k=0;k<2;k++){var bl=new THREE.Mesh(new THREE.BoxGeometry(1.5,.12,.22),new THREE.MeshPhongMaterial({color:0xb9c0ca}));bl.position.y=-.8-k*.5;bl.rotation.y=k*Math.PI/2;imp.add(bl)}
+  g.add(imp);
+  var N=60,pos=new Float32Array(N*3),bp=[];for(var i=0;i<N;i++)bp.push({a:Math.random()*6.28,r:Math.random()*.95,y:Math.random(),s:.15+Math.random()*.3});
+  var bgeo=new THREE.BufferGeometry();bgeo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.add(new THREE.Points(bgeo,new THREE.PointsMaterial({color:0xffffff,size:.07,transparent:true,opacity:.7})));
+  var YA=new THREE.Vector3(0,1,0),XA=new THREE.Vector3(1,0,0),touched=false,tH=1,cH=1,calm=matchMedia('(prefers-reduced-motion:reduce)').matches,vis=true,t0=0;
+  upd=function(){var v=val(),s=v[0]+v[1]+v[2]+v[3],c=rgb(v);liq.material.color.setRGB(c[0]/255,c[1]/255,c[2]/255);tH=Math.max(.002,Math.min(100,s)/100*(H-.1))};
+  function size(){var w=box.clientWidth,h=box.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+  function frame(t){
+    cH+=(tH-cH)*.12;liq.scale.y=cH;liq.position.y=-H/2+cH/2;
+    var dt=(t-t0)/1000;t0=t;if(!calm){imp.rotation.y+=dt*3.2;if(!touched)g.rotateOnWorldAxis(YA,dt*.15)}
+    imp.position.y=.25;
+    for(var i=0;i<N;i++){var b=bp[i];if(!calm)b.y=(b.y+dt*b.s*.5)%1;var yy=-H/2+.05+b.y*(cH-.1);pos[i*3]=Math.cos(b.a+b.y*3)*b.r;pos[i*3+1]=yy;pos[i*3+2]=Math.sin(b.a+b.y*3)*b.r}
+    bgeo.attributes.position.needsUpdate=true;R.render(sc,cam);
+    if(vis&&!calm)requestAnimationFrame(frame)}
+  function run(){if(vis){t0=performance.now();requestAnimationFrame(frame)}}
+  if(calm)frame(performance.now());
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;if(vis)run()}).observe(box);
+  addEventListener('resize',function(){size();if(calm)frame(performance.now())});size();upd();cH=tH;run();
+  var d=null,q0=g.quaternion.clone();box.addEventListener('pointerdown',function(e){d={x:e.clientX,y:e.clientY};touched=true;box.setPointerCapture(e.pointerId)});box.addEventListener('dblclick',function(){g.quaternion.copy(q0);touched=false;if(calm)frame(performance.now())});
+  box.addEventListener('pointermove',function(e){if(d===null)return;g.rotateOnWorldAxis(YA,(e.clientX-d.x)*.012);g.rotateOnWorldAxis(XA,(e.clientY-d.y)*.012);d={x:e.clientX,y:e.clientY};if(calm)frame(performance.now())});
+  box.addEventListener('pointerup',function(){d=null});
+  /* вкладки скрывают сцену: пересчитать размер при возврате */
+  document.getElementById('chemTabs').addEventListener('click',function(){setTimeout(size,30)});
+})();
+</script>
+<script>
+(function(){
+  var RAL=[["1000",76.02,-0.37,27.64,"Green beige"],["1001",74.99,5.1,24.64,"Beige"],["1002",73.45,6.83,33.8,"Sand yellow"],["1003",75.99,18.8,72.93,"Signal yellow"],["1004",71.42,15.28,69.28,"Golden yellow"],["1005",65.65,12.3,61.9,"Honey yellow"],["1006",68.2,21.13,65.98,"Maize yellow"],["1007",68.38,25.44,67.13,"Daffodil yellow"],["1011",59.92,11.35,29.17,"Brown beige"],["1012",75.04,4.64,61.31,"Lemon yellow"],["1013",88.13,0.19,9.67,"Oyster white"],["1014",81.22,2.47,22.88,"Ivory"],["1015",86.4,2.06,15.48,"Light ivory"],["1016",88.37,-9.78,71.3,"Sulfur yellow"],["1017",76.32,19.37,51.02,"Saffron yellow"],["1018",84.83,3.05,69.19,"Zinc yellow"],["1019",62.62,4.31,12.94,"Grey beige"],["1020",61.98,0.39,23.18,"Olive yellow"],["1021",78.88,10.03,82.04,"Rape yellow"],["1023",79.07,10.46,80.5,"Traffic yellow"],["1024",64.2,7.95,36.66,"Ochre yellow"],["1026",95.36,-21.56,120.18,"Luminous yellow"],["1027",58.15,5.83,47.68,"Curry"],["1028",74.97,29.64,79.69,"Melon yellow"],["1032",72.32,12.16,66.97,"Broom yellow"],["1033",73.2,26.5,63.47,"Dahlia yellow"],["1034",72.73,21.4,45.09,"Pastel yellow"],["1035",54.79,0.35,11.86,"Pearl beige"],["1036",48.95,4.77,26.69,"Pearl gold"],["1037",70.28,26.19,64.79,"Sun yellow"],["2000",60.35,34.64,54.65,"Yellow orange"],["2001",49.41,39.79,35.29,"Red orange"],["2002",47.74,47.87,33.73,"Vermilion"],["2003",66.02,41.22,52.36,"Pastel orange"],["2004",56.89,50.34,49.81,"Pure orange"],["2005",62.26,87.83,94.26,"Luminous orange"],["2007",76.86,47.87,97.63,"Luminous bright orange"],["2008",61.99,44.64,51.72,"Bright red orange"],["2009",55.83,47.79,48.83,"Traffic orange"],["2010",55.39,40.1,42.42,"Signal orange"],["2011",61.76,38.16,52.39,"Deep orange"],["2012",57.75,40.28,30.66,"Salmon orange"],["2013",40.73,32.14,34.92,"Pearl orange"],["3000",42.4,43.24,25,"Flame red"],["3001",40.19,41.21,21.6,"Signal red"],["3002",39.82,41.84,22.04,"Carmine red"],["3003",35.59,35.87,15.75,"Ruby red"],["3004",33.05,25.61,9.02,"Purple red"],["3005",30.96,18.46,5.76,"Wine red"],["3007",28.34,8.14,2.22,"Black red"],["3009",35.05,19.93,11.53,"Oxide red"],["3011",34.52,28.66,13.44,"Brown red"],["3012",63.81,20.79,20.45,"Beige red"],["3013",40.7,36.67,21.37,"Tomato red"],["3014",60.17,32.49,12.58,"Antique pink"],["3015",72.73,20.48,3.96,"Light pink"],["3016",44.7,37.92,23.96,"Coral red"],["3017",54.24,44.26,16.87,"Rose"],["3018",50.77,49.15,19.86,"Strawberry red"],["3020",44.66,52.03,32.26,"Traffic red"],["3022",58.1,36.44,27.34,"Salmon pink"],["3024",51.32,82.52,71.62,"Luminous red"],["3026",54.38,86.26,76.07,"Luminous bright red"],["3027",43.07,46.96,15.81,"Raspberry red"],["3028",48.8,54.42,33.08,"Pure red"],["3031",43.87,41.37,18.33,"Orient red"],["3032",26.88,41.34,19.4,"Pearl ruby red"],["3033",44.29,45.11,28.62,"Pearl pink"],["4001",49.1,17.35,-12.85,"Red lilac"],["4002",41.91,30.05,5.67,"Red violet"],["4003",56.81,40.89,-5.53,"Heather violet"],["4004",32.22,24.83,0.06,"Claret violet"],["4005",50.92,15.38,-23.06,"Blue lilac"],["4006",42.38,39.48,-14.94,"Traffic purple"],["4007",30.05,13.16,-5.1,"Purple violet"],["4008",44.82,29.08,-18.58,"Signal violet"],["4009",60.59,10.38,-2.88,"Pastel violet"],["4010",50.39,48.95,-4.24,"Telemagenta"],["4011",47.92,18.89,-20.83,"Pearl violet"],["4012",46.33,7.27,-11.94,"Pearl blackberry"],["5000",38.3,1.9,-19.45,"Violet blue"],["5001",35.43,-7.52,-16.65,"Green blue"],["5002",33.11,8.43,-35.4,"Ultramarine blue"],["5003",30.53,-0.37,-16.68,"Sapphire blue"],["5004",26.56,-0.19,-4.07,"Black blue"],["5005",38.35,-5.03,-32.56,"Signal blue"],["5007",46.37,-6.24,-21.71,"Brilliant blue"],["5008",32,-2.09,-6.07,"Grey blue"],["5009",41.22,-9.56,-18.34,"Azure blue"],["5010",36.57,-5.81,-28.94,"Gentian blue"],["5011",28.21,-1.11,-8.72,"Steel blue"],["5012",55.62,-13.84,-30.72,"Light blue"],["5013",29.81,1.67,-17.2,"Cobalt blue"],["5014",53.79,-2.64,-15.59,"Pigeon blue"],["5015",51.13,-12.69,-34.21,"Sky blue"],["5017",40.4,-10.67,-32,"Traffic blue"],["5018",55.13,-27.27,-8.47,"Turquoise blue"],["5019",41.18,-9.97,-25.87,"Capri blue"],["5020",32.3,-13.01,-9.39,"Ocean blue"],["5021",47.15,-29.26,-9.32,"Water blue"],["5022",29.61,7.97,-21.5,"Night blue"],["5023",47.64,-2.96,-21.18,"Distant blue"],["5024",60.5,-9.53,-17.38,"Pastel blue"],["5025",35.93,-11.81,-16.28,"Pearl gentian blue"],["5026",16,7.84,-29.1,"Pearl night blue"],["6000",48.7,-20.58,4.64,"Patina green"],["6001",43.86,-23.57,18.31,"Emerald green"],["6002",39.87,-19.39,16.95,"Leaf green"],["6003",39.25,-4.36,10.17,"Olive green"],["6004",33.4,-13.17,-3.07,"Blue green"],["6005",32.26,-13.69,2.85,"Moss green"],["6006",33.04,-1.11,4.17,"Grey olive"],["6007",30.42,-3.85,4.77,"Bottle green"],["6008",29.82,-0.67,4.34,"Brown green"],["6009",29.81,-5.74,3.12,"Fir green"],["6010",46.05,-20.46,22.24,"Grass green"],["6011",53.24,-11.61,14.48,"Reseda green"],["6012",31.94,-4.36,-0.46,"Black green"],["6013",52.3,-2.08,14.26,"Reed green"],["6014",33.84,0.46,6.15,"Yellow olive"],["6015",31.93,-1.44,2.99,"Black olive"],["6016",42.92,-32.22,6.72,"Turquoise green"],["6017",52.33,-23.24,26.15,"May green"],["6018",59.83,-32.96,37.72,"Yellow green"],["6019",81.42,-12.57,13.5,"Pastel green"],["6020",34.77,-5.82,6.23,"Chrome green"],["6021",63.69,-11.28,14.13,"Pale green"],["6022",30.43,0.54,5.62,"Brown olive"],["6024",51.81,-38.02,15.5,"Traffic green"],["6025",47.45,-13.45,21.37,"Fern green"],["6026",39.25,-29.43,0.67,"Opal green"],["6027",72.8,-19.82,-3.62,"Light green"],["6028",38.15,-12.86,3.82,"Pine green"],["6029",44.18,-39.06,15.73,"Mint green"],["6032",50.67,-33.25,14.76,"Signal green"],["6033",54.93,-20.4,-2.06,"Mint turquoise"],["6034",69.16,-15.95,-5.1,"Pastel turquoise"],["6035",29.14,-29.19,16.35,"Pearl green"],["6036",33.97,-29.04,0.68,"Pearl opal green"],["6037",53.49,-46.77,34.32,"Pure green"],["6038",63.64,-80.23,54,"Luminous green"],["7000",58.32,-3.14,-4.71,"Squirrel grey"],["7001",63.81,-2.22,-4.05,"Silver grey"],["7002",54.51,-0.09,10.69,"Olive grey"],["7003",52.32,-1.18,6.92,"Moss grey"],["7004",65.77,0.2,-0.81,"Signal grey"],["7005",50,-1.55,0.82,"Mouse grey"],["7006",48.53,2.15,7.57,"Beige grey"],["7008",45.91,3.34,17.92,"Khaki grey"],["7009",43.19,-2.43,3.87,"Green grey"],["7010",42.69,-2.09,2.04,"Tarpaulin grey"],["7011",41.52,-1.68,-2.72,"Iron grey"],["7012",44.34,-1.77,-1.71,"Basalt grey"],["7013",39.21,0.59,6.33,"Brown grey"],["7015",40.5,-0.25,-3.4,"Slate grey"],["7016",33.84,-1.33,-2.83,"Anthracite grey"],["7021",30.65,-0.43,-1.22,"Black grey"],["7022",37.75,-0.07,2.23,"Umbra grey"],["7023",55.6,-1.45,4.52,"Concrete grey"],["7024",36.97,-0.13,-3.32,"Graphite grey"],["7026",34.71,-3.02,-2.48,"Granite grey"],["7030",61.31,-0.26,4.53,"Stone grey"],["7031",47.83,-2.96,-4.01,"Blue grey"],["7032",73.39,-0.93,8.09,"Pebble grey"],["7033",56.78,-3.36,6.32,"Cement grey"],["7034",59.68,-0.1,12.74,"Yellow grey"],["7035",81.29,-1.24,0.79,"Light grey"],["7036",63.49,1.27,0.78,"Platinum grey"],["7037",55.3,-0.46,0.22,"Dusty grey"],["7038",72.97,-1.5,2.97,"Agate grey"],["7039",47.86,0.17,4,"Quartz grey"],["7040",66.63,-1.17,-2.82,"Window grey"],["7042",62.58,-1.51,-0.21,"Traffic grey A"],["7043",40.23,-1.28,0,"Traffic grey B"],["7044",74.66,-0.04,5.08,"Silk grey"],["7045",62.71,-1.24,-2.14,"Telegrey 1"],["8000",46.6,1.48,34.09,"Green brown"],["8001",45.19,16.56,43.04,"Ochre brown"],["8002",30.6,19.76,19.87,"Signal brown"],["8003",33.26,18.14,28.08,"Clay brown"],["8004",37.09,31.45,28.96,"Copper brown"],["8007",26.07,13.7,20.48,"Fawn brown"],["8008",36.22,8.83,27.97,"Olive brown"],["8011",27.87,12.46,16.52,"Nut brown"],["8012",21.71,24.74,13.71,"Red brown"],["9001",89.62,0.59,8.06,"Cream"],["9002",85.07,-1.04,5.18,"Grey white"],["9003",93.22,-0.64,2.45,"Signal white"],["9005",4.04,0.09,-0.87,"Jet black"],["9010",97.81,-2.73,4.44,"Pure white"]];
+  var box=document.getElementById('lab3d');if(!box)return;
+  var $=function(i){return document.getElementById(i)};
+  function fi(t){return t>.206897?t*t*t:.12842*(t-.137931)}
+  function rgb(L,a,b){var fy=(L+16)/116,X=.95047*fi(fy+a/500),Y=fi(fy),Z=1.08883*fi(fy-b/200);
+    return [3.2406*X-1.5372*Y-.4986*Z,-.9689*X+1.8758*Y+.0415*Z,.0557*X-.204*Y+1.057*Z].map(function(c){c=c<=.0031308?12.92*c:1.055*Math.pow(c,1/2.4)-.055;return Math.max(0,Math.min(1,c))})}
+  function css(r){var c=rgb(r[1],r[2],r[3]).map(function(x){return Math.round(x*255)});return 'rgb('+c.join(',')+')'}
+  function dE(p,q){return Math.sqrt(Math.pow(p[1]-q[1],2)+Math.pow(p[2]-q[2],2)+Math.pow(p[3]-q[3],2))}
+  function nd(){box.insertAdjacentHTML('beforeend','<p style="padding:24px;color:var(--ink2);font-size:14px">3D недоступно в этом браузере. Попробуйте обновить браузер или включить аппаратное ускорение.</p>')}
+  if(!window.THREE){nd();return}
+  var R;try{R=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){nd();return}
+  R.setPixelRatio(Math.min(2,devicePixelRatio||1));box.appendChild(R.domElement);
+  var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,.1,60);cam.position.set(0,0,9.2);
+  sc.add(new THREE.AmbientLight(0xffffff,.95));var dl=new THREE.DirectionalLight(0xffffff,.45);dl.position.set(3,6,5);sc.add(dl);
+  var g=new THREE.Group();sc.add(g);g.rotation.set(.35,-.6,0);
+  var V=function(x,y,z){return new THREE.Vector3(x,y,z)},P=function(r){return V(r[2]*.03,(r[1]-50)*.03,r[3]*.03)};
+  var im=new THREE.InstancedMesh(new THREE.SphereGeometry(1,16,12),new THREE.MeshStandardMaterial({roughness:.5,metalness:0}),RAL.length),m4=new THREE.Matrix4(),cl=new THREE.Color();
+  RAL.forEach(function(r,i){m4.makeScale(.075,.075,.075);m4.setPosition(P(r));im.setMatrixAt(i,m4);var c=rgb(r[1],r[2],r[3]);cl.setRGB(c[0],c[1],c[2]);im.setColorAt(i,cl)});
+  g.add(im);
+  function line(a,b,c,o){var l=new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,b]),new THREE.LineBasicMaterial({color:c,transparent:true,opacity:o,depthTest:false}));g.add(l);return l}
+  line(V(-2.2,0,0),V(2.7,0,0),0x8a96a6,.55);line(V(0,-1.8,0),V(0,1.8,0),0x8a96a6,.55);line(V(0,0,-2.2),V(0,0,2.8),0x8a96a6,.55);
+  var gr=new THREE.GridHelper(5,10,0x8a96a6,0x8a96a6);gr.material.transparent=true;gr.material.opacity=.16;g.add(gr);
+  function label(t,x,y,z,c){var cv=document.createElement('canvas');cv.width=256;cv.height=64;var q=cv.getContext('2d');q.font='700 30px Onest,system-ui,sans-serif';q.fillStyle=c;q.textAlign='center';q.textBaseline='middle';q.fillText(t,128,32);
+    var s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false}));s.scale.set(1.3,.325,1);s.position.set(x,y,z);g.add(s)}
+  label('+a* красный',2.95,0,0,'#d6342c');label('−a* зелёный',-2.7,0,0,'#2e9e5b');label('+b* жёлтый',0,0,3.1,'#b58900');label('−b* синий',0,0,-2.6,'#1f5fbf');label('L* 100',0,1.95,0,'#8a96a6');label('L* 0',0,-1.95,0,'#8a96a6');
+  function ring(c){var cv=document.createElement('canvas');cv.width=cv.height=64;var q=cv.getContext('2d');q.lineWidth=9;q.strokeStyle='#fff';q.beginPath();q.arc(32,32,24,0,7);q.stroke();q.lineWidth=4;q.strokeStyle=c;q.stroke();
+    var s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false}));s.scale.set(.5,.5,1);s.renderOrder=9;s.visible=false;g.add(s);return s}
+  var mR=ring('#14202e'),mS=ring('#f2b705'),tie=line(V(0,0,0),V(0,0,0),0xf2b705,1);tie.visible=false;
+  /* выбор */
+  var by=function(c){for(var i=0;i<RAL.length;i++)if(RAL[i][0]===c)return i;return -1};
+  var st={ref:Math.max(0,by('3020')),smp:Math.max(1,by('3000')),slot:'ref'};
+  function near(){var k=st.smp>=0?st.smp:st.ref,o=[];RAL.forEach(function(r,i){if(i!==k)o.push([i,dE(RAL[k],r)])});o.sort(function(a,b){return a[1]-b[1]});
+    $('labNear').innerHTML=o.slice(0,4).map(function(x){var r=RAL[x[0]];return '<li data-i="'+x[0]+'"><i style="background:'+css(r)+'"></i><span>RAL '+r[0]+' '+r[4]+'</span><small>ΔE '+x[1].toFixed(1)+'</small></li>'}).join('')}
+  function sw(el,t,i){var r=RAL[i];el.style.background=css(r);el.innerHTML='<span>'+t+'</span><b>RAL '+r[0]+' '+r[4]+'</b><span>L* '+r[1]+'  a* '+r[2]+'  b* '+r[3]+'</span>'}
+  function upd(){
+    var a=RAL[st.ref],b=RAL[st.smp];sw($('labSwR'),'Эталон',st.ref);sw($('labSwS'),'Образец',st.smp);
+    mR.position.copy(P(a));mS.position.copy(P(b));mR.visible=mS.visible=true;
+    tie.geometry.setFromPoints([P(a),P(b)]);tie.visible=true;
+    var d=dE(a,b),lv=d<1?0:d<3?1:d<5?2:3,T=['не видно','едва заметно','заметно','явно отличается'];
+    $('labDE').textContent=d.toFixed(1);var bd=$('labBadge');bd.textContent=T[lv];bd.style.background=['var(--g)','var(--g)','var(--y)','var(--r)'][lv];bd.style.color=lv===2?'#14202e':'#fff';
+    near();if(calm)frame(performance.now())}
+  function put(i){if(i<0)return;st[st.slot]=i;if(st.slot==='ref')slot('smp');upd()}
+  function slot(s){st.slot=s;[].forEach.call(document.querySelectorAll('#labSlots .chem-tab'),function(b){b.classList.toggle('active',b.dataset.slot===s)})}
+  $('labSlots').addEventListener('click',function(e){var b=e.target.closest('.chem-tab');if(b)slot(b.dataset.slot)});
+  $('labNear').addEventListener('click',function(e){var l=e.target.closest('li');if(l){st.smp=+l.dataset.i;slot('smp');upd()}});
+  $('labQ').addEventListener('change',function(){var c=this.value.replace(/\D/g,'');if(by(c)>=0){put(by(c));this.value=''}else this.setCustomValidity('Нет такого кода')});
+  /* вращение по всем осям, выбор по клику, подсказка при наведении */
+  var rc=new THREE.Raycaster(),mv=new THREE.Vector2(),YA=V(0,1,0),XA=V(1,0,0),calm=matchMedia('(prefers-reduced-motion:reduce)').matches,touched=false,vis=true,t0=0,d0=null,moved=0,q0=g.quaternion.clone();
+  function pick(e){var r=box.getBoundingClientRect();mv.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);rc.setFromCamera(mv,cam);var h=rc.intersectObject(im);return h.length?h[0].instanceId:-1}
+  box.addEventListener('pointerdown',function(e){d0={x:e.clientX,y:e.clientY};moved=0;touched=true;box.setPointerCapture(e.pointerId)});
+  box.addEventListener('pointermove',function(e){var tip=$('labTip');
+    if(d0){moved+=Math.abs(e.clientX-d0.x)+Math.abs(e.clientY-d0.y);g.rotateOnWorldAxis(YA,(e.clientX-d0.x)*.012);g.rotateOnWorldAxis(XA,(e.clientY-d0.y)*.012);d0={x:e.clientX,y:e.clientY};tip.style.display='none';if(calm)frame(performance.now());return}
+    var i=pick(e);if(i<0){tip.style.display='none';return}var r=box.getBoundingClientRect();tip.textContent='RAL '+RAL[i][0]+' '+RAL[i][4];tip.style.display='block';tip.style.left=Math.min(r.width-150,e.clientX-r.left+12)+'px';tip.style.top=(e.clientY-r.top+12)+'px'});
+  box.addEventListener('pointerup',function(e){if(d0&&moved<6){var i=pick(e);if(i>=0)put(i)}d0=null});
+  box.addEventListener('pointerleave',function(){$('labTip').style.display='none'});
+  box.addEventListener('dblclick',function(){g.quaternion.copy(q0);touched=false;if(calm)frame(performance.now())});
+  function size(){var w=box.clientWidth,h=box.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+  function frame(t){var dt=Math.min(.05,(t-t0)/1000);t0=t;if(!calm&&!touched)g.rotateOnWorldAxis(YA,dt*.18);R.render(sc,cam);if(vis&&!calm)requestAnimationFrame(frame)}
+  function run(){if(vis){t0=performance.now();requestAnimationFrame(frame)}}
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;if(vis)run()}).observe(box);
+  addEventListener('resize',function(){size();if(calm)frame(performance.now())});
+  size();upd();run();if(calm)frame(performance.now());
 })();
 </script>
 </body>
