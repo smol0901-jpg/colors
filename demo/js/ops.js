@@ -5,14 +5,26 @@
  */
 import { fmt } from './core.js';
 
-export const ROLES = {
-  admin: 'Администратор',
-  manager: 'Менеджер (заявки)',
-  tech: 'Технолог',
-  premix: 'Оператор премиксов',
-  lead: 'Начальник смены',
-  op: 'Оператор линии',
-};
+export const ROLES = {}; // id -> название; обновляется при изменении ролей
+
+// Каталог прав. Набор расширяется под предприятие при составлении ТЗ.
+export const PERMS = [
+  ['orders.view', 'Заявки: просмотр'], ['orders.create', 'Заявки: создание'], ['recipe.edit', 'Рецепт и режим: редактирование'],
+  ['premix.view', 'Премиксы: очередь'], ['lines.view', 'Линии: просмотр'], ['lines.enter', 'Линии: ввод данных по своей линии'],
+  ['lines.enterAny', 'Линии: ввод данных по любой линии'], ['shift.view', 'Смена, персонал и табель'], ['shift.handover', 'Передача смены'],
+  ['journal.view', 'Журнал: просмотр'], ['journal.export', 'Журнал: выгрузка CSV'], ['analytics.view', 'Аналитика производства'],
+  ['color.use', 'Коррекция цвета'], ['chem.use', 'Состав и нагрев (химический модуль)'], ['batches.view', 'Партии и паспорта'], ['roles.manage', 'Роли и доступ'],
+];
+const ALL = PERMS.map((p) => p[0]);
+const defaultRoles = () => ({
+  admin: { name: 'Администратор', perms: [...ALL], stages: [] },
+  manager: { name: 'Менеджер (заявки)', perms: ['orders.view', 'orders.create', 'lines.view', 'shift.view', 'journal.view', 'analytics.view', 'batches.view'], stages: ['new', 'review'] },
+  tech: { name: 'Технолог', perms: ['orders.view', 'recipe.edit', 'premix.view', 'lines.view', 'shift.view', 'journal.view', 'analytics.view', 'color.use', 'chem.use', 'batches.view'], stages: ['tech', 'check'] },
+  premix: { name: 'Оператор премиксов', perms: ['orders.view', 'premix.view', 'journal.view'], stages: ['premix', 'correction'] },
+  lead: { name: 'Начальник смены', perms: ['orders.view', 'premix.view', 'lines.view', 'lines.enter', 'lines.enterAny', 'shift.view', 'shift.handover', 'journal.view', 'journal.export', 'analytics.view', 'batches.view'], stages: ['ready', 'run'] },
+  op: { name: 'Оператор линии', perms: ['orders.view', 'lines.view', 'lines.enter', 'journal.view'], stages: ['run'] },
+  qc: { name: 'Контролёр качества (ОТК)', perms: ['orders.view', 'lines.view', 'color.use', 'batches.view', 'journal.view'], stages: ['qc'], custom: true },
+});
 
 // Статусы заявки: кто отвечает на этапе и какое действие двигает заявку дальше.
 export const ST = {
@@ -33,7 +45,7 @@ export const ENTRY = { output: 'Выпуск', waste: 'Отход', downtime: '�
 export const WASTE_REASONS = ['Брак по цвету', 'Переналадка', 'Очистка линии', 'Нарушение режима', 'Прочее'];
 export const REPL = ['Замена расходников', 'Замена оснастки', 'Смена цвета на линии', 'Замена фильтра', 'Прочее'];
 
-const KEY = 'nap-paint-ops-v1';
+const KEY = 'nap-paint-ops-v3';
 const H = 3600000, D = 86400000;
 
 export class Ops {
@@ -43,16 +55,18 @@ export class Ops {
     this.me = 'u_t1';
     let d = null;
     try { d = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { d = null; }
-    if (d && d.v === 1) Object.assign(this, d.data); else this.seed();
+    if (d && d.v === 3) Object.assign(this, d.data); else this.seed();
+    this.syncRoles();
   }
 
-  save() { try { localStorage.setItem(KEY, JSON.stringify({ v: 1, data: { orders: this.orders, lines: this.lines, staff: this.staff, entries: this.entries, journal: this.journal, seq: this.seq, me: this.me, settings: this.settings } })); } catch { /* демо работает и без сохранения */ } }
+  save() { try { localStorage.setItem(KEY, JSON.stringify({ v: 3, data: { roles: this.roles, orders: this.orders, lines: this.lines, staff: this.staff, entries: this.entries, journal: this.journal, seq: this.seq, me: this.me, settings: this.settings } })); } catch { /* демо работает и без сохранения */ } }
   reset() { try { localStorage.removeItem(KEY); } catch { /* */ } this.seed(); }
 
   seed() {
     const now = this.plant.t;
     this.seq = 150;
     this.settings = { ovenTol: 5, beltTol: 0.2 };
+    this.roles = defaultRoles();
     this.staff = [
       { id: 'u_admin', name: 'Администратор', role: 'admin', shift: 'день', on: true, since: now - 5 * H, hours: 120 },
       { id: 'u_mgr', name: 'Сидорова М.', role: 'manager', shift: 'день', on: true, since: now - 4 * H, hours: 142 },
@@ -63,6 +77,7 @@ export class Ops {
       { id: 'u_lead', name: 'Тимофеев П.', role: 'lead', shift: 'день', on: true, since: now - 4.5 * H, hours: 160 },
       { id: 'u_op1', name: 'Иванов И.', role: 'op', shift: 'день', on: true, since: now - 4 * H, hours: 149 },
       { id: 'u_op2', name: 'Петрова А.', role: 'op', shift: 'день', on: true, since: now - 4 * H, hours: 153 },
+      { id: 'u_qc', name: 'Морозова Н.', role: 'qc', shift: 'день', on: true, since: now - 4 * H, hours: 140 },
       { id: 'u_op3', name: 'Алексеев В.', role: 'op', shift: 'день', on: true, since: now - 3.5 * H, hours: 144 },
     ];
     const rec = (parts, ver = 1) => ({ ver, items: parts, note: '' });
@@ -117,10 +132,34 @@ export class Ops {
   }
   hist(o, by, text) { o.history.unshift({ ts: this.plant.t, by, text }); }
 
+  syncRoles() { for (const k of Object.keys(ROLES)) delete ROLES[k]; for (const [k, r] of Object.entries(this.roles)) ROLES[k] = r.name; }
+  has(perm, uid = this.me) { const u = this.user(uid); return !!u && (u.role === 'admin' || !!this.roles[u.role]?.perms.includes(perm)); }
+  stageRoles(status) { return Object.entries(this.roles).filter(([, r]) => r.stages.includes(status)).map(([, r]) => r.name).join(' / ') || '—'; }
+
   canAct(o, uid = this.me) {
-    const u = this.user(uid); const s = ST[o.status];
-    return !!s.role && (u.role === 'admin' || u.role === s.role || (s.role === 'op' && u.role === 'lead'));
+    const u = this.user(uid); const r = this.roles[u.role];
+    if (!ST[o.status].role) return false;
+    if (u.role === 'admin') return true;
+    if (!r?.stages.includes(o.status)) return false;
+    if (o.status === 'run' && !this.has('lines.enterAny', uid)) return o.opId === uid;
+    return true;
   }
+
+  // права и роли
+  setPerm(role, perm, on) { const p = this.roles[role].perms; const i = p.indexOf(perm); if (on && i < 0) p.push(perm); if (!on && i >= 0) p.splice(i, 1); this.j('role', this.me, `Роль «${this.roles[role].name}»: право «${PERMS.find((x) => x[0] === perm)[1]}» ${on ? 'включено' : 'отключено'}`); this.save(); }
+  setStage(role, stage, on) { const p = this.roles[role].stages; const i = p.indexOf(stage); if (on && i < 0) p.push(stage); if (!on && i >= 0) p.splice(i, 1); this.j('role', this.me, `Роль «${this.roles[role].name}»: этап «${ST[stage].label}» ${on ? 'добавлен' : 'снят'}`); this.save(); }
+  addRole(name, copyFrom) {
+    const id = 'r' + Date.now().toString(36);
+    const base = this.roles[copyFrom] || { perms: ['orders.view'], stages: [] };
+    this.roles[id] = { name, perms: [...base.perms], stages: [], custom: true };
+    this.syncRoles(); this.j('role', this.me, `Создана роль «${name}»`); this.save(); return id;
+  }
+  renameRole(id, name) { this.roles[id].name = name; this.syncRoles(); this.save(); }
+  deleteRole(id) {
+    if (!this.roles[id]?.custom || this.staff.some((u) => u.role === id)) return false;
+    this.j('role', this.me, `Удалена роль «${this.roles[id].name}»`); delete this.roles[id]; this.syncRoles(); this.save(); return true;
+  }
+  setUserRole(uid, role) { const u = this.user(uid); u.role = role; this.j('role', this.me, `${u.name}: назначена роль «${this.roles[role].name}»`); this.save(); }
 
   /* ---------- заявки ---------- */
   createOrder({ customer, ral, kg, dueDays, prio, comment }) {
@@ -194,13 +233,8 @@ export class Ops {
 
   inbox(uid = this.me) {
     const u = this.user(uid);
-    return this.orders.filter((o) => {
-      const s = ST[o.status];
-      if (!s.role) return false;
-      if (u.role === 'admin') return false;
-      if (s.role === 'op') return o.opId === uid || u.role === 'lead';
-      return s.role === u.role;
-    });
+    if (u.role === 'admin') return [];
+    return this.orders.filter((o) => ST[o.status].role && this.canAct(o, uid));
   }
 
   /* ---------- линии и записи операторов ---------- */
@@ -216,8 +250,8 @@ export class Ops {
   }
 
   canEnter(lineId, uid = this.me) {
-    const u = this.user(uid); const l = this.line(lineId);
-    return u.role === 'admin' || u.role === 'lead' || (u.role === 'op' && l.opId === uid);
+    const l = this.line(lineId);
+    return this.has('lines.enterAny', uid) || (this.has('lines.enter', uid) && l.opId === uid);
   }
 
   addEntry({ lineId, type, kg, minutes, reason, text, sp }) {
@@ -303,7 +337,7 @@ export class Ops {
   csv(extra = []) {
     const rows = [['Время', 'Тип', 'Кто', 'Роль', 'Событие', 'Заявка', 'Линия']];
     const all = [...this.journal.map((j) => ({ ts: j.ts, kind: j.kind, by: j.by, text: j.text, orderId: j.orderId, lineId: j.lineId })), ...extra.map((e) => ({ ts: e.ts, kind: 'alarm', by: null, text: e.text, orderId: '', lineId: '' }))].sort((a, b) => b.ts - a.ts);
-    for (const r of all) rows.push([new Date(r.ts).toLocaleString('ru-RU'), { order: 'заявка', op: 'оператор', shift: 'смена', alarm: 'тревога' }[r.kind] || r.kind, r.by ? this.name(r.by) : 'система', r.by ? ROLES[this.user(r.by)?.role] || '' : '', r.text, r.orderId || '', r.lineId || '']);
+    for (const r of all) rows.push([new Date(r.ts).toLocaleString('ru-RU'), { order: 'заявка', op: 'оператор', shift: 'смена', alarm: 'тревога', role: 'доступ' }[r.kind] || r.kind, r.by ? this.name(r.by) : 'система', r.by ? this.roles[this.user(r.by)?.role]?.name || '' : '', r.text, r.orderId || '', r.lineId || '']);
     return '\ufeff' + rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
   }
 }

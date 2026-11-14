@@ -159,3 +159,28 @@ textarea{background:var(--card);border:1px solid var(--line);border-radius:10px;
 .menu button b{display:block;font-size:16px}
 .menu button span{color:var(--muted);font-size:13px}
 .two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+
+.perms{display:grid;gap:7px;margin-top:8px}
+.tg{display:flex;gap:9px;align-items:center;font-size:14px;cursor:pointer}
+.tg input{width:auto;accent-color:var(--accent)}
+.barrow{display:grid;grid-template-columns:minmax(90px,1.1fr) 2fr auto;gap:10px;align-items:center;margin:6px 0;font-size:13.5px}
+.barrow .bt{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.barrow .bt i{display:block;height:100%;background:var(--accent);border-radius:5px}
+.barrow .bt i.w{background:var(--warn-dot)}.barrow .bt i.d{background:var(--danger-dot)}
+.barrow b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table.tab{border:0;border-radius:0;font-size:12.5px;min-width:760px}
+table.tab th,table.tab td{padding:5px 4px;text-align:center;border-top:1px solid var(--line)}
+table.tab th span{font-weight:500;opacity:.7;text-transform:none;letter-spacing:0}
+table.tab th.nm,table.tab td.nm{text-align:left;padding-left:10px;min-width:150px;position:sticky;left:0;background:var(--card);z-index:1}
+table.tab th.today{background:var(--accent);color:var(--accent-fg)}
+table.tab td.Д{background:var(--ok-bg);color:var(--ok);font-weight:800}
+table.tab td.Н{background:var(--tint);color:var(--accent);font-weight:800}
+table.tab td.О{background:var(--warn-bg);color:var(--warn);font-weight:800}
+table.tab td.В{color:var(--muted)}
+table.tab td.tt{font-weight:800}
+
+.sl{margin:8px 0}.sh{display:flex;justify-content:space-between;font-size:14px}.sl input[type=range]{width:100%;padding:0;accent-color:var(--accent);background:none;border:0}
+.verdict{display:grid;gap:2px;background:var(--tint);border-radius:10px;padding:9px 12px;margin-bottom:10px}
+.stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}.stack i{display:block;height:100%}
+table.cmpt{font-size:13.5px}table.cmpt th,table.cmpt td{padding:6px 8px}

@@ -1,5 +1,6 @@
 import { Plant, STAGES, fmt } from './core.js';
-import { Ops, ROLES, ST, STAGE_ORDER, ENTRY, WASTE_REASONS, REPL } from './ops.js';
+import { BASE, NAMES, BASE_PROC, predict, advice, window_ } from './chem.js';
+import { Ops, ROLES, PERMS, ST, STAGE_ORDER, ENTRY, WASTE_REASONS, REPL } from './ops.js';
 
 const plant = new Plant();
 const ops = new Ops(plant);
@@ -19,19 +20,22 @@ const ICON = {
   system: '<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><path d="M12 7v3M10.5 13.5L6.5 16.5M13.5 13.5l4 3"/>',
 };
 const TABS = [['center', 'Центр'], ['lines', 'Линии'], ['orders', 'Заявки'], ['shift', 'Смена'], ['more', 'Ещё']];
-const NAV = { color: 'more', batches: 'more', journal: 'more', helper: 'more', system: 'more' };
+const NAV = { color: 'more', batches: 'more', journal: 'more', helper: 'more', system: 'more', premix: 'more', analytics: 'more', roles: 'more', chem: 'more' };
+const NEED = { lines: 'lines.view', orders: 'orders.view', shift: 'shift.view', color: 'color.use', batches: 'batches.view', journal: 'journal.view', premix: 'premix.view', analytics: 'analytics.view', roles: 'roles.manage', chem: 'chem.use' };
+const tabOk = (t) => !NEED[t] || ops.has(NEED[t]);
 const st = { tab: 'center', filter: 'all', chat: [], tier: 'f', sig: {} };
 
 /* ---------- каркас ---------- */
 function renderTabs() {
-  $('#tabs').innerHTML = TABS.map(([id, name]) =>
+  $('#tabs').innerHTML = TABS.filter(([id]) => tabOk(id)).map(([id, name]) =>
     `<button data-tab="${id}" ${(NAV[st.tab] || st.tab) === id ? 'aria-current="page"' : ''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[id]}</svg>${name}</button>`).join('');
 }
 function go(tab) {
+  if (!tabOk(tab)) tab = 'center';
   st.tab = tab; st.sig = {};
   renderTabs();
   const v = $('#view');
-  ({ center: viewCenter, lines: viewLines, orders: viewOrders, shift: viewShift, more: viewMore, color: viewColor, batches: viewBatches, journal: viewJournal, helper: viewHelper, system: viewSystem })[tab](v);
+  ({ center: viewCenter, lines: viewLines, orders: viewOrders, shift: viewShift, more: viewMore, color: viewColor, batches: viewBatches, journal: viewJournal, helper: viewHelper, system: viewSystem, premix: viewPremix, analytics: viewAnalytics, roles: viewRoles, chem: viewChem })[tab](v);
   window.scrollTo({ top: 0 });
 }
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
@@ -48,7 +52,8 @@ function viewCenter(v) {
     <h2>Сводка</h2><div class="kpis" id="kpi"></div>
     <h2>Что требует внимания</h2><div class="attn" id="attn"></div>
     <h2>Линии сейчас</h2><div class="two-col" id="lmini"></div>
-    <h2>Линия порошковой окраски</h2><div class="pipe" id="pipe"></div>
+    <h2>Этапы производства</h2><div class="pipe" id="pipe"></div>
+    <p class="note" style="margin-top:6px">Этапы показаны для линии порошковых красок. Для жидких красок и других процессов набор этапов, параметров и норм собирается под производство.</p>
     <h2>Датчики</h2><div class="sens" id="sens"></div>
     <h2>Журнал отклонений</h2><div class="jr" id="jr"></div>
     <h2>Показать на демо</h2>
@@ -250,7 +255,7 @@ function viewHelper(v) {
   const ask = (t) => {
     t = t.trim(); if (!t) return;
     st.chat.push({ r: 'u', t }); draw(); $('#q').value = '';
-    setTimeout(() => { st.chat.push({ r: 'a', t: plant.assistant(t) }); draw(); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 350);
+    setTimeout(() => { st.chat.push({ r: 'a', t: plant.assistant(t, ops.lineItems()) }); draw(); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }, 350);
   };
   draw();
   $('#send').onclick = () => ask($('#q').value);
@@ -270,7 +275,7 @@ function viewSystem(v) {
   const t = TIERS[st.tier];
   v.innerHTML = `
     <h2>Единая система контроля качества и безопасности</h2>
-    <div class="card"><p><b>Что это.</b> Система собирает данные с датчиков и приборов линии порошковой окраски, заранее показывает отклонения, подсказывает технологу, что проверить, и рассчитывает коррекцию цвета. Цель: меньше брака, меньше корректировок, быстрее запуск продукции на линии и выше производительность.</p>
+    <div class="card"><p><b>Что это.</b> Система собирает данные с датчиков и приборов производства красок (порошковых, жидких или другого процесса), заранее показывает отклонения, подсказывает технологу, что проверить, и рассчитывает коррекцию цвета. Цель: меньше брака, меньше корректировок, быстрее запуск продукции на линии и выше производительность.</p>
     <p style="margin:0"><b>Единой системой или по отдельности.</b> Модули можно внедрять все вместе или по одному, под конкретную задачу предприятия.</p></div>
 
     <h2>Модули</h2>
@@ -279,15 +284,24 @@ function viewSystem(v) {
          ['Процесс и датчики', 'Смешение, экструзия, помол, нанесение, печь. Прогноз отклонений до появления брака.'],
          ['Партии и прослеживаемость', 'Номер партии, паспорт качества, этикетка, срок хранения.'],
          ['Безопасность', 'Контроль параметров, влияющих на безопасность: аспирация и запылённость, температуры, журнал отклонений.'],
-         ['Помощник технолога', 'Подсказывает причины и порядок проверки, знает регламенты предприятия.']].map(([n, d]) => `<div class="card"><h3>${n}</h3><p class="note" style="margin:0">${d}</p></div>`).join('')}
+         ['Помощник технолога', 'Подсказывает причины и порядок проверки, знает регламенты предприятия.'],
+         ['Состав и нагрев (опционально)', 'Нейросеть сравнивает рецептуры и считает результат при смещении ингредиентов и нагреве, расчёт состава.'],
+         ['Компьютерное зрение (опционально)', 'Камеры и тепловизоры наблюдают за процессами, замечают перегрев и отклонения. После обучения предупреждает заранее.']].map(([n, d]) => `<div class="card"><h3>${n}</h3><p class="note" style="margin:0">${d}</p></div>`).join('')}
     </div>
 
-    <h2>Масштаб нейросети</h2>
+    <h2>Какие нейросети работают в системе</h2>
+    <p class="note" style="margin-bottom:8px">Одна самая большая сеть на все задачи не нужна. Работает набор моделей, каждая под свою задачу, на вашем сервере.</p>
+    <div class="grid2">
+      <div class="card"><h3>Прикладные нейросети</h3><p class="note" style="margin:0">Прогноз отклонений, дозы колоранта, аномалии, брак, настройка под каждую линию. От ≈ 0,05 до 0,5 млн параметров и выше. Серверный процессор.</p></div>
+      <div class="card"><h3>Модели свойств продукции</h3><p class="note" style="margin:0">Результат по составу и режиму: цвет, блеск, отверждение. Обучаются на ваших рецептах и результатах. От сотен тысяч до десятков миллионов параметров и выше.</p></div>
+      <div class="card"><h3>Языковая модель</h3><p class="note" style="margin:0">Помощник на русском (текст, голос), технологические карты, регламенты, документы. Миллиарды параметров, сервер с видеокартой.</p></div>
+    </div>
+    <h2>Масштаб прикладных нейросетей</h2>
     <div class="tiers">${Object.entries(TIERS).map(([k, x]) => `<button data-tier="${k}" aria-pressed="${st.tier === k}"><b>${x.n}</b><small>${x.p} параметров</small></button>`).join('')}</div>
     <div class="card"><h3>${t.n}: ${t.p === 'по задаче' ? 'размер сети подбирается по задаче' : t.p + ' параметров'}</h3>
       <p class="note">${t.who}</p><b>Задачи</b><ul class="l">${t.tasks.map((x) => `<li>${x}</li>`).join('')}</ul>
       <p style="margin:10px 0 0"><b>Оборудование:</b> ${t.hw}</p></div>
-    <p class="note" style="margin-top:8px">Число параметров — размер нейронной сети, а не показатель качества: его подбирают под объём ваших данных и задачу. Эффект (меньше брака, меньше корректировок) оценивается на пилоте по реальным данным предприятия.</p>
+    <p class="note" style="margin-top:8px">Число параметров — размер нейронной сети, а не показатель качества. Прогноз по составу и режимам упирается в объём и качество данных: размер модели подбирают экспериментом, начиная с компактной. Каждая линия настраивается отдельно на общей модели. Что можно надёжно предсказывать и какой будет эффект, определяется на пилоте по реальным данным предприятия.</p>
 
     <h2>Как это устроено</h2>
     <div class="flow">
@@ -302,7 +316,7 @@ function viewSystem(v) {
     <div style="overflow-x:auto"><table><tr><th></th><th>Демо</th><th>Рабочая система</th></tr>
       <tr><td>Данные</td><td>Имитация</td><td>Реальные датчики и приборы через шлюз</td></tr>
       <tr><td>Прогноз отклонений</td><td>Статистика: тренд и отклонение от обычного поведения</td><td>Нейросети, обученные на данных вашего производства</td></tr>
-      <tr><td>Нейросеть цвета</td><td>Малая учебная сеть, порядка 700 параметров (вкладка «Цвет»)</td><td>0,05 · 0,1 · от 0,5 млн параметров и выше, по масштабу</td></tr>
+      <tr><td>Нейросеть цвета</td><td>Малая учебная сеть, порядка 700 параметров (вкладка «Цвет»)</td><td>Набор моделей: прикладные сети (от ≈ 0,05 до 0,5 млн и выше), модели свойств, языковая модель (миллиарды параметров)</td></tr>
       <tr><td>Помощник</td><td>Ответы по правилам и базе знаний</td><td>Локальная языковая модель и ваши регламенты</td></tr>
       <tr><td>Где работает</td><td>В браузере</td><td>На вашем сервере</td></tr>
       <tr><td>Эффект</td><td>Не измеряется</td><td>Оценивается на пилоте по вашим данным</td></tr></table></div>
@@ -334,9 +348,9 @@ function viewOrders(v) {
   const cnt = (s) => ops.orders.filter((o) => o.status === s).length;
   v.innerHTML = `
     <h2>Путь заявки</h2>
-    <div class="flowbar">${STAGE_ORDER.map((s) => `<div class="fb ${cnt(s) ? 'on' : ''}"><b>${cnt(s)}</b>${ST[s].label}<br><span class="note">${ST[s].role ? ROLES[ST[s].role] : ''}</span></div>`).join('')}</div>
+    <div class="flowbar">${STAGE_ORDER.map((s) => `<div class="fb ${cnt(s) ? 'on' : ''}"><b>${cnt(s)}</b>${ST[s].label}<br><span class="note">${ST[s].role ? ops.stageRoles(s) : ''}</span></div>`).join('')}</div>
     <p class="note" style="margin-top:6px">Заявка → обработка → задача технологу → рецепт → премикс (малый или большой) → проверка и корректировки → запуск на линии → контроль → готово. Этапы и роли настраиваются под предприятие.</p>
-    ${ops.canAct({ status: 'new' }) ? `
+    ${ops.has('orders.create') ? `
     <h2>Новая заявка</h2><div class="card"><div class="form">
       <label><small>Заказчик</small><input id="ncCust" placeholder="Название"></label>
       <label><small>Цвет (RAL)</small><input id="ncRal" placeholder="RAL 9010"></label>
@@ -353,21 +367,27 @@ function viewOrders(v) {
   bindOrderActions(v, () => viewOrders(v));
 }
 
-function orderCard(o, isMine) {
-  const s = ST[o.status];
-  const can = ops.canAct(o);
-  const tt = ops.totals(o.id);
+function orderActions(o) {
+  const s = ST[o.status], can = ops.canAct(o);
   let act = '';
   if (can) {
     if (o.status === 'ready') {
       act = `<div class="form" style="margin:0"><select id="ln-${o.id}">${ops.lines.map((l) => `<option value="${l.id}" ${l.orderId ? 'disabled' : ''}>${l.name}${l.orderId ? ' (занята)' : ''}</option>`).join('')}</select>
-        <select id="op-${o.id}">${ops.staff.filter((u) => u.role === 'op').map((u) => `<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>`;
+        <select id="op-${o.id}">${ops.staff.filter((u) => ops.has('lines.enter', u.id) && !ops.has('lines.enterAny', u.id) && u.role !== 'admin').map((u) => `<option value="${u.id}">${esc(u.name)}</option>`).join('')}</select></div>`;
     }
     act += `<div class="btns" style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn pri" data-adv="${o.id}">${s.btn}</button>${s.alt ? `<button class="btn" data-adv="${o.id}" data-alt="1">${s.altBtn}</button>` : ''}</div>`;
   }
+  return act;
+}
+
+function orderCard(o, isMine) {
+  const s = ST[o.status];
+  const can = ops.canAct(o);
+  const tt = ops.totals(o.id);
+  const act = orderActions(o);
   return `<div class="oc ${isMine ? 'mine' : ''}"><div class="hd"><div><b>${esc(o.no)} · ${esc(o.customer)}</b><div class="m"><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:${swatch(o.ral)};vertical-align:-1px;border:1px solid var(--line)"></span> ${esc(o.ral)} · ${o.kg} кг · срок ${dt(o.due)}</div></div><span class="pill ${stClass(o.status)}">${s.label}</span></div>
     <div class="pills">${o.prio === 'срочный' ? '<span class="pill d">срочный</span>' : ''}${o.recipe ? `<span class="pill">премикс ${o.premixSize} ${o.premixKg} кг</span>` : ''}${o.corrections.length ? `<span class="pill w">корректировок: ${o.corrections.length}</span>` : ''}${o.lineId ? `<span class="pill">${ops.line(o.lineId).name} · ${esc(ops.name(o.opId))}</span>` : ''}${tt.output ? `<span class="pill g">выпуск ${tt.output} кг${tt.waste ? ', отход ' + tt.waste : ''}</span>` : ''}</div>
-    <div class="m">${s.role ? 'Ждёт: ' + ROLES[s.role] : '—'}${o.techId ? ' · технолог ' + esc(ops.name(o.techId)) : ''}</div>
+    <div class="m">${s.role ? 'Ждёт: ' + ops.stageRoles(o.status) : '—'}${o.techId ? ' · технолог ' + esc(ops.name(o.techId)) : ''}</div>
     ${act}<div><button class="btn" data-open="${o.id}">Подробнее: рецепт, история, комментарии</button></div></div>`;
 }
 
@@ -387,7 +407,7 @@ function bindOrderActions(root, refresh) {
 
 function openOrder(id) {
   const o = ops.order(id), s = ST[o.status];
-  const canRecipe = ['tech', 'check', 'correction'].includes(o.status) && (ops.role === 'tech' || ops.role === 'admin');
+  const canRecipe = ['tech', 'check', 'correction'].includes(o.status) && ops.has('recipe.edit');
   const it = o.recipe?.items || {};
   const sum = Object.values(it).reduce((a, b) => a + b, 0);
   $('#dlg').innerHTML = `
@@ -512,7 +532,8 @@ function viewShift(v) {
     <h2>Персонал смены</h2>
     <div style="overflow-x:auto"><table><tr><th>Сотрудник</th><th>Роль</th><th>Линия</th><th>Смена</th><th>Статус</th><th>Часов за месяц</th></tr>
       ${ops.staff.filter((u) => u.role !== 'admin').map((u) => { const ln = ops.lines.find((l) => l.opId === u.id); return `<tr><td>${esc(u.name)}</td><td>${ROLES[u.role]}</td><td>${ln ? ln.name : '—'}</td><td>${u.shift}</td><td>${u.on ? '<span class="pill g">на смене' + (u.since ? ' с ' + hm(u.since) : '') + '</span>' : '<span class="pill">нет</span>'}</td><td>${fmt(u.hours, 0)}</td></tr>`; }).join('')}</table></div>
-    ${['lead', 'admin'].includes(me.role) ? `<h2>Передача смены</h2><div class="card"><p class="note">В записи автоматически указывается число открытых отклонений: ${allItems().length}.</p><textarea id="hoNote" placeholder="Замечания следующей смене"></textarea><div style="margin-top:8px"><button class="btn pri" id="hoSend">Передать смену</button></div></div>` : ''}`;
+    <h2>Табель за 14 дней</h2>${tabelHtml()}
+    ${ops.has('shift.handover') ? `<h2>Передача смены</h2><div class="card"><p class="note">В записи автоматически указывается число открытых отклонений: ${allItems().length}.</p><textarea id="hoNote" placeholder="Замечания следующей смене"></textarea><div style="margin-top:8px"><button class="btn pri" id="hoSend">Передать смену</button></div></div>` : ''}`;
   $('#clk').onclick = () => { ops.clock(ops.me); viewShift(v); };
   v.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => go(b.dataset.go)));
   const hs = $('#hoSend'); if (hs) hs.onclick = () => { ops.handover(ops.me, $('#hoNote').value, allItems().length); toast('Смена передана, запись в журнале'); $('#hoNote').value = ''; };
@@ -520,7 +541,7 @@ function viewShift(v) {
 
 /* ---------- Ещё и журнал ---------- */
 function viewMore(v) {
-  const m = [['color', 'Цвет', 'Коррекция цвета: график a*b*, колорант и % добавки'], ['batches', 'Партии', 'Готовая продукция, паспорт качества и этикетка'], ['journal', 'Журнал', 'Все действия людей и отклонения, выгрузка в CSV'], ['helper', 'Помощник', 'Подсказки технологу по текущему состоянию'], ['system', 'Система', 'Модули, масштаб нейросети, схема, демо и рабочая версия']];
+  const m = [['premix', 'Премиксы', 'Очередь малых и больших премиксов, корректировки'], ['color', 'Цвет', 'Коррекция цвета: график a*b*, колорант и % добавки'], ['chem', 'Состав и нагрев', 'Опционально: прогноз результата при смещении ингредиентов и нагреве'], ['batches', 'Партии', 'Готовая продукция, паспорт качества и этикетка'], ['analytics', 'Аналитика', 'Выпуск, отходы, простои и корректировки по линиям'], ['journal', 'Журнал', 'Все действия людей и отклонения, выгрузка в CSV'], ['roles', 'Роли и доступ', 'Права каждой роли настраиваются индивидуально'], ['helper', 'Помощник', 'Подсказки технологу по текущему состоянию'], ['system', 'Система', 'Модули, масштаб нейросети, схема, демо и рабочая версия']].filter(([k]) => tabOk(k));
   v.innerHTML = `<h2>Разделы</h2><div class="menu">${m.map(([k, n, d]) => `<button data-go="${k}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>`;
   v.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => go(b.dataset.go)));
 }
@@ -529,13 +550,168 @@ function viewJournal(v) {
   const f = st.jf || 'all';
   const all = [...ops.journal.map((j) => ({ ts: j.ts, kind: j.kind, text: j.text, by: j.by })), ...plant.events.map((e) => ({ ts: e.ts, kind: 'alarm', text: e.text, by: null }))].sort((a, b) => b.ts - a.ts);
   const list = all.filter((x) => f === 'all' || x.kind === f).slice(0, 80);
-  const KL = { order: 'заявка', op: 'оператор', shift: 'смена', alarm: 'тревога' };
+  const KL = { order: 'заявка', op: 'оператор', shift: 'смена', alarm: 'тревога', role: 'доступ' };
   v.innerHTML = `<h2>Журнал</h2>
     <p class="note">Все записи сохраняются: кто, когда и что сделал, а также отклонения датчиков. Журнал выгружается в CSV для проверки и отчётов.</p>
-    <div class="row" style="margin:8px 0">${[['all', 'Все'], ['order', 'Заявки'], ['op', 'Операторы'], ['shift', 'Смены'], ['alarm', 'Тревоги']].map(([k, n]) => `<button class="chip" data-jf="${k}" aria-pressed="${f === k}">${n}</button>`).join('')}<button class="btn" id="csv" style="margin-left:auto">Выгрузить CSV</button></div>
+    <div class="row" style="margin:8px 0">${[['all', 'Все'], ['order', 'Заявки'], ['op', 'Операторы'], ['shift', 'Смены'], ['role', 'Доступ'], ['alarm', 'Тревоги']].map(([k, n]) => `<button class="chip" data-jf="${k}" aria-pressed="${f === k}">${n}</button>`).join('')}${ops.has('journal.export') ? '<button class="btn" id="csv" style="margin-left:auto">Выгрузить CSV</button>' : ''}</div>
     <div class="jr">${list.map((x) => `<div><time>${hm(x.ts)}</time><span>${esc(x.text)}<br><span class="note">${x.by ? esc(ops.name(x.by)) + ' · ' + ROLES[ops.user(x.by)?.role] : 'система'}</span></span><span class="tag ${x.kind === 'alarm' ? 'act' : 'open'}">${KL[x.kind]}</span></div>`).join('')}</div>`;
   v.querySelectorAll('[data-jf]').forEach((b) => (b.onclick = () => { st.jf = b.dataset.jf; viewJournal(v); }));
-  $('#csv').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ops.csv(plant.events)], { type: 'text/csv;charset=utf-8' })); a.download = 'zhurnal.csv'; a.click(); };
+  if ($('#csv')) $('#csv').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([ops.csv(plant.events)], { type: 'text/csv;charset=utf-8' })); a.download = 'zhurnal.csv'; a.click(); };
+}
+
+/* ---------- Роли и доступ ---------- */
+function viewRoles(v) {
+  const rid = st.rid && ops.roles[st.rid] ? st.rid : 'tech';
+  const r = ops.roles[rid], adm = rid === 'admin';
+  v.innerHTML = `<h2>Роли и доступ</h2>
+    <p class="note">Права каждой роли настраиваются индивидуально: можно включать и отключать доступ к разделам и действиям, назначать этапы заявки, добавлять свои роли. Итоговый состав ролей и прав согласуется при составлении технического задания.</p>
+    <div class="row" style="margin:8px 0">${Object.entries(ops.roles).map(([k, x]) => `<button class="chip" data-rid="${k}" aria-pressed="${k === rid}">${esc(x.name)}</button>`).join('')}<button class="chip" id="addRole">+ Новая роль</button></div>
+    <div class="two-col">
+      <div class="card"><h3>${esc(r.name)}</h3><p class="note">${adm ? 'Администратор имеет полный доступ, его права не редактируются.' : r.custom ? 'Индивидуальная роль предприятия.' : 'Базовая роль: права можно изменить.'}</p>
+        <b>Доступ к разделам и действиям</b>
+        <div class="perms">${PERMS.map(([k, n]) => `<label class="tg"><input type="checkbox" data-perm="${k}" ${adm || r.perms.includes(k) ? 'checked' : ''} ${adm ? 'disabled' : ''}> ${n}</label>`).join('')}</div></div>
+      <div class="card"><b>Какие этапы заявки ведёт роль</b>
+        <div class="perms">${STAGE_ORDER.filter((x) => ST[x].role).map((x) => `<label class="tg"><input type="checkbox" data-stage="${x}" ${adm || r.stages.includes(x) ? 'checked' : ''} ${adm ? 'disabled' : ''}> ${ST[x].label}</label>`).join('')}</div>
+        ${r.custom ? '<div class="row" style="margin-top:10px"><button class="btn" id="renRole">Переименовать</button><button class="btn" id="delRole">Удалить роль</button></div>' : ''}</div>
+    </div>
+    <h2>Сотрудники и их роли</h2>
+    <div style="overflow-x:auto"><table><tr><th>Сотрудник</th><th>Роль</th></tr>${ops.staff.map((u) => `<tr><td>${esc(u.name)}</td><td><select data-ur="${u.id}" ${u.role === 'admin' ? 'disabled' : ''}>${Object.entries(ops.roles).filter(([k]) => k !== 'admin' || u.role === 'admin').map(([k, x]) => `<option value="${k}" ${u.role === k ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></td></tr>`).join('')}</table></div>
+    <h2>Кого уведомлять</h2>
+    <div class="card"><p class="note">Уведомления получает роль, на чьём этапе находится заявка (в приложении, в Telegram или по почте, по темам: заявки, ожидание, согласования, история).</p>
+      <ul class="l">${STAGE_ORDER.filter((x) => ST[x].role).map((x) => `<li><b>${ST[x].label}</b> → ${esc(ops.stageRoles(x))}</li>`).join('')}</ul></div>`;
+  v.querySelectorAll('[data-rid]').forEach((b) => (b.onclick = () => { st.rid = b.dataset.rid; viewRoles(v); }));
+  v.querySelectorAll('[data-perm]').forEach((c) => (c.onchange = () => { ops.setPerm(rid, c.dataset.perm, c.checked); renderTabs(); toast('Доступ обновлён, запись в журнале'); }));
+  v.querySelectorAll('[data-stage]').forEach((c) => (c.onchange = () => { ops.setStage(rid, c.dataset.stage, c.checked); toast('Этапы роли обновлены'); }));
+  v.querySelectorAll('[data-ur]').forEach((x) => (x.onchange = () => { ops.setUserRole(x.dataset.ur, x.value); initWho(); renderTabs(); toast('Роль назначена'); }));
+  $('#addRole').onclick = () => { const n = prompt('Название новой роли (например, «Лаборант»):', ''); if (!n || !n.trim()) return; st.rid = ops.addRole(n.trim(), rid); viewRoles(v); };
+  const rn = $('#renRole'); if (rn) rn.onclick = () => { const n = prompt('Новое название роли:', r.name); if (n && n.trim()) { ops.renameRole(rid, n.trim()); initWho(); viewRoles(v); } };
+  const dl = $('#delRole'); if (dl) dl.onclick = () => { if (!ops.deleteRole(rid)) return toast('Нельзя удалить: роль назначена сотрудникам'); st.rid = 'tech'; initWho(); viewRoles(v); };
+}
+
+/* ---------- Премиксы ---------- */
+function viewPremix(v) {
+  const q = ops.orders.filter((o) => ['premix', 'correction'].includes(o.status));
+  const big = q.filter((o) => o.premixSize === 'большой'), small = q.filter((o) => o.premixSize !== 'большой');
+  const wait = ops.orders.filter((o) => o.status === 'check'), soon = ops.orders.filter((o) => o.status === 'tech');
+  const recipe = (o) => o.recipe ? Object.entries(o.recipe.items).map(([c, x]) => `${esc(c)} ${fmt(x, 2)} %`).join(' · ') : '—';
+  const card = (o) => {
+    const lastC = o.status === 'correction' ? o.corrections[o.corrections.length - 1] : null;
+    return `<div class="oc ${ops.canAct(o) ? 'mine' : ''}"><div class="hd"><div><b>${esc(o.no)} · ${esc(o.ral)}</b><div class="m">${esc(o.customer)} · заказ ${o.kg} кг · срок ${dt(o.due)}</div></div><span class="pill ${o.premixSize === 'большой' ? '' : 'g'}">${o.premixSize} · ${o.premixKg} кг</span></div>
+      <div class="m"><b>Рецепт v${o.recipe?.ver ?? '—'}:</b> ${recipe(o)}</div>
+      ${lastC ? `<div class="al act" style="border-left-color:var(--warn-dot)"><div class="t" style="font-size:13.5px">Корректировка №${lastC.n}: ${esc(lastC.note)}</div><div class="m">${esc(ops.name(lastC.by))}</div></div>` : ''}
+      ${orderActions(o)}<div><button class="btn" data-open="${o.id}">Подробнее</button></div></div>`;
+  };
+  v.innerHTML = `<h2>Премиксы</h2>
+    <div class="kpis"><div class="kpi"><small>Большие в очереди</small><b>${big.length}</b></div><div class="kpi"><small>Малые в очереди</small><b>${small.length}</b></div>
+      <div class="kpi ${wait.length ? 'w' : ''}"><small>Ждут проверки технолога</small><b>${wait.length}</b></div><div class="kpi"><small>Рецепты в подготовке</small><b>${soon.length}</b></div></div>
+    <h2>Большие премиксы</h2><div class="bl">${big.map(card).join('') || '<div class="empty">Очередь пуста.</div>'}</div>
+    <h2>Малые премиксы</h2><div class="bl">${small.map(card).join('') || '<div class="empty">Очередь пуста.</div>'}</div>
+    <h2>Готовы, ждут проверки цвета у технолога</h2><div class="bl">${wait.map((o) => `<div class="oc"><div class="hd"><div><b>${esc(o.no)} · ${esc(o.ral)}</b><div class="m">${esc(o.customer)} · ${recipe(o)}</div></div><span class="pill w">проверка</span></div><div class="m">Премикс ${o.premixSize}, ${o.premixKg} кг · технолог ${esc(ops.name(o.techId))}</div></div>`).join('') || '<div class="empty">Нет.</div>'}</div>`;
+  bindOrderActions(v, () => viewPremix(v));
+}
+
+/* ---------- Аналитика ---------- */
+function viewAnalytics(v) {
+  const sum = (arr, f) => arr.reduce((a, e) => a + f(e), 0);
+  const per = ops.lines.map((l) => { const e = ops.entries.filter((x) => x.lineId === l.id); return { name: l.name, out: sum(e.filter((x) => x.type === 'output'), (x) => x.kg || 0), waste: sum(e.filter((x) => x.type === 'waste'), (x) => x.kg || 0), down: sum(e.filter((x) => x.type === 'downtime' || x.type === 'replacement'), (x) => x.minutes || 0) }; });
+  const by = (type, key) => { const m = {}; ops.entries.filter((x) => x.type === type).forEach((x) => { const k = x.reason || x.text || 'Прочее'; m[k] = (m[k] || 0) + (key === 'kg' ? x.kg || 0 : x.minutes || 0); }); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
+  const wr = by('waste', 'kg'), dr = [...by('downtime', 'min'), ...by('replacement', 'min')].sort((a, b) => b[1] - a[1]);
+  const out = sum(per, (p) => p.out), waste = sum(per, (p) => p.waste), down = sum(per, (p) => p.down);
+  const ords = ops.orders.filter((o) => o.recipe);
+  const bar = (name, val, max, unit, cls = '') => `<div class="barrow"><span>${esc(name)}</span><div class="bt"><i class="${cls}" style="width:${max ? Math.max(3, (val / max) * 100) : 0}%"></i></div><b>${fmt(val, 0)} ${unit}</b></div>`;
+  const mo = Math.max(1, ...per.map((p) => p.out)), mw = Math.max(1, ...wr.map((x) => x[1])), md = Math.max(1, ...dr.map((x) => x[1]));
+  v.innerHTML = `<h2>Аналитика производства</h2>
+    <p class="note">Данные собираются из записей операторов, заявок и датчиков. В рабочей системе набор отчётов и показателей согласуется при составлении ТЗ.</p>
+    <div class="kpis"><div class="kpi"><small>Выпуск, кг</small><b>${out}</b></div><div class="kpi ${waste ? 'w' : ''}"><small>Отходы, кг</small><b>${waste}</b></div>
+      <div class="kpi"><small>Доля отходов</small><b>${out + waste ? fmt((waste / (out + waste)) * 100, 1) : '0'} %</b></div><div class="kpi"><small>Простои и замены, мин</small><b>${down}</b></div>
+      <div class="kpi"><small>Корректировок на заявку</small><b>${fmt(ops.kpi().corr, 1)}</b></div></div>
+    <div class="two-col">
+      <div class="card"><h3>Выпуск по линиям</h3>${per.map((p) => bar(p.name, p.out, mo, 'кг')).join('')}<h3 style="margin-top:14px">Отходы по линиям</h3>${per.map((p) => bar(p.name, p.waste, Math.max(1, ...per.map((x) => x.waste)), 'кг', 'w')).join('')}</div>
+      <div class="card"><h3>Причины отходов</h3>${wr.map(([n, x]) => bar(n, x, mw, 'кг', 'w')).join('') || '<p class="note">Записей нет.</p>'}<h3 style="margin-top:14px">Простои и замены</h3>${dr.map(([n, x]) => bar(n, x, md, 'мин', 'd')).join('') || '<p class="note">Записей нет.</p>'}</div>
+    </div>
+    <h2>Корректировки по заявкам</h2>
+    <div class="card">${ords.map((o) => bar(o.no + ' · ' + o.ral, o.corrections.length, Math.max(1, ...ords.map((x) => x.corrections.length)), 'корр.', o.corrections.length > 1 ? 'w' : '')).join('')}<p class="note" style="margin-top:8px">Цель системы: уменьшить число корректировок на заявку, быстрее выходить на цвет и сокращать отходы.</p></div>`;
+}
+
+/* ---------- Табель ---------- */
+function tabelHtml() {
+  const days = [...Array(14)].map((_, i) => new Date(plant.t - (13 - i) * 86400000));
+  const wd = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+  const rows = ops.staff.filter((u) => u.role !== 'admin').map((u, ix) => {
+    let tot = 0;
+    const cells = days.map((d, i) => {
+      const w = d.getDay(); let c = 'В', h = 0;
+      if ((ix * 5 + i * 3) % 17 === 0 && i < 13) { c = 'О'; }
+      else if (u.shift === 'ночь') { if ((i + ix) % 4 < 2) { c = 'Н'; h = 12; } }
+      else if (w !== 0 && w !== 6) { c = 'Д'; h = 8; }
+      if (i === 13 && !u.on && c !== 'В') { c = 'В'; h = 0; }
+      tot += h;
+      return `<td class="tc ${c}">${c}</td>`;
+    }).join('');
+    return `<tr><td class="nm">${esc(u.name)}<br><span class="note">${esc(ROLES[u.role])}</span></td>${cells}<td class="tt">${tot}</td></tr>`;
+  }).join('');
+  return `<div class="tw"><table class="tab"><tr><th class="nm">Сотрудник</th>${days.map((d, i) => `<th class="${i === 13 ? 'today' : ''}">${d.getDate()}<br><span>${wd[d.getDay()]}</span></th>`).join('')}<th>Часов</th></tr>${rows}</table></div>
+    <p class="note" style="margin-top:6px">Д — день (8 ч), Н — ночь (12 ч), В — выходной, О — отгул или отпуск. В рабочей системе табель формируется автоматически из отметок «Начать/закончить смену» и согласуется начальником смены.</p>`;
+}
+
+/* ---------- Состав и нагрев (опциональный химический модуль, демо) ---------- */
+const CH = { c: { ...BASE }, T: BASE_PROC.T, t: BASE_PROC.t };
+const RNG = { resin: [52, 64], hard: [3.7, 6.7], fill: [11, 23], pig: [12, 24], add: [0.3, 3.3] };
+const SC = { ok: ['var(--ok-dot)', 'в рабочем окне'], edge: ['#e9b8a8', 'на грани'], under: ['#e8c36a', 'недоотверждение'], burn: ['var(--danger-dot)', 'риск пригорания'] };
+const pc = (x, d = 1) => fmt(x, d);
+
+function viewChem(v) {
+  v.innerHTML = `<h2>Состав и нагрев</h2>
+    <p class="note">Опциональный модуль. Нейросеть сравнивает рецептуру с эталонной и считает результат при смещении ингредиентов и нагреве: цвет, блеск, степень отверждения, риск пригорания. В демо работает учебная модель с условными коэффициентами. В рабочей версии прогноз строится по данным ваших рецептур, режимов и результатов и проверяется на пилоте.</p>
+    <div class="two-col" style="margin-top:8px">
+      <div class="card"><h3>Рецептура, % масс.</h3>
+        ${Object.keys(BASE).map((k) => `<div class="sl"><div class="sh"><span>${NAMES[k]}</span><b id="cv-${k}"></b></div><input type="range" data-ing="${k}" min="${RNG[k][0]}" max="${RNG[k][1]}" step="0.1" value="${CH.c[k]}" aria-label="${NAMES[k]}"><small class="note">эталон ${pc(BASE[k])} %</small></div>`).join('')}
+        <h3 style="margin-top:12px">Нагрев</h3>
+        <div class="sl"><div class="sh"><span>Температура отверждения</span><b id="cv-T"></b></div><input type="range" id="chT" min="160" max="230" step="1" value="${CH.T}"></div>
+        <div class="sl"><div class="sh"><span>Время в печи</span><b id="cv-t"></b></div><input type="range" id="cht" min="5" max="25" step="0.5" value="${CH.t}"></div>
+        <button class="btn" id="chReset" style="margin-top:6px">Вернуть эталон</button></div>
+      <div class="card" id="chRes"></div>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="card"><h3>Карта режимов</h3><p class="note">Температура и время при текущей рецептуре. Зелёное: рабочее окно, жёлтое: недоотверждение, красное: риск пригорания.</p><div id="chMap"></div></div>
+      <div class="card"><h3>Рекомендации нейросети</h3><ul class="l" id="chAdv"></ul><p class="note" style="margin-top:10px">Состав: расчёт химического состава и подбор ингредиентов подключаются, если модуль добавлен в проект.</p></div>
+    </div>`;
+  v.querySelectorAll('[data-ing]').forEach((i) => i.oninput = () => { CH.c[i.dataset.ing] = parseFloat(i.value); paintChem(); });
+  $('#chT').oninput = (e) => { CH.T = parseFloat(e.target.value); paintChem(); };
+  $('#cht').oninput = (e) => { CH.t = parseFloat(e.target.value); paintChem(); };
+  $('#chReset').onclick = () => { CH.c = { ...BASE }; CH.T = BASE_PROC.T; CH.t = BASE_PROC.t; viewChem(v); };
+  paintChem();
+}
+
+function paintChem() {
+  if (!$('#chRes')) return;
+  const p = predict(CH.c, CH.T, CH.t), b = predict(BASE, BASE_PROC.T, BASE_PROC.t);
+  for (const k of Object.keys(BASE)) { const d = CH.c[k] - BASE[k]; $('#cv-' + k).textContent = `${pc(CH.c[k])} %${Math.abs(d) > 0.04 ? ` (${d > 0 ? '+' : ''}${pc(d)})` : ''}`; }
+  $('#cv-T').textContent = `${CH.T} °C${CH.T !== BASE_PROC.T ? ` (${CH.T > BASE_PROC.T ? '+' : ''}${CH.T - BASE_PROC.T})` : ''}`;
+  $('#cv-t').textContent = `${pc(CH.t)} мин`;
+  const [col, label] = SC[p.status];
+  const row = (n, a, c, d, bad) => `<tr><td>${n}</td><td>${a}</td><td><b>${c}</b></td><td class="${bad ? 'bad' : ''}">${d}</td></tr>`;
+  const sg = (x, dd = 1) => (x > 0 ? '+' : '') + pc(x, dd);
+  $('#chRes').innerHTML = `<div class="verdict" style="border-left:6px solid ${col}"><b>${label[0].toUpperCase() + label.slice(1)}</b><span class="note">Расчёт нейросети по текущей рецептуре и режиму</span></div>
+    <div class="stack">${Object.keys(BASE).map((k, i) => `<i style="width:${p.f[k]}%;background:${['#0c5c38', '#3dbe86', '#9bb8a8', '#e9b94a', '#6c8cbf'][i]}" title="${NAMES[k]} ${pc(p.f[k])} %"></i>`).join('')}</div>
+    <p class="note" style="margin:4px 0 10px">${Object.keys(BASE).map((k, i) => `<span style="color:${['#0c5c38', '#3dbe86', '#9bb8a8', '#b8860b', '#6c8cbf'][i]}">■</span> ${NAMES[k]} ${pc(p.f[k])}%`).join(' · ')}</p>
+    <div style="overflow-x:auto"><table class="cmpt"><tr><th>Показатель</th><th>Эталон</th><th>Ваш вариант</th><th>Разница</th></tr>
+      ${row('Степень отверждения', pc(b.alpha * 100, 0) + ' %', pc(p.alpha * 100, 0) + ' %', sg((p.alpha - b.alpha) * 100, 0) + ' п.п.', p.alpha < 0.9)}
+      ${row('Риск пригорания', pc(b.risk * 100, 0) + ' %', pc(p.risk * 100, 0) + ' %', sg((p.risk - b.risk) * 100, 0) + ' п.п.', p.risk > 0.25)}
+      ${row('Цвет, ΔE к эталону', '0,0', pc(p.dE, 1), 'ΔL ' + sg(p.dL) + ', Δb ' + sg(p.db), p.dE > 1)}
+      ${row('Блеск, GU', pc(b.gloss, 0), pc(p.gloss, 0), sg(p.gloss - b.gloss, 0), Math.abs(p.gloss - b.gloss) > 5)}
+      ${row('Стойкость плёнки, индекс', pc(b.resist, 0), pc(p.resist, 0), sg(p.resist - b.resist, 0), p.resist < b.resist - 8)}
+      ${row('Смола : отвердитель', pc(b.ratio, 1), pc(p.ratio, 1), sg(p.ratio - b.ratio), Math.abs(p.ratio / p.ideal - 1) > 0.06)}</table></div>`;
+  const w = window_(CH.c), cw = 28, ch = 22, ox = 44, oy = 8;
+  const cx = ox + ((CH.T - 160) / 5) * cw + cw / 2, cy = oy + ((CH.t - 5) / 2.5) * ch + ch / 2;
+  $('#chMap').innerHTML = `<svg viewBox="0 0 ${ox + w.Ts.length * cw + 6} ${oy + w.ts.length * ch + 34}" style="width:100%;height:auto;display:block">
+    ${w.cells.map((r, j) => r.map((s, i) => `<rect x="${ox + i * cw}" y="${oy + j * ch}" width="${cw - 1}" height="${ch - 1}" rx="3" fill="${SC[s][0]}" opacity="${s === 'ok' ? 0.85 : 0.9}"/>`).join('')).join('')}
+    ${w.Ts.filter((_, i) => i % 2 === 0).map((T) => `<text x="${ox + ((T - 160) / 5) * cw + cw / 2}" y="${oy + w.ts.length * ch + 14}" font-size="10" text-anchor="middle" fill="currentColor">${T}</text>`).join('')}
+    ${w.ts.filter((_, j) => j % 2 === 0).map((t, j) => `<text x="${ox - 6}" y="${oy + j * 2 * ch + ch / 2 + 3}" font-size="10" text-anchor="end" fill="currentColor">${t}</text>`).join('')}
+    <text x="${ox + (w.Ts.length * cw) / 2}" y="${oy + w.ts.length * ch + 29}" font-size="10.5" text-anchor="middle" fill="currentColor" opacity=".7">температура, °C</text>
+    <text x="8" y="${oy + 10}" font-size="10.5" fill="currentColor" opacity=".7">мин</text>
+    <circle cx="${cx}" cy="${cy}" r="9" fill="#fff" stroke="#14202e" stroke-width="2.5"/></svg>`;
+  $('#chAdv').innerHTML = advice(CH.c, CH.T, CH.t).map((x) => `<li>${esc(x)}</li>`).join('');
 }
 
 /* ---------- цикл ---------- */

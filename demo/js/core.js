@@ -286,9 +286,9 @@ export class Plant {
   }
 
   /** Ответ помощника технолога (демо: по правилам и базе знаний; в продукте — локальная языковая модель) */
-  assistant(q) {
+  assistant(q, extra = []) {
     const t = (q || '').toLowerCase();
-    const open = this.items.filter((i) => i.level !== 'ok');
+    const open = [...this.items, ...extra].filter((i) => i.level !== 'ok');
     const lines = [];
     const list = (arr) => arr.map((i) => `• ${i.text}${i.advice ? '\n   Что проверить: ' + i.advice : ''}`).join('\n');
     const has = (...w) => w.some((x) => t.includes(x));
