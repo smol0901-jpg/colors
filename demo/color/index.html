@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Коррекция цвета по L*a*b*: покажите образец на графике и узнайте, какой колорант и сколько % добавить." />
+  <title>Коррекция цвета · DEMO v0.4.0</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+  <header>
+    <h1><span id="appName">Коррекция цвета</span> <span class="badge" id="appBadge">DEMO v0.4.0</span></h1>
+    <p class="subtitle">Покажите пальцем, где образец относительно эталона — получите, что и сколько % добавить.</p>
+  </header>
+
+  <main class="layout">
+    <section class="col-plot">
+      <div class="card">
+        <div class="plot-head">
+          <h2>Где образец?</h2>
+          <div class="zoom" id="zoom">
+            <span>Масштаб ±</span>
+            <button data-r="0.5">0,5</button>
+            <button data-r="2.5">2,5</button>
+            <button data-r="5">5</button>
+            <button data-r="10">10</button>
+            <button data-r="20" class="active">20</button>
+            <button data-r="40">40</button>
+          </div>
+        </div>
+        <div class="zoom-custom">
+          <label for="rangeSlider">Свой масштаб ±</label>
+          <input type="range" id="rangeSlider" min="0" max="3000" step="1" value="2301" />
+          <input type="number" id="rangeNum" min="0.1" max="100" step="any" value="20" inputmode="decimal" aria-label="Масштаб от 0,1 до 100" />
+        </div>
+        <div class="plot-wrap">
+          <div class="plot-box"><canvas id="plot" class="plot"></canvas></div>
+          <div class="strip-box"><canvas id="lstrip" class="lstrip"></canvas></div>
+        </div>
+        <p class="note">Центр графика — <b>эталон</b>. Коснитесь графика или потяните точку — это <b>образец</b> (a*, b*). Полоса справа — светлее/темнее (L*). Белая стрелка показывает, куда надо сдвинуть образец.</p>
+      </div>
+    </section>
+
+    <section class="col-ctrl">
+      <div class="card">
+        <h2>Прибор</h2>
+        <div class="opts">
+          <label>Модель / геометрия
+            <select id="instModel">
+              <option>spectro2guide 45/0</option>
+              <option>spectro2guide d/8 SCI (с блеском)</option>
+              <option>spectro2guide d/8 SCE (без блеска)</option>
+              <option>spectro-guide 45/0 gloss</option>
+              <option>spectro-guide sphere gloss</option>
+            </select>
+          </label>
+          <label>Источник / наблюдатель
+            <select id="instIllum">
+              <option>D65 / 10°</option><option>D65 / 2°</option><option>D50 / 2°</option><option>C / 2°</option>
+            </select>
+          </label>
+        </div>
+        <p class="note">Сравнивайте только замеры, сделанные с одинаковыми настройками. Они сохраняются в истории вместе с замером.</p>
+      </div>
+
+      <div class="card">
+        <h2>Быстрый ввод с прибора</h2>
+        <input id="pasteBox" placeholder="Вставьте: L* a* b* (например 43,36  44,41  25,67)" autocomplete="off" />
+        <div class="btn-row">
+          <button class="secondary" data-paste="std">→ в эталон</button>
+          <button class="secondary" data-paste="sam">→ в образец</button>
+          <button class="secondary" data-paste="delta">→ как Δ образца</button>
+        </div>
+        <p class="note" id="pasteStatus">Берутся первые три числа из строки: L*, a*, b* (или ΔL*, Δa*, Δb* для «как Δ»).</p>
+      </div>
+
+      <div class="card">
+        <h2>Эталон (замер прибора или RAL)</h2>
+        <div class="ral-search">
+          <input id="ralSearch" type="search" inputmode="search" placeholder="Код RAL: 3001, RAL 7035 или название" autocomplete="off" />
+          <button id="ralBtn">Найти</button>
+        </div>
+        <div id="ralResults" class="ral-results"></div>
+        <p class="note" id="ralStatus"></p>
+        <div class="inputs">
+          <label>L*<input type="number" id="stdL" step="any" inputmode="decimal" value="62.5" /></label>
+          <label>a*<input type="number" id="stdA" step="any" inputmode="decimal" value="18.2" /></label>
+          <label>b*<input type="number" id="stdB" step="any" inputmode="decimal" value="42.8" /></label>
+        </div>
+        <input type="text" id="stdName" value="Эталон" aria-label="Название эталона" />
+        <label>Блеск 60°, GU (необязательно)<input type="number" id="stdG" step="any" inputmode="decimal" /></label>
+      </div>
+
+      <div class="card">
+        <h2>Образец</h2>
+        <div class="seg" id="modeSeg">
+          <button id="modeAbs" class="active">L*a*b* образца</button>
+          <button id="modeDelta">Δ с экрана прибора</button>
+        </div>
+        <div class="inputs" id="absRow">
+          <label>L*<input type="number" id="samL" step="any" inputmode="decimal" value="58.1" /></label>
+          <label>a*<input type="number" id="samA" step="any" inputmode="decimal" value="22.4" /></label>
+          <label>b*<input type="number" id="samB" step="any" inputmode="decimal" value="38.9" /></label>
+        </div>
+        <div class="inputs" id="deltaRow" hidden>
+          <label>ΔL*<input type="number" id="dsL" step="any" inputmode="decimal" value="0" /></label>
+          <label>Δa*<input type="number" id="dsA" step="any" inputmode="decimal" value="0" /></label>
+          <label>Δb*<input type="number" id="dsB" step="any" inputmode="decimal" value="0" /></label>
+        </div>
+        <input type="text" id="samName" value="Образец" aria-label="Название образца" />
+        <label>Блеск 60°, GU (необязательно)<input type="number" id="samG" step="any" inputmode="decimal" /></label>
+        <p class="note">Знак Δ как на приборе: образец минус эталон (ΔL* плюс — образец светлее, Δa* плюс — краснее, Δb* плюс — желтее). Можно просто ткнуть по графику.</p>
+      </div>
+    </section>
+  </main>
+
+  <section class="card wide">
+    <h2>Цвета и разница</h2>
+    <div class="swatches">
+      <div class="swatch" id="swatchStd"><span>Эталон</span></div>
+      <div class="swatch" id="swatchSam"><span>Образец</span></div>
+      <div class="swatch" id="swatchPred"><span>После добавки</span></div>
+    </div>
+    <p class="verdict" id="descr"></p>
+    <div class="deltas">
+      <div class="delta"><div class="val" id="dL">—</div><div class="lbl">ΔL* светлота</div></div>
+      <div class="delta"><div class="val" id="dA">—</div><div class="lbl">Δa* красн./зел.</div></div>
+      <div class="delta"><div class="val" id="dB">—</div><div class="lbl">Δb* жёлт./синий</div></div>
+      <div class="delta"><div class="val" id="dC">—</div><div class="lbl">ΔC* насыщенность</div></div>
+      <div class="delta"><div class="val" id="dH">—</div><div class="lbl">ΔH* оттенок</div></div>
+      <div class="delta"><div class="val" id="dE">—</div><div class="lbl">ΔE*ab</div></div>
+      <div class="delta"><div class="val" id="dE00">—</div><div class="lbl">ΔE00</div></div>
+      <div class="delta"><div class="val" id="dCMC">—</div><div class="lbl">ΔE CMC 2:1</div></div>
+      <div class="delta" id="tileG" hidden><div class="val" id="dG">—</div><div class="lbl">ΔGloss 60°, GU</div></div>
+    </div>
+  </section>
+
+  <section class="card wide">
+    <h2>Рецептура (ТТК): % пигмента в замесе</h2>
+    <p class="note">Укажите, сколько % каждого пигмента стоит в рецептуре по ТТК. Тогда доза коррекции считается как у вас на калькуляторе: <b>масса × % пигмента в ТТК × % добавки = граммы</b>. Пигмента нет в ТТК — доза покажется в % от массы.</p>
+    <div class="seg" id="unitSeg">
+      <button id="unitTtk" class="active">Доза в % от пигмента ТТК</button>
+      <button id="unitMass">Доза в % от массы</button>
+    </div>
+    <div id="ttkTable" class="ttk"></div>
+  </section>
+
+  <section class="card wide">
+    <h2>Что добавить</h2>
+    <p class="note" id="brainStatus">🧠 нейросеть: запуск…</p>
+    <div class="opts">
+      <label>Масса для коррекции, кг (по регламенту)<input type="number" id="batchKg" step="any" inputmode="decimal" min="0" value="1" /></label>
+      <label class="chk"><input type="checkbox" id="growMass" /> Учитывать рост массы после добавки</label>
+      <label>Допуск
+        <input type="number" id="tol" step="any" min="0" value="1" /></label>
+      <label>Формула допуска
+        <select id="tolFormula"><option value="dE">ΔE*ab</option><option value="dE00">ΔE00</option><option value="dCMC">ΔE CMC 2:1</option></select></label>
+      <div class="frac">
+        <span>Доля от полной дозы</span>
+        <div id="fracBtns">
+          <button data-f="auto" class="active">Авто</button>
+            <button data-f="0.5">50 %</button>
+          <button data-f="0.75">75 %</button>
+          <button data-f="1">100 %</button>
+        </div>
+      </div>
+    </div>
+    <div id="advice" class="advice"></div>
+    <p class="note" id="learnStatus"></p>
+    <div class="btn-row">
+      <button id="btnHistory">Записать замер в историю</button>
+      <button class="secondary" id="btnSwap">Поменять эталон/образец</button>
+    </div>
+  </section>
+
+  
+
+  <details class="card wide">
+    <summary>Колоранты и их сила (на 1 % добавки)</summary>
+    <p class="note">Стартовые значения ориентировочные. Правьте под свои материалы. Снимите галочку у колоранта, которого нет в наличии. Колонка «× сила» — поправка силы краски: уточняется сама по вашим замерам после добавок (1,00 = как в таблице).</p>
+    <div id="colorantTable" class="ctable"></div>
+    <div class="btn-row"><button class="secondary" id="btnResetColorants">Сбросить к стартовым</button><button class="secondary" id="btnResetStrength">Сбросить калибровку силы</button><button class="secondary" id="btnRetrain">Переобучить нейросеть</button></div>
+  </details>
+
+  <details class="card wide">
+    <summary>Для продукта: подключение LLM (план)</summary>
+    <p class="note">В демо советы считает малая нейросеть прямо в браузере. В рабочей версии рекомендации будут идти через LLM по серверному шлюзу (ключи API нельзя держать на GitHub Pages). Планируемые провайдеры:</p>
+    <div class="ral-results" id="llmList"></div>
+    <p class="note">Уже сейчас можно скопировать готовый запрос (система + данные замера) и вставить в любой чат с LLM.</p>
+    <div class="btn-row"><button id="btnCopyLLM">Скопировать запрос для LLM</button></div>
+    <p class="note" id="llmStatus"></p>
+  </details>
+
+  <section class="card wide">
+    <h2>История замеров</h2>
+    <div class="history-list" id="historyList"></div>
+    <div class="btn-row"><button class="secondary" id="btnClearHistory">Очистить историю</button></div>
+  </section>
+
+  <section class="card wide">
+    <h2>Справочник RAL Classic <span id="ralCount" class="note"></span></h2>
+    <div class="ral-filter" id="ralFilter">
+      <button data-g="" class="active">Все</button><button data-g="1">1 жёлт.</button><button data-g="2">2 оранж.</button><button data-g="3">3 красн.</button><button data-g="4">4 фиол.</button><button data-g="5">5 синие</button><button data-g="6">6 зелён.</button><button data-g="7">7 серые</button><button data-g="8">8 коричн.</button><button data-g="9">9 бел./чёрн.</button>
+    </div>
+    <p class="note">Нажмите на цвет — он станет эталоном. Экран ≠ RAL-карта: для точной работы используйте замер прибора. Значения с «≈» — оценка по sRGB.</p>
+    <div class="ral-grid" id="ralGrid"></div>
+  </section>
+
+  <div class="footer" id="footer">Демо-версия · расчёт локальный · проверяйте замером</div>
+
+  <script src="js/version.js"></script>
+  <script src="js/lab.js"></script>
+  <script src="js/colorants.js"></script>
+  <script src="js/dosing.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/nn.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/llm.js"></script>
+  <script src="js/plot.js"></script>
+  <script src="js/ral-data.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

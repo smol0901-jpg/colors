@@ -36,12 +36,12 @@ section:first-of-type{border-top:0}
 /* nav */
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
-.brand{font-weight:800;letter-spacing:-.01em;text-decoration:none;display:flex;gap:10px;align-items:center}
+.brand{white-space:nowrap;font-weight:800;letter-spacing:-.01em;text-decoration:none;display:flex;gap:10px;align-items:center}
 .brand i{width:22px;height:22px;border-radius:6px;background:var(--ink);position:relative;display:block}
 .brand i:before,.brand i:after{content:"";position:absolute;background:var(--paper)}
 .brand i:before{left:10.5px;top:4px;bottom:4px;width:1.5px}
 .brand i:after{top:10.5px;left:4px;right:4px;height:1.5px}
-nav{display:flex;gap:18px;font-size:15px;overflow-x:auto;white-space:nowrap}
+nav{display:flex;gap:16px;font-size:15px;overflow-x:auto;white-space:nowrap}
 nav a{text-decoration:none;color:var(--ink2)}
 nav a:hover{color:var(--ink)}
 @media(max-width:700px){nav{display:none}}
@@ -121,6 +121,11 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
 .contact a.big{display:block;font-size:clamp(22px,3.4vw,30px);font-weight:800;text-decoration:none;letter-spacing:-.01em;margin:4px 0}
 .small{font-size:13px;color:var(--ink2)}
 @media print{header.top{display:none}section{padding:28px 0;break-inside:avoid}}
+
+.phones4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+@media(max-width:900px){.phones4{grid-template-columns:repeat(2,1fr)}}
+.demo-btn{display:inline-block;margin-top:18px;background:var(--ink);color:var(--paper);text-decoration:none;padding:13px 22px;border-radius:10px;font-weight:700}
+.sysblock{margin-top:56px}
 </style>
 </head>
 <body>
@@ -129,10 +134,12 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
   <div class="wrap">
     <a class="brand" href="#top"><i></i>Цвет и контроль</a>
     <nav>
-      <a href="#how">Как это работает</a>
-      <a href="#axes">Оси L*a*b*</a>
-      <a href="#device">Прибор и планшет</a>
-      <a href="#control">Контроль производства</a>
+      <a href="#how">Как работает</a>
+      <a href="#axes">Оси</a>
+      <a href="#device">Прибор</a>
+      <a href="#system">Система</a>
+      <a href="#control">Контроль</a>
+      <a href="#scale">Масштаб</a>
       <a href="#terms">Сроки и формат</a>
       <a href="#contact">Контакты</a>
     </nav>
@@ -283,6 +290,134 @@ footer{padding:64px 0;border-top:1px solid var(--line)}
 
     <figure class="shot" style="margin-top:20px"><img src="img/zhur-realtime.webp" alt="Всё в реальном времени: холодильники, линии, отклонения, УФ" loading="lazy"><figcaption>Что контролируется: температура, линии и этапы, отклонения, ресурс ламп. Выгрузка в PDF</figcaption></figure>
     <span class="tag">Скриншоты ZHUR показывают логику контроля; для вашего предприятия набор параметров настраивается заново (например: печи, температуры, влажность, время цикла).</span>
+  </div>
+</section>
+
+<section id="system">
+  <div class="wrap">
+    <h2>Система в работе: от заявки до готовой партии</h2>
+    <p class="lead">Единая картина для всех участников: заявки, задачи, рецепты, премиксы, корректировки, линии, операторы, отходы, простои, температуры и журналы. Ниже скриншоты демонстрационной версии. Этапы, роли и нормы настраиваются под процессы конкретного предприятия.</p>
+    <a class="demo-btn" href="demo/index.html">Открыть интерактивное демо</a>
+    <p class="small" style="margin-top:10px">В демо можно переключать роли («Работаю как»), двигать заявку по этапам, вносить данные оператора и запускать сценарии отклонений. Данные в демо имитируются.</p>
+
+    <div class="steps sysblock">
+      <div class="step">
+        <div class="txt">
+          <h3>Центр управления</h3>
+          <p>Сводка по производству: тревоги, внимание, датчики онлайн, заявки и линии в работе, число корректировок на заявку. Каждое отклонение сопровождается подсказкой, что проверить, и кнопками «Принял» и «Не критично».</p>
+        </div>
+        <figure class="shot"><img src="img/system/center.webp" alt="Центр управления: сводка, отклонения и линии" loading="lazy"><figcaption>Скриншот демо: центр управления</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Путь заявки</h3>
+          <p>Заявка проходит этапы: обработка, задача технологу, рецепт, премикс (малый или большой), проверка и корректировки, запуск на линии, контроль качества. На каждом этапе отвечает своя роль и видит только свои задачи: «Ждут меня».</p>
+        </div>
+        <figure class="shot"><img src="img/system/orders.webp" alt="Путь заявки и список заявок по ролям" loading="lazy"><figcaption>Скриншот демо: заявки и этапы</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Заявка подробно</h3>
+          <p>Рецепт, размер премикса, режим на линии по задаче, список корректировок, история действий и комментарии участников. Ничего не теряется между технологом, премиксом и линией.</p>
+        </div>
+        <figure class="shot"><img src="img/system/order-detail.webp" alt="Карточка заявки: рецепт, корректировки, история" loading="lazy"><figcaption>Скриншот демо: карточка заявки</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Линии и установки операторов</h3>
+          <p>Видно, какая линия работает, какая свободна, чем занята и кто оператор. Для каждой линии рядом: режим по задаче, установка оператора и реальная температура в данный момент. Если оператор выставил значение вне задачи или факт расходится с установкой, система сразу показывает отклонение.</p>
+        </div>
+        <figure class="shot"><img src="img/system/lines.webp" alt="Линии: задача, установка оператора, реальная температура, отклонения" loading="lazy"><figcaption>Скриншот демо: линии и отклонения</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Оператор вносит данные с телефона</h3>
+          <p>Выпуск, отходы с причиной, простои, замены, установки и заметки. Каждая запись попадает в журнал с именем и временем. Оператор вносит данные только по своей линии, начальник смены по любой.</p>
+        </div>
+        <div class="phones4" style="margin-top:0;grid-template-columns:repeat(2,1fr)">
+          <figure class="shot"><img src="img/system/m-lines.webp" alt="Линии на телефоне" loading="lazy"><figcaption>Линия на телефоне</figcaption></figure>
+          <figure class="shot"><img src="img/system/m-entry.webp" alt="Ввод данных оператором" loading="lazy"><figcaption>Ввод отхода</figcaption></figure>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Смена и персонал</h3>
+          <p>Кто сейчас на смене, на какой линии и сколько часов отработано. Итоги смены: выпуск, отходы, простои. Начальник смены передаёт смену одной записью, в которую автоматически попадает число открытых отклонений.</p>
+        </div>
+        <figure class="shot"><img src="img/system/shift.webp" alt="Смена: итоги, задачи, персонал, передача смены" loading="lazy"><figcaption>Скриншот демо: смена и персонал</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Журналы</h3>
+          <p>Все действия людей и отклонения датчиков сохраняются: кто, когда и что сделал. Фильтры по заявкам, операторам, сменам и тревогам, выгрузка в CSV для проверок и отчётов.</p>
+        </div>
+        <figure class="shot"><img src="img/system/journal.webp" alt="Журнал действий и отклонений" loading="lazy"><figcaption>Скриншот демо: журнал</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Датчики в реальном времени</h3>
+          <p>Температуры, скорость конвейера, влажность камеры, аспирация, толщина покрытия, цвет. Для каждого параметра норма, график за последние минуты и прогноз выхода за границу ещё до появления брака.</p>
+        </div>
+        <figure class="shot"><img src="img/system/sensors.webp" alt="Датчики производства и их тренды" loading="lazy"><figcaption>Скриншот демо: датчики</figcaption></figure>
+      </div>
+
+      <div class="step">
+        <div class="txt">
+          <h3>Коррекция цвета</h3>
+          <p>Модуль для работы со спектрофотометром: график a*b*, подсказка, какой колорант и сколько процентов добавить. Меньше корректировок и быстрее выход на цвет.</p>
+        </div>
+        <figure class="shot"><img src="img/system/color.webp" alt="Коррекция цвета на графике a*b*" loading="lazy"><figcaption>Скриншот демо: коррекция цвета</figcaption></figure>
+      </div>
+    </div>
+
+    <h3 style="margin-top:56px;font-size:26px">Кто что делает</h3>
+    <div class="cols">
+      <div class="box"><h3>Менеджер</h3><p>Принимает и обрабатывает заявки, формирует задачи.</p></div>
+      <div class="box"><h3>Технолог</h3><p>Составляет рецепт, задаёт режим, проверяет цвет, назначает корректировки.</p></div>
+      <div class="box"><h3>Оператор премиксов</h3><p>Делает малые и большие премиксы, сообщает технологу о готовности.</p></div>
+      <div class="box"><h3>Начальник смены</h3><p>Назначает линию и оператора, контролирует смену, передаёт смену.</p></div>
+      <div class="box"><h3>Оператор линии</h3><p>Выставляет установки, вносит выпуск, отходы, простои и замены.</p></div>
+      <div class="box"><h3>Администратор</h3><p>Настраивает роли, этапы, нормы и доступы.</p></div>
+    </div>
+
+    <div class="phones4">
+      <figure class="shot"><img src="img/system/m-center.webp" alt="Центр управления на телефоне" loading="lazy"><figcaption>Центр на телефоне</figcaption></figure>
+      <figure class="shot"><img src="img/system/m-orders.webp" alt="Заявки на телефоне, роль оператора премиксов" loading="lazy"><figcaption>Заявки: задачи оператора премиксов</figcaption></figure>
+      <figure class="shot"><img src="img/system/scale.webp" alt="Модули и масштаб нейросети" loading="lazy" style="height:100%;object-fit:cover"><figcaption>Модули и масштаб</figcaption></figure>
+      <figure class="shot"><img src="img/system/lines.webp" alt="Линии" loading="lazy" style="height:100%;object-fit:cover;object-position:left top"><figcaption>Линии и отклонения</figcaption></figure>
+    </div>
+    <p class="small" style="margin-top:14px;max-width:80ch">Скриншоты сделаны в демонстрационной версии: данные имитируются, имена и заказчики вымышленные. Названия этапов, роли, нормы и поля настраиваются под процессы предприятия.</p>
+  </div>
+</section>
+
+<section id="scale">
+  <div class="wrap">
+    <h2>Единая система или отдельные модули</h2>
+    <p class="lead">Контроль качества и безопасности продукции можно внедрить целиком: меньше брака, меньше корректировок, быстрее запуск и выше производительность. Либо внедрять модули по одному, под конкретную задачу.</p>
+    <div class="cols">
+      <div class="box"><h3>Цвет и коррекция</h3><p>Спектрофотометр, RAL, расчёт колоранта и дозы. Меньше корректировок.</p></div>
+      <div class="box"><h3>Процесс и датчики</h3><p>Смешение, экструзия, помол, нанесение, печь. Прогноз отклонений до появления брака.</p></div>
+      <div class="box"><h3>Партии и прослеживаемость</h3><p>Номер партии, паспорт качества, этикетка, срок хранения.</p></div>
+      <div class="box"><h3>Безопасность</h3><p>Контроль параметров, влияющих на безопасность: аспирация, температуры, журнал отклонений.</p></div>
+      <div class="box"><h3>Помощник технолога</h3><p>Подсказывает причины отклонений и порядок проверки. Работает на вашем сервере.</p></div>
+    </div>
+
+    <h3 style="margin-top:40px;font-size:26px">Нейросеть подбирается под масштаб предприятия</h3>
+    <p class="lead" style="margin-top:8px">Система работает на вашем сервере локально, данные остаются на предприятии. Размер нейронной сети выбирается под объём данных и задачу.</p>
+    <div class="tl">
+      <div><b>≈ 0,05 млн</b><span>параметров. Малое предприятие, одна линия: подбор дозы колоранта, контроль ключевых параметров.</span></div>
+      <div><b>≈ 0,1 млн</b><span>параметров. Малое предприятие, несколько линий: прогноз отклонений по 10–20 датчикам.</span></div>
+      <div><b>от 0,5 млн</b><span>параметров и выше. Завод: единая модель по всему циклу, много датчиков и приборов.</span></div>
+      <div><b>Расширенный</b><span>Более продвинутая архитектура нейронной сети для мощного оборудования, подбирается под задачу.</span></div>
+    </div>
+    <p class="small" style="margin-top:14px;max-width:80ch">Число параметров характеризует размер сети, а не качество: его подбирают под ваши данные. Эффект (меньше брака, меньше корректировок) оценивается на пилоте по реальным данным предприятия. Демонстрационная версия центра управления показывает принцип: данные в ней имитируются.</p>
   </div>
 </section>
 
