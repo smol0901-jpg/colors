@@ -1,3 +1,4 @@
+import { viewVision } from './vision.js';
 import { Plant, STAGES, fmt } from './core.js';
 import { BASE, NAMES, BASE_PROC, predict, advice, window_ } from './chem.js';
 import { Ops, ROLES, PERMS, ST, STAGE_ORDER, ENTRY, WASTE_REASONS, REPL } from './ops.js';
@@ -20,8 +21,8 @@ const ICON = {
   system: '<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><path d="M12 7v3M10.5 13.5L6.5 16.5M13.5 13.5l4 3"/>',
 };
 const TABS = [['center', 'Центр'], ['lines', 'Линии'], ['orders', 'Заявки'], ['shift', 'Смена'], ['more', 'Ещё']];
-const NAV = { color: 'more', batches: 'more', journal: 'more', helper: 'more', system: 'more', premix: 'more', analytics: 'more', roles: 'more', chem: 'more' };
-const NEED = { lines: 'lines.view', orders: 'orders.view', shift: 'shift.view', color: 'color.use', batches: 'batches.view', journal: 'journal.view', premix: 'premix.view', analytics: 'analytics.view', roles: 'roles.manage', chem: 'chem.use' };
+const NAV = { color: 'more', batches: 'more', journal: 'more', helper: 'more', system: 'more', premix: 'more', analytics: 'more', roles: 'more', chem: 'more', vision: 'more' };
+const NEED = { lines: 'lines.view', orders: 'orders.view', shift: 'shift.view', color: 'color.use', batches: 'batches.view', journal: 'journal.view', premix: 'premix.view', analytics: 'analytics.view', roles: 'roles.manage', chem: 'chem.use', vision: 'lines.view' };
 const tabOk = (t) => !NEED[t] || ops.has(NEED[t]);
 const st = { tab: 'center', filter: 'all', chat: [], tier: 'f', sig: {} };
 
@@ -35,7 +36,7 @@ function go(tab) {
   st.tab = tab; st.sig = {};
   renderTabs();
   const v = $('#view');
-  ({ center: viewCenter, lines: viewLines, orders: viewOrders, shift: viewShift, more: viewMore, color: viewColor, batches: viewBatches, journal: viewJournal, helper: viewHelper, system: viewSystem, premix: viewPremix, analytics: viewAnalytics, roles: viewRoles, chem: viewChem })[tab](v);
+  ({ center: viewCenter, lines: viewLines, orders: viewOrders, shift: viewShift, more: viewMore, color: viewColor, batches: viewBatches, journal: viewJournal, helper: viewHelper, system: viewSystem, premix: viewPremix, analytics: viewAnalytics, roles: viewRoles, chem: viewChem, vision: (x) => viewVision(x, plant, ops) })[tab](v);
   window.scrollTo({ top: 0 });
 }
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
@@ -63,6 +64,8 @@ function viewCenter(v) {
       <button class="chip" data-sc="belt">Конвейер ускорился</button>
       <button class="chip" data-sc="dust">Слабая аспирация</button>
       <button class="chip" data-sc="color">Цвет уходит</button>
+      <button class="chip" data-sc="stretch">Чипсы тянутся</button>
+      <button class="chip" data-sc="burn">Вкрапления от шнека</button>
       <button class="chip" data-sc="reset">Сбросить</button>
     </div>
     <p class="note" style="margin-top:8px">Сценарии плавно меняют имитируемые датчики: видно, как система сначала прогнозирует выход за норму, затем поднимает тревогу и подсказывает, что проверить.</p>`;
@@ -541,7 +544,7 @@ function viewShift(v) {
 
 /* ---------- Ещё и журнал ---------- */
 function viewMore(v) {
-  const m = [['premix', 'Премиксы', 'Очередь малых и больших премиксов, корректировки'], ['color', 'Цвет', 'Коррекция цвета: график a*b*, колорант и % добавки'], ['chem', 'Состав и нагрев', 'Опционально: прогноз результата при смещении ингредиентов и нагреве'], ['batches', 'Партии', 'Готовая продукция, паспорт качества и этикетка'], ['analytics', 'Аналитика', 'Выпуск, отходы, простои и корректировки по линиям'], ['journal', 'Журнал', 'Все действия людей и отклонения, выгрузка в CSV'], ['roles', 'Роли и доступ', 'Права каждой роли настраиваются индивидуально'], ['helper', 'Помощник', 'Подсказки технологу по текущему состоянию'], ['system', 'Система', 'Модули, масштаб нейросети, схема, демо и рабочая версия']].filter(([k]) => tabOk(k));
+  const m = [['premix', 'Премиксы', 'Очередь малых и больших премиксов, корректировки'], ['color', 'Цвет', 'Коррекция цвета: график a*b*, колорант и % добавки'], ['vision', 'Визуальный контроль', 'Лента и чипсы: излом, вкрапления, толщина, температура по длине'], ['chem', 'Состав и нагрев', 'Опционально: прогноз результата при смещении ингредиентов и нагреве'], ['batches', 'Партии', 'Готовая продукция, паспорт качества и этикетка'], ['analytics', 'Аналитика', 'Выпуск, отходы, простои и корректировки по линиям'], ['journal', 'Журнал', 'Все действия людей и отклонения, выгрузка в CSV'], ['roles', 'Роли и доступ', 'Права каждой роли настраиваются индивидуально'], ['helper', 'Помощник', 'Подсказки технологу по текущему состоянию'], ['system', 'Система', 'Модули, масштаб нейросети, схема, демо и рабочая версия']].filter(([k]) => tabOk(k));
   v.innerHTML = `<h2>Разделы</h2><div class="menu">${m.map(([k, n, d]) => `<button data-go="${k}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>`;
   v.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => go(b.dataset.go)));
 }
