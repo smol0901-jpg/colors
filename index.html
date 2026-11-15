@@ -326,6 +326,30 @@ body.pm main>section.cur{display:block}
 .eq-list{display:none;gap:18px;margin-top:16px}.eq-list.on{display:grid}
 .eqf img{border-radius:12px;border:1px solid var(--line);width:100%;height:auto;display:block}
 @media(max-width:820px){.vsw .vgrid{grid-template-columns:1fr}}
+.cp{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:14px;color:var(--fg,var(--ink));font-size:14px}
+.cp h4{margin:0 0 8px;font-size:15px}.cp .k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.cp .k div{border:1px solid var(--line);border-radius:10px;padding:8px 10px}.cp .k span{display:block;font-size:12px;color:var(--muted,var(--ink2))}.cp .k b{font-size:19px}
+.cp .g{display:grid;gap:9px;margin:6px 0 12px}.cp .g div{display:grid;grid-template-columns:128px 1fr auto;gap:10px;align-items:center;font-size:13px}
+.cp .g i{display:block;height:10px;border-radius:5px;background:var(--line);overflow:hidden}.cp .g u{display:block;height:100%;text-decoration:none;border-radius:5px}
+.cp .b{border-radius:10px;padding:10px 12px;margin:10px 0;border:1px solid;font-size:13.5px}
+.cp .b.ok{background:var(--ok-bg,#d7f0e3);border-color:var(--ok-dot,var(--g))}.cp .b.warn{background:var(--warn-bg,#f8e7c4);border-color:var(--warn-dot,var(--y))}.cp .b.over{background:var(--danger-bg,#f8dcd9);border-color:var(--danger-dot,var(--r))}
+.cp .b b{display:block;margin-bottom:2px}.cp .n{font-size:12.5px;color:var(--muted,var(--ink2));margin:6px 0 0}
+@media(max-width:640px){.cp .k{grid-template-columns:repeat(2,1fr)}.cp .g div{grid-template-columns:96px 1fr auto}}
+.scrf{margin:0}.scrf figcaption{margin-top:8px;font-size:13px;color:var(--ink2)}
+.scr{--card:#f7fbf8;--line:#c5d5cb;--fg:#102117;--muted:#3c5146;--ok-dot:#1f9d5c;--warn-dot:#e29a12;--danger-dot:#c9342b;--ok-bg:#d7f0e3;--warn-bg:#f8e7c4;--danger-bg:#f8dcd9;--tint:#dceee3;--accent:#0c5c38;background:#e7efe9;color:#102117;border:1px solid #c5d5cb;border-radius:14px;overflow:hidden;font-size:14px}
+.scr-h{background:#0c5c38;color:#f4fff8;padding:10px 14px;display:flex;justify-content:space-between;align-items:center}.scr-h b{font-size:16px;display:block}.scr-h small{display:block;font-size:11px;opacity:.85}.scr-h i{font-style:normal;font-size:11px;font-weight:800;border:1.5px solid currentColor;border-radius:6px;padding:2px 7px}
+.scr-b{padding:12px 14px}.scr-b h5{margin:10px 0 6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#3c5146}.scr-b h5:first-child{margin-top:0}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:8px}
+.st2{border:1px solid #c5d5cb;background:#f7fbf8;border-radius:12px;padding:8px 10px}.st2 span{font-size:12px;color:#3c5146;display:block}.st2 b{font-size:20px}.st2 small{font-size:11px;color:#3c5146;display:block}.st2.bad{border-color:#c9342b;background:#f8dcd9}.st2.warn{border-color:#e29a12}
+.al2{border:1px solid #c5d5cb;border-left:4px solid #c9342b;background:#f7fbf8;border-radius:10px;padding:10px 12px;margin-top:6px}.al2 small{display:block;color:#3c5146;font-size:12px}.al2 p{margin:6px 0;font-size:13px}
+.btn2{display:inline-block;border-radius:8px;padding:5px 12px;font-weight:700;font-size:13px;background:#0c5c38;color:#fff;margin:2px 6px 2px 0}.btn2.l{background:#dceee3;color:#0c5c38}
+.agr{display:flex;gap:10px;padding:8px 0;border-top:1px solid #c5d5cb}.agr:first-of-type{border-top:0}.agr i{width:10px;height:10px;border-radius:50%;background:#1f9d5c;margin-top:5px;flex:none}.agr small{display:block;color:#3c5146;font-size:12px}.agr p{margin:2px 0 0;font-size:13px}
+.tl{display:flex;gap:2px;margin:10px 0;font-size:12px;color:#fff;font-weight:700}.tl div{padding:6px 8px;border-radius:6px;white-space:nowrap;overflow:hidden}.t1{background:#0c5c38}.t2{background:#5a7d8c}.t3{background:#8a8f96}
+.vt2{width:100%;border-collapse:collapse;font-size:13px}.vt2 th,.vt2 td{text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid #c5d5cb}.vt2 th{font-size:12px;color:#3c5146}
+.cpf{display:none}.plat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
+#belt3d{position:relative}.bnum{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.binfo h3{margin:0 0 6px}.binfo ul{margin:6px 0 0;padding-left:18px;font-size:14px;display:grid;gap:4px}.binfo p{margin:10px 0 0;font-size:14px}.binfo p b{display:block;font-size:13px;color:var(--ink2);font-weight:600}
+@media(max-width:900px){.plat-grid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.plat-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1091,6 +1115,81 @@ body.pm main>section.cur{display:block}
   </div>
 </section>
 
+<section id="platform">
+  <div class="wrap">
+    <h2>Линии разного типа, агенты, данные и мощность</h2>
+    <p class="lead">Система растёт вместе с производством: линий, датчиков, сотрудников и агентов можно добавлять сколько нужно. Мощность сервера считается автоматически, а нехватку показывает информационная панель. Ниже экраны демо и рендер ленточного конвейера. Где это только макет рабочей версии, так и написано.</p>
+
+    <h3 style="font-size:26px;margin-top:30px">Линия на ленточном конвейере: почему она ломается</h3>
+    <p class="lead">Ленточный конвейер несёт и сам продукт, и риск простоя. Нажмите на номер на модели, чтобы увидеть реальные причины ремонта узла, что видит датчик и что делает агент.</p>
+    <div class="lab-grid">
+      <div><div class="chem3d" id="belt3d" role="img" aria-label="3D-модель ленточного конвейера с номерами узлов. Перетащите, чтобы повернуть, нажмите на номер, чтобы увидеть причины ремонта"></div>
+        <div class="bnum" id="bnum"></div>
+        <div class="chem-tabs" id="bmode" style="margin-top:10px"><button type="button" class="chem-tab active" data-m="ok">Норма</button><button type="button" class="chem-tab" data-m="slip">Проскальзывание</button><button type="button" class="chem-tab" data-m="track">Сход ленты</button></div></div>
+      <div class="binfo" id="binfo"></div>
+    </div>
+    <div class="ann-row" style="margin-top:28px"><figure class="scrf"><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Линия 3 · ленточный конвейер</small></div><i>ДЕМО</i></div><div class="scr-b"><h5>Датчики конвейера</h5><div class="sg"><div class="st2 "><span>Скорость ленты</span><b>2,21 <small style="display:inline">м/мин</small></b><small>норма 1,50…3,00</small></div><div class="st2 bad"><span>Проскальзывание</span><b>4,6 <small style="display:inline">%</small></b><small>допуск ≤ 2,0</small></div><div class="st2 warn"><span>Натяжение ленты</span><b>88 <small style="display:inline">%</small></b><small>норма 85…115</small></div><div class="st2 "><span>Смещение от центра</span><b>3 <small style="display:inline">мм</small></b><small>норма -15…15</small></div><div class="st2 "><span>Подшипник барабана</span><b>47 <small style="display:inline">°C</small></b><small>норма 20…70</small></div><div class="st2 "><span>Вибрация редуктора</span><b>2,1 <small style="display:inline">мм/с</small></b><small>норма 0,5…4,5</small></div></div><h5>Что требует внимания</h5><div class="al2"><b>Проскальзывание ленты 4,6 % — вне нормы (допуск ≤ 2,0)</b><small>Страж параметров · тревога</small><p><b style="display:inline">Что проверить:</b> лента проскальзывает на приводном барабане: износ или отслоение футеровки, слабое натяжение, налипание пыли или влага. Осмотреть барабан, проверить натяжение, остановить конвейер до ремонта.</p><span class="btn2">Принял</span><span class="btn2 l">Не критично</span></div></div></div><figcaption>Экран линии с ленточным конвейером: сценарий «Лента проскальзывает». Заявку ремонтной бригаде в рабочей версии оформляет агент обслуживания.</figcaption></figure>
+      <div><h3 style="margin-top:0">Что видит система</h3><ol class="ann-list">
+      <li><span class="m">1</span><p><b>Проскальзывание.</b> Скорость ленты сравнивается со скоростью привода. Рост говорит об износе футеровки барабана или слабом натяжении.</p></li>
+      <li><span class="m">2</span><p><b>Натяжение и сход.</b> Падение натяжения и смещение ленты видны раньше, чем лента заденет раму или порвётся стык.</p></li>
+      <li><span class="m">3</span><p><b>Подшипники и редуктор.</b> Температура подшипников барабанов и вибрация редуктора показывают износ и нехватку масла.</p></li></ol>
+      <div class="ann-res"><b>Итог.</b> Вместо аварийной остановки ремонтная бригада получает заявку с узлом, причиной и временем до порога, и работа попадает в плановое окно. В демо эти сценарии включаются кнопками «Лента проскальзывает», «Сход ленты» и «Греется подшипник барабана».</div></div></div>
+
+    <h3 style="font-size:26px;margin-top:44px">ИИ-агенты: от одного на линию до сети на производстве</h3>
+    <div class="plat-grid"><div class="feat"><b>Агент линии</b><p>От одного на линию и больше. Слушает датчики своей линии, объясняет отклонения простыми словами, принимает данные оператора текстом или голосом.</p></div><div class="feat"><b>Агент производства</b><p>Один или несколько на предприятие. Сводит линии, смену и партии, готовит сводки руководству и передачу смены.</p></div><div class="feat"><b>Агент технолога</b><p>Помогает с рецептурой и цветом: считает добавку колоранта, сверяет с эталоном, подсказывает следующий шаг.</p></div><div class="feat"><b>Агент обслуживания</b><p>Следит за износом по вибрации, температуре и проскальзыванию, оформляет заявки ремонтным бригадам с узлом и причиной, ведёт историю ремонтов.</p></div><div class="feat"><b>Агент качества</b><p>Контролирует отклонения, паспорта качества и сроки хранения партий, готовит данные к проверке.</p></div><div class="feat"><b>Агент журнала и архива</b><p>Ведёт журнал, выгрузки и архивацию по заданным срокам хранения.</p></div></div>
+    <div class="ann-row" style="margin-top:24px"><figure class="scrf"><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>ИИ-агенты</small></div><i>ДЕМО</i></div><div class="scr-b"><h5>Агенты производства</h5><div class="agr"><i></i><div><b>Агент линии 1</b><small>Линия 1 · на связи</small><p>Объяснил отклонение влажности камеры, принял три записи оператора</p></div></div><div class="agr"><i></i><div><b>Агент линии 3</b><small>Конвейер · на связи</small><p>Предупредил о проскальзывании ленты, подготовил заявку ремонтной бригаде</p></div></div><div class="agr"><i></i><div><b>Агент производства</b><small>Все линии · на связи</small><p>Собрал сводку смены и передал начальнику смены</p></div></div><div class="agr"><i></i><div><b>Агент обслуживания</b><small>Все линии · на связи</small><p>Ведёт открытые заявки на ремонт и историю узлов</p></div></div><div class="agr"><i></i><div><b>Агент технолога</b><small>Цвет и рецептура · на связи</small><p>Рассчитал добавку колоранта по замеру</p></div></div><div style="margin-top:8px"><span class="btn2 l">+ Агент на линию</span><span class="btn2 l">+ Агент на производство</span></div></div></div><figcaption>Панель агентов: их можно добавлять от одного и больше на линию и на всё производство. Действия в примере условные.</figcaption></figure>
+      <div><h3 style="margin-top:0">Как внедряются агенты</h3><ol class="ann-list">
+      <li><span class="m">1</span><p>Агентов можно внедрять от одного и больше на линию и на всё производство. Один агент может обслуживать несколько линий, а сложной линии можно дать несколько.</p></li>
+      <li><span class="m">2</span><p>У каждого агента свои права, как у роли сотрудника, и свой набор датчиков и данных. Решения остаются за людьми.</p></li>
+      <li><span class="m">3</span><p>Сотрудники пишут агенту и вносят данные одновременно. Агенты передают друг другу задачи: агент линии сообщает агенту обслуживания, тот оформляет заявку.</p></li></ol>
+      <p class="note">В демо работает один «Помощник технолога». Несколько агентов на линию и на производство это архитектура рабочей версии.</p></div></div>
+
+    <h3 style="font-size:26px;margin-top:44px">Данные: сколько хранить и когда архивировать</h3>
+    <div class="ann-row"><figure class="scrf"><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Хранение данных</small></div><i>ДЕМО</i></div><div class="scr-b"><h5>Срок хранения</h5><div class="sg" style="grid-template-columns:1fr 1fr"><div class="st2 "><span>Оперативная БД</span><b>3 <small style="display:inline">лет</small></b><small>быстрый доступ, отчёты и анализ</small></div><div class="st2 "><span>Архив</span><b>7 <small style="display:inline">лет</small></b><small>сжатие, доступ медленнее</small></div></div>
+<div class="tl"><div style="flex:3" class="t1">Оперативная БД · 3 л.</div><div style="flex:7" class="t2">Архив · 7 л.</div><div style="flex:2" class="t3">Удаление по регламенту</div></div>
+<h5>Что хранится</h5><p style="margin:0;font-size:13px">Показания датчиков, журнал отклонений и действий людей, кадры камер по событиям, замеры цвета и контрольные замеры технолога. Сейчас в оперативной БД около 2.0 ТБ, в архиве около 1.3 ТБ (для 10 линий).</p></div></div><figcaption>Настройка срока хранения и архивации. Срок оперативной БД и срок архива задаются отдельно.</figcaption></figure>
+      <div><ol class="ann-list">
+      <li><span class="m">1</span><p><b>Оперативная БД.</b> Свежие данные, быстрые отчёты и анализ. Срок настраивается. Ориентир для старта: 2–3 года.</p></li>
+      <li><span class="m">2</span><p><b>Архив.</b> По истечении срока данные уходят в архив: сжимаются и переносятся в холодное хранилище. Доступ медленнее, срок архива тоже настраивается. Ориентир: ещё 5–7 лет.</p></li>
+      <li><span class="m">3</span><p><b>Удаление.</b> После срока архива данные удаляются по регламенту предприятия.</p></li></ol>
+      <p class="note">Это ориентиры. Точные сроки задают служба качества и регламент предприятия, они зависят от продукции, требований заказчиков и гарантийных сроков. Данные сотрудников хранят отдельно.</p></div></div>
+
+    <h3 style="font-size:26px;margin-top:44px">Линии и датчики: у каждой своя спецификация</h3>
+    <div class="ann-row"><figure class="scrf"><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Линии и датчики</small></div><i>ДЕМО</i></div><div class="scr-b"><table class="vt2"><thead><tr><th>Линия</th><th>Тип</th><th>Датчиков</th><th>Камер</th></tr></thead><tbody><tr><td>Линия 1</td><td>Порошковая линия</td><td>34</td><td>2</td></tr><tr><td>Линия 2</td><td>Порошковая линия</td><td>34</td><td>2</td></tr><tr><td>Линия 3</td><td>Ленточный конвейер</td><td>12</td><td>1</td></tr><tr><td>Линия 4</td><td>Печь полимеризации</td><td>14</td><td>1</td></tr><tr><td>Линия 5</td><td>Жидкие краски</td><td>26</td><td>1</td></tr><tr><td>Линия 6</td><td>Порошковая линия</td><td>34</td><td>2</td></tr><tr><td>Линия 7</td><td>Порошковая линия</td><td>34</td><td>2</td></tr><tr><td>Линия 8</td><td>Ленточный конвейер</td><td>12</td><td>1</td></tr><tr><td>Линия 9</td><td>Печь полимеризации</td><td>14</td><td>1</td></tr><tr><td>Линия 10</td><td>Жидкие краски</td><td>26</td><td>1</td></tr></tbody></table><div style="margin-top:8px"><span class="btn2 l">+ Порошковая</span><span class="btn2 l">+ Ленточный конвейер</span><span class="btn2 l">+ Жидкие краски</span><span class="btn2 l">+ Печь</span><span class="btn2 l">+ Своя</span></div></div></div><figcaption>У каждой линии своя спецификация и свой набор датчиков. Линий можно добавлять сколько нужно.</figcaption></figure>
+      <div><ol class="ann-list">
+      <li><span class="m">1</span><p>Линии бывают разные: порошковая, ленточный конвейер, печь, жидкие краски или своя спецификация. Тип задаёт набор датчиков по умолчанию.</p></li>
+      <li><span class="m">2</span><p>Датчики разделяются по линиям. Для каждой линии число датчиков и камер можно менять под задачу.</p></li>
+      <li><span class="m">3</span><p>Линий и сотрудников можно добавлять без ограничения. Расчёт мощности пересчитывается сразу.</p></li></ol></div></div>
+
+    <h3 style="font-size:26px;margin-top:44px">Мощность сервера считается автоматически</h3>
+    <p class="lead">Проект рассчитан на 12 линий и 60 сотрудников. Переключайте состояния: при 5 линиях всё хорошо, при 10 панель уже предупреждает, что при расширении сервер нужно усиливать, при 15 показывает, чего не хватает.</p>
+    <div class="chem-tabs" id="capTabs"><button type="button" class="chem-tab active" data-k="p5">Было 5 линий</button><button type="button" class="chem-tab" data-k="p10">Стало 10</button><button type="button" class="chem-tab" data-k="p15">Расширение до 15</button></div>
+    <div id="capBox" style="max-width:720px;margin-top:14px"><figure class="scrf cpf st-p5" style="display:block"><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Мощность и масштаб · было 5 линий</small></div><i>ДЕМО</i></div><div class="scr-b"><div class="cp"><h4>Информационная панель: мощность сервера</h4>
+<div class="k"><div><span>Линии</span><b>5 из 12</b></div><div><span>Сотрудники</span><b>30 из 60</b></div><div><span>Датчики</span><b>120</b></div><div><span>ИИ-агенты</span><b>6</b></div></div>
+<div class="g"><div><span>Процессор</span><i><u style="width:42%;background:var(--ok-dot,var(--g))"></u></i><span>13,4 из 32 ядер · 42 %</span></div><div><span>Память</span><i><u style="width:38%;background:var(--ok-dot,var(--g))"></u></i><span>24,4 из 64 ГБ · 38 %</span></div><div><span>Диск, оперативная БД</span><i><u style="width:25%;background:var(--ok-dot,var(--g))"></u></i><span>1 из 4 ТБ · 25 %</span></div><div><span>GPU для агентов</span><i><u style="width:50%;background:var(--ok-dot,var(--g))"></u></i><span>1 из 2 шт · 50 %</span></div></div>
+<div class="b ok"><b>Мощности хватает</b>Занято 5 из 12 линий проекта. Сервер справляется с запасом.</div><div class="b ok"><b>Для 5 линий</b>Текущего сервера достаточно.</div>
+<p class="n">Хранение: оперативная БД 3 лет (1 ТБ), затем архив ещё 7 лет (0,6 ТБ). Одновременно работают 15 сотрудников, из них с агентом 6. Время ответа агента ≈ 1,5 с, очередь нет. Ориентировочный расчёт, точные цифры дают на пилоте.</p></div></div></div><figcaption>Пять линий из двенадцати проектных: мощностей хватает с запасом.</figcaption></figure><figure class="scrf cpf st-p10" style=""><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Мощность и масштаб · стало 10 линий</small></div><i>ДЕМО</i></div><div class="scr-b"><div class="cp"><h4>Информационная панель: мощность сервера</h4>
+<div class="k"><div><span>Линии</span><b>10 из 12</b></div><div><span>Сотрудники</span><b>30 из 60</b></div><div><span>Датчики</span><b>240</b></div><div><span>ИИ-агенты</span><b>11</b></div></div>
+<div class="g"><div><span>Процессор</span><i><u style="width:72%;background:var(--warn-dot,var(--y))"></u></i><span>23 из 32 ядер · 72 %</span></div><div><span>Память</span><i><u style="width:66%;background:var(--ok-dot,var(--g))"></u></i><span>42,5 из 64 ГБ · 66 %</span></div><div><span>Диск, оперативная БД</span><i><u style="width:51%;background:var(--ok-dot,var(--g))"></u></i><span>2 из 4 ТБ · 51 %</span></div><div><span>GPU для агентов</span><i><u style="width:50%;background:var(--ok-dot,var(--g))"></u></i><span>1 из 2 шт · 50 %</span></div></div>
+<div class="b warn"><b>Запас исчерпывается</b>Занято 10 из 12 линий проекта (83 %). При расширении потребуется усилить сервер и вычислительные мощности.</div><div class="b over"><b>Для 15 линий потребуется добавить</b>+16 ядер процессора, +64 ГБ памяти.</div>
+<p class="n">Хранение: оперативная БД 3 лет (2 ТБ), затем архив ещё 7 лет (1,3 ТБ). Одновременно работают 15 сотрудников, из них с агентом 6. Время ответа агента ≈ 2,3 с, очередь нет. Ориентировочный расчёт, точные цифры дают на пилоте.</p></div></div></div><figcaption>Десять из двенадцати: панель уже предупреждает, что при расширении сервер нужно усиливать.</figcaption></figure><figure class="scrf cpf st-p15" style=""><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Мощность и масштаб · расширение до 15 линий</small></div><i>ДЕМО</i></div><div class="scr-b"><div class="cp"><h4>Информационная панель: мощность сервера</h4>
+<div class="k"><div><span>Линии</span><b>15 из 12</b></div><div><span>Сотрудники</span><b>30 из 60</b></div><div><span>Датчики</span><b>360</b></div><div><span>ИИ-агенты</span><b>16</b></div></div>
+<div class="g"><div><span>Процессор</span><i><u style="width:100%;background:var(--danger-dot,var(--r))"></u></i><span>32,7 из 32 ядер · 102 %</span></div><div><span>Память</span><i><u style="width:95%;background:var(--warn-dot,var(--y))"></u></i><span>60,6 из 64 ГБ · 95 %</span></div><div><span>Диск, оперативная БД</span><i><u style="width:76%;background:var(--warn-dot,var(--y))"></u></i><span>3 из 4 ТБ · 76 %</span></div><div><span>GPU для агентов</span><i><u style="width:50%;background:var(--ok-dot,var(--g))"></u></i><span>1 из 2 шт · 50 %</span></div></div>
+<div class="b over"><b>Не хватает мощностей</b>Проект рассчитан на 12 линий, сейчас их 15. Сервер нужно усилить.</div><div class="b over"><b>Для 15 линий потребуется добавить</b>+16 ядер процессора, +64 ГБ памяти.</div>
+<p class="n">Хранение: оперативная БД 3 лет (3 ТБ), затем архив ещё 7 лет (1,9 ТБ). Одновременно работают 15 сотрудников, из них с агентом 6. Время ответа агента растёт, очередь ≈ 104. Ориентировочный расчёт, точные цифры дают на пилоте.</p></div></div></div><figcaption>Пятнадцать линий при проекте на двенадцать: панель показывает, что именно не хватает.</figcaption></figure></div>
+    <p class="note">Модель ориентировочная: считает нагрузку по датчикам, камерам, агентам, одновременным сотрудникам и сроку хранения. Точные цифры дают на пилоте. В демо: «Ещё» → «Мощность и масштаб».</p>
+
+    <h3 style="font-size:26px;margin-top:44px">Одновременная работа без очередей</h3>
+    <div class="ann-row"><figure class="scrf"><div class="scr"><div class="scr-h"><div><b>NAP Paint</b><small>Одновременная работа</small></div><i>ДЕМО</i></div><div class="scr-b"><div class="cp" style="border:0;background:none;padding:0"><svg viewBox="0 0 500 210" role="img" aria-label="Сотрудники вносят данные и пишут агенту одновременно: запросы идут параллельно, очереди нет" style="width:100%;height:auto;color:var(--fg,var(--ink))"><text x="34" y="18" font-size="12" font-weight="700" fill="currentColor">Сотрудники: 15 онлайн</text><circle cx="34" cy="46" r="9" fill="var(--accent,var(--g))"/><path d="M48 46H330" stroke="var(--line)"/><circle r="3.5" fill="var(--warn-dot,var(--y))"><animateMotion dur="2s" begin="0s" repeatCount="indefinite" path="M48 46H330"/></circle><path d="M330 46L380 60" stroke="var(--line)"/><circle cx="34" cy="74" r="9" fill="var(--accent,var(--g))"/><path d="M48 74H330" stroke="var(--line)"/><circle r="3.5" fill="var(--warn-dot,var(--y))"><animateMotion dur="2.6s" begin="0.3s" repeatCount="indefinite" path="M48 74H330"/></circle><path d="M330 74L380 100" stroke="var(--line)"/><circle cx="34" cy="102" r="9" fill="var(--accent,var(--g))"/><path d="M48 102H330" stroke="var(--line)"/><circle r="3.5" fill="var(--warn-dot,var(--y))"><animateMotion dur="3.2s" begin="0.6s" repeatCount="indefinite" path="M48 102H330"/></circle><path d="M330 102L380 140" stroke="var(--line)"/><circle cx="34" cy="130" r="9" fill="var(--accent,var(--g))"/><path d="M48 130H330" stroke="var(--line)"/><circle r="3.5" fill="var(--warn-dot,var(--y))"><animateMotion dur="2s" begin="0.8999999999999999s" repeatCount="indefinite" path="M48 130H330"/></circle><path d="M330 130L380 60" stroke="var(--line)"/><circle cx="34" cy="158" r="9" fill="var(--accent,var(--g))"/><path d="M48 158H330" stroke="var(--line)"/><circle r="3.5" fill="var(--warn-dot,var(--y))"><animateMotion dur="2.6s" begin="1.2s" repeatCount="indefinite" path="M48 158H330"/></circle><path d="M330 158L380 100" stroke="var(--line)"/><circle cx="34" cy="186" r="9" fill="var(--accent,var(--g))"/><path d="M48 186H330" stroke="var(--line)"/><circle r="3.5" fill="var(--warn-dot,var(--y))"><animateMotion dur="3.2s" begin="1.5s" repeatCount="indefinite" path="M48 186H330"/></circle><path d="M330 186L380 140" stroke="var(--line)"/><rect x="300" y="28" width="30" height="168" rx="6" fill="var(--tint,var(--paper))" stroke="var(--line)"/><text x="315" y="112" font-size="10" text-anchor="middle" transform="rotate(-90 315 112)" fill="currentColor">параллельные обработчики</text><rect x="380" y="44" width="110" height="32" rx="8" fill="var(--card)" stroke="var(--line)"/><text x="435" y="64" font-size="12" text-anchor="middle" fill="currentColor">Агенты</text><rect x="380" y="84" width="110" height="32" rx="8" fill="var(--card)" stroke="var(--line)"/><text x="435" y="104" font-size="12" text-anchor="middle" fill="currentColor">База данных</text><rect x="380" y="124" width="110" height="32" rx="8" fill="var(--card)" stroke="var(--line)"/><text x="435" y="144" font-size="12" text-anchor="middle" fill="currentColor">Журнал</text><text x="250" y="204" font-size="12" text-anchor="middle" fill="var(--ok-dot,var(--g))" font-weight="700">вносят данные: 9 · пишут агенту: 6 · очередь: нет</text></svg></div></div></div><figcaption>Сотрудники вносят данные и пишут агенту одновременно: запросы идут параллельно. Это иллюстрация процесса, а не фотография.</figcaption></figure>
+      <div><ol class="ann-list">
+      <li><span class="m">1</span><p><b>Параллельно.</b> Запросы сотрудников обрабатываются одновременно, а не по очереди: один вносит выпуск, другой пишет агенту, третий смотрит журнал.</p></li>
+      <li><span class="m">2</span><p><b>Пока хватает мощности.</b> При загрузке ниже порога очереди нет и ответ приходит быстро.</p></li>
+      <li><span class="m">3</span><p><b>Когда не хватает.</b> Время ответа растёт, и информационная панель заранее предупреждает, что нужно усилить сервер.</p></li></ol>
+      <p class="note">Это схема процесса, а не фотография. Если есть фото цеха или диспетчерской, их можно добавить рядом.</p></div></div>
+  </div>
+</section>
+
+
 
 <section id="compare">
   <div class="wrap">
@@ -1653,6 +1752,86 @@ t.addEventListener('click',function(e){var b=e.target.closest('.chem-tab');if(!b
     [].forEach.call(q.children,function(x){x.classList.toggle('active',x===b)});
     ['pw','lq'].forEach(function(k){document.getElementById('eq_'+k).classList.toggle('on',k===b.dataset.e)})});
 })();
+</script>
+<script>/* belt3d.js */
+(function(){
+  var box=document.getElementById('belt3d');if(!box)return;
+  var $=function(i){return document.getElementById(i)};
+  var N=[
+   ['Мотор-редуктор',['Перегрев обмоток при перегрузке или плохом охлаждении','Износ подшипников ротора','Износ зубьев и нехватка масла или его утечка в редукторе','Расцентровка муфты и ослабшие крепления, отсюда вибрация','Отказ частотного преобразователя или пускателя'],'Ток двигателя, вибрация корпуса, температура корпуса и масла.','Заметит рост вибрации раньше остановки, назовёт вероятную причину и оформит заявку с узлом и временем до порога.'],
+   ['Приводной барабан',['Износ или отслоение футеровки: лента проскальзывает','Налипание пыли и материала, сцепление падает','Влага на барабане','Износ подшипников барабана'],'Скорость ленты против скорости привода (проскальзывание в процентах), температура подшипников.','При росте проскальзывания предложит осмотреть футеровку и проверить натяжение. Остановку согласует с начальником смены.'],
+   ['Лента и стык',['Растяжение и износ ленты','Порезы, проколы и расслоение','Расслоение или разрыв стыка (механического или вулканизированного)','Износ кромок от схода'],'Камера на поверхность и стык, счётчик оборотов ленты, ток двигателя.','Найдёт дефект и добавит в заявку кадр и место на ленте.'],
+   ['Поддерживающие ролики',['Заклинивание и износ подшипников','Налипание материала на ролик','Перекос оси'],'Тепловизор и пирометры по роликам, вибрация или акустика.','Покажет, какой ролик греется, и поставит замену в плановую остановку.'],
+   ['Хвостовой барабан и натяжитель',['Недостаточное натяжение: лента проскальзывает','Избыточное натяжение: нагрузка на подшипники и стык','Заедание винта или противовеса натяжителя','Износ подшипников хвостового барабана'],'Натяжение (тензодатчик или положение натяжителя), температура подшипников.','Предупредит об уходе натяжения и подскажет, подтянуть или ослабить.'],
+   ['Центрирование ленты',['Перекос барабана или роликов','Неравномерная загрузка','Налипание с одной стороны','Неравномерный износ кромки'],'Концевые датчики схода по краям, камера на кромку.','Поднимет тревогу раньше, чем лента заденет раму, и подскажет проверить центровку.'],
+   ['Скребок и очистка',['Износ скребка: налипание остаётся на ленте','Налипший материал бьёт по роликам и уводит ленту в сторону','Загрязнение датчиков пылью'],'Камера на поверхность ленты, ток двигателя.','Напомнит о чистке по состоянию, а не только по календарю.']];
+  var cur=0;
+  function show(i){cur=i;var n=N[i];$('binfo').innerHTML='<h3>'+(i+1)+'. '+n[0]+'</h3><b style="font-size:13px;color:var(--ink2);font-weight:600">Причины ремонта</b><ul>'+n[1].map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul><p><b>Что видит датчик</b>'+n[2]+'</p><p><b>Что делает агент</b>'+n[3]+'</p><p class="note">Общие причины для любого узла: перегрузка, пыль и влага, смазка не по графику.</p>';
+    [].forEach.call($('bnum').children,function(b,k){b.classList.toggle('active',k===i)});mark()}
+  $('bnum').innerHTML=N.map(function(n,i){return '<button type="button" class="chem-tab" title="'+n[0]+'">'+(i+1)+'</button>'}).join('');
+  $('bnum').addEventListener('click',function(e){var b=e.target.closest('button');if(b)show([].indexOf.call(this.children,b))});
+  var mark=function(){};
+  /* ---- 3D ---- */
+  function nd(){box.insertAdjacentHTML('beforeend','<p style="padding:24px;color:var(--ink2);font-size:14px">3D недоступно в этом браузере. Список узлов справа работает без него.</p>')}
+  var R=null;
+  if(window.THREE){try{R=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){R=null}}
+  if(!R){nd();show(0);return}
+  R.setPixelRatio(Math.min(2,devicePixelRatio||1));box.appendChild(R.domElement);
+  var sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(38,1,.1,60);cam.position.set(0,1.8,14.5);
+  sc.add(new THREE.AmbientLight(0xffffff,.85));var dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(4,7,6);sc.add(dl);
+  var g=new THREE.Group();sc.add(g);g.rotation.set(.38,-.55,0);
+  var M=function(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:.15},o||{}))};
+  var L=6.2,r=.42,steel=M(0x8a96a6),dark=M(0x2b2f36);
+  function stad(rr){var s=new THREE.Path();s.moveTo(-L/2,rr);s.lineTo(L/2,rr);s.absarc(L/2,0,rr,Math.PI/2,-Math.PI/2,true);s.lineTo(-L/2,-rr);s.absarc(-L/2,0,rr,-Math.PI/2,Math.PI/2,true);return s}
+  var sh=new THREE.Shape();sh.moveTo(-L/2,r);sh.lineTo(L/2,r);sh.absarc(L/2,0,r,Math.PI/2,-Math.PI/2,true);sh.lineTo(-L/2,-r);sh.absarc(-L/2,0,r,-Math.PI/2,Math.PI/2,true);sh.holes.push(stad(r-.045));
+  var bg=new THREE.ExtrudeGeometry(sh,{depth:1.2,bevelEnabled:false,curveSegments:28});bg.translate(0,0,-.6);
+  var belt=new THREE.Group();belt.add(new THREE.Mesh(bg,M(0x23272d,{roughness:.85,metalness:0})));g.add(belt);
+  var P=2*L+2*Math.PI*r;
+  function at(s){s=((s%P)+P)%P;var a=Math.PI*r;if(s<L)return[-L/2+s,r];s-=L;if(s<a){var t=Math.PI/2-s/r;return[L/2+r*Math.cos(t),r*Math.sin(t)]}s-=a;if(s<L)return[L/2-s,-r];s-=L;var t2=-Math.PI/2-s/r;return[-L/2+r*Math.cos(t2),r*Math.sin(t2)]}
+  var cl=[];for(var i=0;i<26;i++){var m=new THREE.Mesh(new THREE.BoxGeometry(.07,.05,1.05),M(i===0?0xff9f1c:0xdfe6ee));cl.push(m);belt.add(m)}
+  function drum(x){var d=new THREE.Mesh(new THREE.CylinderGeometry(r-.05,r-.05,1.3,32),steel);d.rotation.x=Math.PI/2;d.position.x=x;g.add(d);var st=new THREE.Mesh(new THREE.BoxGeometry(.06,.06,1.32),M(0xffffff));st.position.set(0,r-.05,0);var pv=new THREE.Group();pv.position.x=x;pv.add(st);g.add(pv);return pv}
+  var drv=drum(L/2),tail=drum(-L/2);
+  [-.75,.75].forEach(function(z){var rl=new THREE.Mesh(new THREE.BoxGeometry(L+1,.1,.08),steel);rl.position.set(0,-.62,z);g.add(rl);[-2.6,0,2.6].forEach(function(x){var lg=new THREE.Mesh(new THREE.BoxGeometry(.08,.9,.08),steel);lg.position.set(x,-1.05,z);g.add(lg)})});
+  for(var k=-4;k<=4;k++){var id=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,1.1,12),M(0xb9c0ca));id.rotation.x=Math.PI/2;id.position.set(k*.65,r-.12,0);g.add(id)}
+  var mt=new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.95,24),M(0x0c5c38));mt.rotation.z=Math.PI/2;mt.position.set(L/2+1.35,0,0);g.add(mt);
+  var gb=new THREE.Mesh(new THREE.BoxGeometry(.6,.7,.7),M(0x3b4656));gb.position.set(L/2+.7,0,0);g.add(gb);
+  var tn=new THREE.Mesh(new THREE.BoxGeometry(.4,.5,.5),M(0x6b7686));tn.position.set(-L/2-.7,0,0);g.add(tn);
+  var rod=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.7,10),steel);rod.rotation.z=Math.PI/2;rod.position.set(-L/2-1.05,0,0);g.add(rod);
+  var scr=new THREE.Mesh(new THREE.BoxGeometry(.05,.3,1.1),M(0xff9f1c));scr.position.set(L/2-.1,-r-.22,0);scr.rotation.z=.5;g.add(scr);
+  var it=[];[0,1,2,3].forEach(function(i){var b=new THREE.Mesh(new THREE.BoxGeometry(.5,.32,.55),M([0xe9b21a,0x1f5fbf,0xd6342c,0x2e9e5b][i]));b.userData.x=-2.7+i*1.4;g.add(b);it.push(b)});
+  var grid=new THREE.GridHelper(14,14,0x8a96a6,0x8a96a6);grid.position.y=-1.55;grid.material.transparent=true;grid.material.opacity=.15;g.add(grid);
+  /* номера узлов */
+  function tag(n,x,y,z){var cv=document.createElement('canvas');cv.width=cv.height=64;var q=cv.getContext('2d');q.fillStyle='#f2b705';q.beginPath();q.arc(32,32,26,0,7);q.fill();q.lineWidth=5;q.strokeStyle='#fff';q.stroke();q.fillStyle='#14202e';q.font='800 32px Onest,system-ui,sans-serif';q.textAlign='center';q.textBaseline='middle';q.fillText(n,32,34);
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false}));sp.scale.set(.5,.5,1);sp.position.set(x,y,z);sp.renderOrder=9;g.add(sp);return sp}
+  var tags=[tag(1,L/2+1.35,.75,0),tag(2,L/2,.95,.7),tag(3,.4,.75,.62),tag(4,-1.3,.45,.7),tag(5,-L/2-.9,.7,0),tag(6,1.4,.7,.68),tag(7,L/2-.1,-.95,.55)];
+  mark=function(){tags.forEach(function(t,i){var s=i===cur?.72:.5;t.scale.set(s,s,1)})};
+  /* режимы */
+  var mode='ok',calm=matchMedia('(prefers-reduced-motion:reduce)').matches,run=true,vis=true,t0=0,pos=0,touched=false;
+  $('bmode').addEventListener('click',function(e){var b=e.target.closest('.chem-tab');if(!b)return;[].forEach.call(this.children,function(x){x.classList.toggle('active',x===b)});mode=b.dataset.m;belt.position.z=mode==='track'?.28:0;if(mode==='slip')show(1);if(mode==='track')show(5);if(calm)frame(performance.now())});
+  var YA=new THREE.Vector3(0,1,0),XA=new THREE.Vector3(1,0,0),RC=new THREE.Raycaster(),mv=new THREE.Vector2(),d0=null,moved=0,q0=g.quaternion.clone();
+  function pick(e){var b=box.getBoundingClientRect();mv.set((e.clientX-b.left)/b.width*2-1,-((e.clientY-b.top)/b.height)*2+1);RC.setFromCamera(mv,cam);var h=RC.intersectObjects(tags);return h.length?tags.indexOf(h[0].object):-1}
+  box.addEventListener('pointerdown',function(e){d0={x:e.clientX,y:e.clientY};moved=0;touched=true;box.setPointerCapture(e.pointerId)});
+  box.addEventListener('pointermove',function(e){if(!d0)return;moved+=Math.abs(e.clientX-d0.x)+Math.abs(e.clientY-d0.y);g.rotateOnWorldAxis(YA,(e.clientX-d0.x)*.012);g.rotateOnWorldAxis(XA,(e.clientY-d0.y)*.012);d0={x:e.clientX,y:e.clientY};if(calm)frame(performance.now())});
+  box.addEventListener('pointerup',function(e){if(d0&&moved<6){var i=pick(e);if(i>=0)show(i)}d0=null});
+  box.addEventListener('dblclick',function(){g.quaternion.copy(q0);touched=false;if(calm)frame(performance.now())});
+  function size(){var w=box.clientWidth,h=box.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+  function frame(t){var dt=Math.min(.05,(t-t0)/1000);t0=t;
+    if(!calm){var v=.9;pos+=dt*v;cl.forEach(function(m,i){var p=at(pos+i*P/cl.length);m.position.set(p[0],p[1],0)});
+      var w=dt*v/(r-.05);tail.rotation.z-=w;drv.rotation.z-=mode==='slip'?w*1.9:w;
+      it.forEach(function(b){b.userData.x+=dt*v*(mode==='slip'?.5:1);if(b.userData.x>L/2-.4)b.userData.x=-L/2+.4;b.position.set(b.userData.x,r+.17,belt.position.z)});
+      if(!touched)g.rotateOnWorldAxis(YA,dt*.1)}
+    else{cl.forEach(function(m,i){var p=at(i*P/cl.length);m.position.set(p[0],p[1],0)});it.forEach(function(b){b.position.set(b.userData.x,r+.17,belt.position.z)})}
+    R.render(sc,cam);if(vis&&!calm)requestAnimationFrame(frame)}
+  new IntersectionObserver(function(e){vis=e[0].isIntersecting;if(vis){t0=performance.now();requestAnimationFrame(frame)}}).observe(box);
+  addEventListener('resize',function(){size();if(calm)frame(performance.now())});
+  size();show(0);if(calm)frame(performance.now());
+})();
+</script>
+<script>
+(function(){var t=document.getElementById('capTabs');if(!t)return;
+t.addEventListener('click',function(e){var b=e.target.closest('.chem-tab');if(!b)return;
+[].forEach.call(t.children,function(x){x.classList.toggle('active',x===b)});
+[].forEach.call(document.querySelectorAll('#capBox .cpf'),function(f){f.style.display=f.classList.contains('st-'+b.dataset.k)?'block':'none'})})})();
 </script>
 </body>
 </html>
