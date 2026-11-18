@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Программа контроля под ваше производство: что даёт и сколько сохраняет</title>
+<meta name="description" content="Для чего нужна система контроля линий красок, что для неё нужно, чем поможет, сколько вы сохраните и за какой период. Калькулятор выгоды и помощник с готовыми ответами.">
+<meta name="theme-color" content="#14202e">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14202e;--ink2:#4a5868;--paper:#f5f6f8;--card:#fff;--line:#dde2e8;--y:#f2b705;--b:#1f5fbf;--g:#2e9e5b;--r:#d6342c;--ok:#1b8a4b;--warn:#a86a00;--bad:#c0291f;--maxw:1180px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eef1f5;--ink2:#a9b4c2;--paper:#0f1722;--card:#17212e;--line:#2a3646;--ok:#46d391;--warn:#f6c453;--bad:#ff7a70}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.6 "Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+a{color:inherit}img{max-width:100%;height:auto;display:block}button,input,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.55}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+h1,h2,h3{line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800}h1{font-size:clamp(34px,6vw,58px)}h2{font-size:clamp(25px,3.8vw,38px);margin-bottom:12px}h3{font-size:19px;margin-bottom:6px}
+p{margin:0 0 12px}.lead{font-size:clamp(17px,2vw,20px);color:var(--ink2);max-width:70ch}.small{font-size:13.5px;color:var(--ink2)}
+section{padding:60px 0;border-top:1px solid var(--line)}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+header.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:56px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none}.brand i{width:22px;height:22px;border-radius:6px;background:var(--ink);position:relative}.brand i::before,.brand i::after{content:"";position:absolute;background:var(--y);left:50%;top:50%;transform:translate(-50%,-50%);border-radius:2px}.brand i::before{width:12px;height:3px}.brand i::after{width:3px;height:12px}
+nav{display:flex;gap:16px;font-size:14px;align-items:center;flex-wrap:wrap}nav a{text-decoration:none;color:var(--ink2)}nav a:hover{color:var(--ink)}@media(max-width:860px){nav a.opt{display:none}}
+.btn,.cta{display:inline-flex;gap:8px;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:700;border:1px solid var(--ink)}.cta.ghost,.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.hero{border-top:0;padding:54px 0 34px}.hero h1 span{color:var(--b)}:root[data-theme="dark"] .hero h1 span{color:#7fb0ff}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero h1 span{color:#7fb0ff}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chips span{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ink2)}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:980px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}.card p{color:var(--ink2);font-size:15px;margin:6px 0 0}
+.ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--b) 14%,transparent);color:var(--b);margin-bottom:10px}
+.ic svg{width:24px;height:24px}
+.shot{margin:0;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--card)}.shot img{width:100%}.shot figcaption{padding:10px 14px;font-size:13.5px;color:var(--ink2)}
+/* ---- помощник ---- */
+.ask{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;margin-top:22px;align-items:start}@media(max-width:940px){.ask{grid-template-columns:1fr}}
+.pre{display:grid;gap:8px}@media(max-width:940px){.pre{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.pre{grid-template-columns:1fr}}
+.pre button{text-align:left;display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px;transition:.15s}.pre button:hover:not(:disabled){border-color:var(--b);transform:translateY(-1px)}.pre button.on{border-color:var(--b);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent)}
+.pre i{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--b) 14%,transparent);color:var(--b)}.pre i svg{width:20px;height:20px}.pre b{display:block;font-size:14.5px;line-height:1.2}.pre span{font-size:12.5px;color:var(--ink2)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}.ph .small{font-weight:500}
+#chat{height:640px;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msg{display:flex;gap:10px}.msg.me{justify-content:flex-end}.msg .b{border-radius:14px;padding:10px 14px;min-width:0;max-width:100%}.msg.me .b{background:var(--ink);color:var(--paper);border-bottom-right-radius:4px;max-width:85%}
+.msg.bot .b{background:color-mix(in srgb,var(--ink) 5%,var(--card));border:1px solid var(--line);border-bottom-left-radius:4px;flex:1}
+.av{width:34px;height:34px;border-radius:10px;background:var(--b);color:#fff;display:grid;place-items:center;flex:none}
+.steps{display:grid;gap:4px;font-size:12.5px;color:var(--ink2);margin-bottom:8px}.steps span{display:flex;gap:7px;align-items:center}.steps svg{color:var(--ok);flex:none}.steps u{width:11px;height:11px;border:2px solid var(--b);border-top-color:transparent;border-radius:50%;display:inline-block;animation:sp .7s linear infinite;flex:none}@keyframes sp{to{transform:rotate(360deg)}}
+.txt h4{margin:0 0 6px;font-size:17px}.txt p{margin:0 0 8px;font-size:15px}.txt ul{margin:6px 0 8px;padding-left:20px;display:grid;gap:4px;font-size:14.5px}
+.cur{display:inline-block;width:7px;height:15px;background:var(--b);margin-left:2px;vertical-align:-2px;animation:pl 1s infinite}@keyframes pl{50%{opacity:.25}}
+.sm-btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 10px;font-size:12.5px}
+.empty{color:var(--ink2);font-size:14.5px;padding:14px;border:1px dashed var(--line);border-radius:12px}
+/* графика-карточки */
+.bd{position:relative;border-radius:14px;overflow:hidden;color:#fff;isolation:isolate;margin-top:8px}.bd>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:blur(3px) saturate(1.05);transform:scale(1.08)}.bd-s{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,18,30,.78),rgba(10,18,30,.9));z-index:-1}.bd-c{padding:12px;display:grid;gap:10px}
+.gg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.gg.g3{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:620px){.gg.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:10px 12px;min-width:0}.gl.wide{grid-column:1/-1}
+.gl-h{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.72);font-weight:600;display:flex;gap:7px;align-items:center}.gl-h svg{width:15px;height:15px;flex:none}
+.gl-v{font-size:22px;font-weight:800;line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums}.gl-v small{font-size:12px;font-weight:500;color:rgba(255,255,255,.7);margin-left:4px}.gl-t{font-size:12.5px;color:rgba(255,255,255,.75);margin-top:2px}.gl-c{margin-top:6px}
+.c-ok{color:#46d391}.c-warn{color:#f6c453}.c-bad{color:#ff7a70}.c-b{color:#8fbcff}
+.chart{display:block;width:100%;height:auto;color:#fff}.leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:rgba(255,255,255,.8);margin-top:6px}.leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}
+.bar{height:7px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}.bar i{display:block;height:100%;border-radius:99px}
+/* калькулятор */
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;margin-top:22px;align-items:start}@media(max-width:940px){.calc{grid-template-columns:1fr}}
+.inp{padding:14px 16px;display:grid;gap:14px}.row{display:grid;gap:4px}.row label{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-weight:600}.row label output{font-variant-numeric:tabular-nums;color:var(--b);font-weight:800}:root[data-theme="dark"] .row label output{color:#7fb0ff}
+.row input[type=range]{width:100%;accent-color:var(--b)}.row small{font-size:12px;color:var(--ink2)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}.seg button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-size:13.5px;font-weight:600}.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.numin{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:9px 12px}
+.out{padding:16px;display:grid;gap:14px}.big{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}@media(max-width:620px){.big{grid-template-columns:1fr}}
+.kpi{border:1px solid var(--line);border-radius:14px;padding:12px;background:color-mix(in srgb,var(--ink) 3%,var(--card))}.kpi span{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:600}.kpi b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.2;margin-top:2px}.kpi em{font-style:normal;font-size:12.5px;color:var(--ink2)}
+.chartbox{border:1px solid var(--line);border-radius:14px;padding:12px;background:#10202c;color:#fff}.chartbox h4{margin:0 0 6px;font-size:14px;color:#cfe0f0;font-weight:600}
+.why{display:grid;gap:8px}.why li{list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:9px 12px}.why{padding:0;margin:0}.why i{width:10px;height:10px;border-radius:3px}.why b{font-variant-numeric:tabular-nums}
+.disc{font-size:13px;color:var(--ink2)}
+/* варианты и шаги */
+.var{position:relative}.var .n{position:absolute;right:14px;top:12px;font-size:30px;font-weight:800;color:color-mix(in srgb,var(--ink) 12%,transparent)}
+.tl{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;counter-reset:s}@media(max-width:980px){.tl{grid-template-columns:1fr 1fr}}@media(max-width:560px){.tl{grid-template-columns:1fr}}
+.tl li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;position:relative}.tl li::before{counter-increment:s;content:counter(s);position:absolute;right:12px;top:8px;font-size:28px;font-weight:800;color:color-mix(in srgb,var(--ink) 12%,transparent)}.tl b{display:block;font-size:15px;margin-bottom:4px}.tl p{font-size:13.5px;color:var(--ink2);margin:0}
+.versus{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}@media(max-width:700px){.versus{grid-template-columns:1fr}}
+.versus .card h3{display:flex;gap:8px;align-items:center}.versus ul{margin:8px 0 0;padding-left:18px;display:grid;gap:5px;font-size:15px;color:var(--ink2)}
+.contact{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}@media(max-width:760px){.contact{grid-template-columns:1fr}}.big-link{display:block;font-size:24px;font-weight:800;text-decoration:none;margin:2px 0}
+footer{padding:50px 0 60px;border-top:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.offline::after{content:"Нет сети: работает сохранённая версия";position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:999px;font-size:13px;z-index:50}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html"><i></i>Цвет и контроль</a>
+  <nav><a class="opt" href="#ask">Помощник</a><a class="opt" href="#need">Что нужно</a><a class="opt" href="#calc">Калькулятор</a><a class="opt" href="#connect">Подключение</a>
+    <a href="../agent/index.html">ИИ-агент</a><a href="../demo/index.html">Демо</a><a href="../correction/index.html">Коррекция цвета</a><a href="../index.html">← На сайт</a>
+    <button class="sm-btn" data-install hidden type="button">Установить</button></nav></div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+  <div class="eyebrow">Программа под ваше производство</div>
+  <h1>Система контроля, которая <span>окупается сохранённым браком и простоем</span></h1>
+  <p class="lead" style="margin-top:14px">Мы создадим программу под ваш проект и ваше оборудование: подключим датчики и камеры, настроим нормы и правила под ваши рецептуры. Она заранее показывает отклонение, объясняет причину и предлагает действие. Ниже: для чего это нужно, что для этого требуется, чем поможет и сколько вы сохраните.</p>
+  <div class="chips"><span>под ваши линии и оборудование</span><span>работает на вашем сервере</span><span>без интернета</span><span>порошковые и жидкие краски</span></div>
+  <div class="btns"><a class="cta" href="#calc">Посчитать выгоду</a><a class="cta ghost" href="#ask">Спросить помощника</a><button class="cta ghost" data-install hidden type="button">Установить приложение</button></div>
+</div></section>
+
+<section id="ask"><div class="wrap">
+  <h2>Спросите программу: нажмите на вопрос</h2>
+  <p class="lead">Выберите готовый вопрос. Помощник ответит с графикой, а цифры подставит из калькулятора ниже: меняйте данные вашего производства и задавайте вопрос заново.</p>
+  <div class="ask">
+    <div class="pre" id="pre"></div>
+    <div class="panel"><div class="ph"><span>Помощник по внедрению</span><span style="display:flex;gap:8px"><button class="sm-btn" id="skip" type="button" hidden>Сразу ответ</button><button class="sm-btn" id="clr" type="button">Очистить</button></span></div><div id="chat" role="log" aria-live="polite"></div></div>
+  </div>
+</div></section>
+
+<section id="need"><div class="wrap">
+  <h2>Для чего это нужно и что для этого нужно</h2>
+  <p class="lead">Брак порошка нельзя исправить после выпуска, а поломка начинается за часы и дни до остановки. Программа превращает показания оборудования в понятное предупреждение.</p>
+  <div class="grid g3" style="margin-top:20px">
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l8-4 8 4v10l-8 4-8-4z"/><path d="M4 7l8 4 8-4M12 11v10"/><path d="M16 3l5 5M21 3l-5 5" stroke="#d6342c"/></svg></div><h3>Меньше брака</h3><p>Уход температуры зоны, давления, влажности камеры, режима печи ловится до того, как партия уйдёт в брак или на переделку.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></svg></div><h3>Меньше внеплановых остановок</h3><p>Вибрация и нагрев подшипников, износ шнеков, забитые фильтры видны заранее: остановка переносится в плановое окно.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><h3>Порядок и документы</h3><p>Журнал отклонений, паспорта партий и история замеров готовы к проверке и разбору рекламаций.</p></div>
+  </div>
+  <h3 style="margin-top:34px">Что для этого нужно</h3>
+  <div class="grid g3" style="margin-top:12px">
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0"/><circle cx="12" cy="12" r="1.6"/><path d="M12 14v7"/></svg></div><h3>Датчики на оборудовании</h3><p>Температуры зон, давление расплава, момент и ток, вибрация, температура подшипников, влажность камеры, печь. Часть уже стоит, остальное докупается точечно.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></div><h3>Камера над лентой</h3><p>Промышленная камера в пыленепроницаемом корпусе с обдувом оптики: чипсы на ленте, вкрапления, задвижки и другие контрольные точки.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></div><h3>Шлюз и сервер в цеху</h3><p>Шлюз собирает данные (OPC UA, Modbus и другие протоколы), локальный сервер хранит их и считает нейросети. Всё остаётся у вас, интернет не нужен.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v4h4M10 12h6M10 16h6"/></svg></div><h3>Ваши нормы и история</h3><p>Технологические карты, рецептуры, допуски, история отказов и брака. По ним настраиваются пороги и правила под ваше производство.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M15 20c0-2.5 1.6-4.5 4-4.5"/></svg></div><h3>Люди с двух сторон</h3><p>С вашей стороны технолог, механик и специалист по АСУ/ИТ для доступа. С нашей: разработка, настройка и обучение смен.</p></div>
+    <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 9l7-6 7 6"/><path d="M7 21h10"/></svg></div><h3>Пилот на одной линии</h3><p>Начинаем с одной линии или участка, проверяем эффект на ваших данных и только потом масштабируем на остальные.</p></div>
+  </div>
+</div></section>
+
+<section id="proof"><div class="wrap">
+  <h2>Как это выглядит в работе</h2>
+  <p class="lead">Скриншоты демонстрационной версии: схема оборудования с датчиками, несколько ситуаций сразу, камера над лентой и ИИ-агент.</p>
+  <div class="grid g2" style="margin-top:20px">
+    <figure class="shot"><img src="../img/system/equip-extruder.webp" alt="Экструдер в разрезе с датчиками по зонам" loading="lazy"><figcaption>Экструдер в разрезе, датчик на каждой зоне цилиндра</figcaption></figure>
+    <figure class="shot"><img src="../img/system/vision-belt.webp" alt="Визуальный контроль ленты и чипсов" loading="lazy"><figcaption>Камера над лентой: излом, вкрапления, температура и толщина</figcaption></figure>
+    <figure class="shot"><img src="../img/system/situations.webp" alt="Несколько ситуаций одновременно" loading="lazy"><figcaption>Несколько ситуаций сразу: причины и что проверить</figcaption></figure>
+    <figure class="shot"><img src="../img/system/agent-console.webp" alt="Консоль ИИ-агента" loading="lazy"><figcaption>ИИ-агент: ответ с доказательствами</figcaption></figure>
+  </div>
+</div></section>
+
+<section id="calc"><div class="wrap">
+  <h2>Сколько вы сохраните: калькулятор выгоды</h2>
+  <p class="lead">Введите данные вашего производства. Калькулятор считает потери сейчас, эффект от системы и накопленную экономию по месяцам. Это расчёт по допущениям, а точный эффект подтверждается на пилоте.</p>
+  <div class="calc">
+    <div class="panel"><div class="ph"><span>Ваше производство</span><span class="small">двигайте ползунки</span></div><div class="inp" id="inp"></div></div>
+    <div class="panel"><div class="ph"><span>Результат</span><span class="small" id="scn"></span></div><div class="out" id="out"></div></div>
+  </div>
+  <p class="disc" style="margin-top:14px;max-width:90ch">Допущения по эффекту (доля потерь, которую удаётся сохранить) стартовые и зависят от оборудования, дисциплины смен и качества данных. Эффект нарастает за первые три месяца после запуска. Стоимость внедрения считается отдельно после обследования; введённая вами цифра нужна только для оценки срока окупаемости.</p>
+</div></section>
+
+<section id="why"><div class="wrap">
+  <h2>Почему это выгодно бизнесу</h2>
+  <p class="lead">Потери на производстве красок складываются из мелочей, которые видны только после факта. Система переносит их обнаружение на раньше.</p>
+  <div class="versus">
+    <div class="card"><h3 style="color:var(--bad)">Без системы</h3><ul><li>отклонение замечают по анализу или рекламации, партия уже выпущена</li><li>поломка узнаётся остановкой линии, ремонт аварийный и дорогой</li><li>причину ищут по бумажным журналам и памяти смены</li><li>опыт технолога остаётся в голове и уходит вместе с ним</li></ul></div>
+    <div class="card"><h3 style="color:var(--ok)">С системой</h3><ul><li>прогноз и предупреждение до выхода за допуск</li><li>остановка и ремонт в плановое окно, заказ запчастей заранее</li><li>причина и доказательства (график, кадр камеры) под рукой</li><li>правила и опыт закреплены в системе, смены работают по одной логике</li></ul></div>
+  </div>
+  <div class="grid g4" style="margin-top:16px">
+    <div class="card"><h3>Брак и переделка</h3><p>Отклонение режима поймано до выпуска: меньше списаний и корректировок.</p></div>
+    <div class="card"><h3>Простой</h3><p>Каждый час линии стоит денег. Плановая остановка дешевле аварийной.</p></div>
+    <div class="card"><h3>Ремонт и запчасти</h3><p>Замена подшипника по состоянию дешевле, чем замена вместе с повреждённым узлом.</p></div>
+    <div class="card"><h3>Рекламации</h3><p>Паспорт партии и история режимов позволяют быстро разобраться и снять претензию.</p></div>
+  </div>
+</div></section>
+
+<section id="connect"><div class="wrap">
+  <h2>Как подключим ваше оборудование</h2>
+  <p class="lead">Программу создаём под ваш проект и ваше производство. Подключать датчики и оборудование можно тремя способами, выбирайте удобный.</p>
+  <div class="grid g3" style="margin-top:20px">
+    <div class="card var"><span class="n">1</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div><h3>Ваши инженеры</h3><p>Ваши специалисты подключают датчики и приборы сами. Мы даём схему подключения, список точек, протоколы и принимаем данные в систему. Подходит, если у вас сильная служба АСУ.</p></div>
+    <div class="card var"><span class="n">2</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2.8"/><circle cx="17" cy="9" r="2.4"/><path d="M2 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14 20c0-2.5 1.8-4.5 5-4.5"/></svg></div><h3>Вместе с вашими инженерами</h3><p>Мы подключаем программную часть и сложные точки, ваши инженеры дают доступ к оборудованию и выполняют монтаж. Быстрее, чем самим, и дешевле, чем всё под ключ.</p></div>
+    <div class="card var"><span class="n">3</span><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4l6 6-4 4-6-6zM10 8l-6 6v6h6l6-6"/></svg></div><h3>Всё под ключ нашими инженерами</h3><p>Наши инженеры подключают все датчики и оборудование и рассчитывают стоимость работ дополнительно, после обследования вашей линии.</p></div>
+  </div>
+  <h3 style="margin-top:34px">С чего начинаем</h3>
+  <ol class="tl">
+    <li><b>Знакомство и обследование</b><p>Разбираем ваши линии, приборы, потери и цели.</p></li>
+    <li><b>Техническое задание</b><p>Состав датчиков, камер, правил, сроки и стоимость.</p></li>
+    <li><b>Пилот на одной линии</b><p>Подключаем, настраиваем нормы, обучаем смену.</p></li>
+    <li><b>Проверка эффекта</b><p>Сравниваем потери до и после на ваших данных.</p></li>
+    <li><b>Масштабирование</b><p>Распространяем на остальные линии и участки.</p></li>
+  </ol>
+</div></section>
+</main>
+
+<footer><div class="wrap contact">
+  <div><h2>Обсудим вашу линию</h2><p class="lead" style="font-size:17px">Расскажите, какое у вас оборудование и где больше всего потерь. Мы посчитаем, что можно сохранить, и предложим состав системы и способ подключения.</p><div class="btns"><a class="cta" href="tel:+79934894429">Позвонить</a><a class="cta ghost" href="mailto:smol0901@gmail.com">Написать</a><a class="cta ghost" href="../index.html">← На сайт</a></div></div>
+  <div><p class="small" style="margin-bottom:6px">Александр Смолянинов, разработчик</p><a class="big-link" href="tel:+79934894429">+7 993 489-44-29</a><a class="big-link" href="mailto:smol0901@gmail.com">smol0901@gmail.com</a></div>
+</div>
+<div class="wrap"><p class="small" style="margin-top:26px;max-width:80ch">Расчёты и графики на странице иллюстративные, построены по допущениям и не являются гарантией результата. Реальный эффект определяется на пилоте по данным вашего производства. Изображения интерфейсов и оборудования — иллюстрации принципа работы.</p></div></footer>
+
+<script src="../pwa.js"></script>
+<script type="module" src="program.js"></script>
+</body>
+</html>
