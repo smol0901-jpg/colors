@@ -1,6 +1,7 @@
+import { Plant, STAGES, SCENARIOS, LINES, fmt, normText } from './core.js';
+import { SCENES, equipSvg, paintEquip } from './equip.js';
 import { viewVision } from './vision.js';
 import { viewCapacity } from './capacity.js';
-import { Plant, STAGES, fmt } from './core.js';
 import { BASE, NAMES, BASE_PROC, predict, advice, window_ } from './chem.js';
 import { Ops, ROLES, PERMS, ST, STAGE_ORDER, ENTRY, WASTE_REASONS, REPL } from './ops.js';
 
@@ -22,10 +23,11 @@ const ICON = {
   system: '<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><path d="M12 7v3M10.5 13.5L6.5 16.5M13.5 13.5l4 3"/>',
 };
 const TABS = [['center', 'Центр'], ['lines', 'Линии'], ['orders', 'Заявки'], ['shift', 'Смена'], ['more', 'Ещё']];
-const NAV = { color: 'more', batches: 'more', journal: 'more', helper: 'more', system: 'more', premix: 'more', analytics: 'more', roles: 'more', chem: 'more', vision: 'more', capacity: 'more' };
-const NEED = { lines: 'lines.view', orders: 'orders.view', shift: 'shift.view', color: 'color.use', batches: 'batches.view', journal: 'journal.view', premix: 'premix.view', analytics: 'analytics.view', roles: 'roles.manage', chem: 'chem.use', vision: 'lines.view', capacity: 'analytics.view' };
+const NAV = { vision: 'more', capacity: 'more', equip: 'more', color: 'more', batches: 'more', journal: 'more', helper: 'more', system: 'more', premix: 'more', analytics: 'more', roles: 'more', chem: 'more' };
+const NEED = { lines: 'lines.view', orders: 'orders.view', shift: 'shift.view', color: 'color.use', batches: 'batches.view', journal: 'journal.view', premix: 'premix.view', analytics: 'analytics.view', roles: 'roles.manage', chem: 'chem.use' , vision: 'lines.view', capacity: 'analytics.view' };
 const tabOk = (t) => !NEED[t] || ops.has(NEED[t]);
-const st = { tab: 'center', filter: 'all', chat: [], tier: 'f', sig: {} };
+const st = { tab: 'center', filter: 'all', chat: [], tier: 'f', sig: {}, ln: 'all', eq: { ln: 'p', i: 0 } };
+const vis = (x) => st.ln === 'all' || x.ln === st.ln;
 
 /* ---------- каркас ---------- */
 function renderTabs() {
@@ -37,7 +39,7 @@ function go(tab) {
   st.tab = tab; st.sig = {};
   renderTabs();
   const v = $('#view');
-  ({ center: viewCenter, lines: viewLines, orders: viewOrders, shift: viewShift, more: viewMore, color: viewColor, batches: viewBatches, journal: viewJournal, helper: viewHelper, system: viewSystem, premix: viewPremix, analytics: viewAnalytics, roles: viewRoles, chem: viewChem, vision: (x) => viewVision(x, plant, ops), capacity: (x) => viewCapacity(x) })[tab](v);
+  ({ vision: (x) => viewVision(x, plant, ops), capacity: (x) => viewCapacity(x), equip: viewEquip, center: viewCenter, lines: viewLines, orders: viewOrders, shift: viewShift, more: viewMore, color: viewColor, batches: viewBatches, journal: viewJournal, helper: viewHelper, system: viewSystem, premix: viewPremix, analytics: viewAnalytics, roles: viewRoles, chem: viewChem })[tab](v);
   window.scrollTo({ top: 0 });
 }
 $('#tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
@@ -54,24 +56,14 @@ function viewCenter(v) {
     <h2>Сводка</h2><div class="kpis" id="kpi"></div>
     <h2>Что требует внимания</h2><div class="attn" id="attn"></div>
     <h2>Линии сейчас</h2><div class="two-col" id="lmini"></div>
-    <h2>Этапы производства</h2><div class="pipe" id="pipe"></div>
-    <p class="note" style="margin-top:6px">Этапы показаны для линии порошковых красок. Для жидких красок и других процессов набор этапов, параметров и норм собирается под производство.</p>
+    <h2>Этапы производства</h2>
+    <div class="row" id="lnf" style="margin-bottom:8px">${[['all', 'Все линии'], ['p', LINES.p], ['l', LINES.l]].map(([k, n]) => `<button class="chip" data-ln="${k}" aria-pressed="${st.ln === k}">${n}</button>`).join('')}<button class="chip" data-go-eq="1">Оборудование в разрезе →</button></div>
+    <div class="pipe" id="pipe"></div>
+    <p class="note" style="margin-top:6px">Две линии: порошковые и жидкие краски. Набор этапов, параметров и норм собирается под ваше производство и оборудование.</p>
     <h2>Датчики</h2><div class="sens" id="sens"></div>
     <h2>Журнал отклонений</h2><div class="jr" id="jr"></div>
     <h2>Показать на демо</h2>
-    <div class="row" id="scen">
-      <button class="chip" data-sc="humidity">Влажность выросла</button>
-      <button class="chip" data-sc="oven">Печь остывает</button>
-      <button class="chip" data-sc="belt">Конвейер ускорился</button>
-      <button class="chip" data-sc="dust">Слабая аспирация</button>
-      <button class="chip" data-sc="color">Цвет уходит</button>
-      <button class="chip" data-sc="stretch">Чипсы тянутся</button>
-      <button class="chip" data-sc="burn">Вкрапления от шнека</button>
-      <button class="chip" data-sc="slip">Лента проскальзывает</button>
-      <button class="chip" data-sc="track">Сход ленты</button>
-      <button class="chip" data-sc="brg">Греется подшипник барабана</button>
-      <button class="chip" data-sc="reset">Сбросить</button>
-    </div>
+    <div class="row" id="scen">${scenButtons()}</div>
     <p class="note" style="margin-top:8px">Сценарии плавно меняют имитируемые датчики: видно, как система сначала прогнозирует выход за норму, затем поднимает тревогу и подсказывает, что проверить.</p>`;
   paintCenter();
 }
@@ -86,6 +78,10 @@ function spark(s, w = 100, h = 30, band = true) {
   const col = lvl === 'act' ? 'var(--danger-dot)' : lvl === 'watch' ? 'var(--warn-dot)' : 'var(--ok-dot)';
   const b = band ? `<rect x="0" y="${y(s.max)}" width="${w}" height="${Math.max(0, y(s.min) - y(s.max))}" fill="currentColor" opacity=".08"/>` : '';
   return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="color:var(--fg)">${b}<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
+function scenButtons() {
+  return Object.entries(SCENARIOS).filter(([, s]) => vis(s)).map(([k, s]) => `<button class="chip" data-sc="${k}">${s.label}</button>`).join('') + '<button class="chip" data-sc="reset">Сбросить</button>';
 }
 
 function paintCenter() {
@@ -120,15 +116,16 @@ function paintCenter() {
     return `<div class="lc ${l.state}"><div class="hd" style="display:flex;justify-content:space-between"><b>${l.name}</b><span class="pill ${l.state === 'work' ? (dev ? 'd' : 'g') : l.state === 'stop' ? 'w' : ''}">${l.state === 'work' ? (dev ? 'отклонение' : 'работает') : l.state === 'stop' ? 'простой' : 'свободна'}</span></div>
       ${o ? `<div class="m">${esc(o.no)} · ${esc(o.ral)} · ${esc(ops.name(l.opId))}</div><div class="kv"><span>Установка печи</span><b>${fmt(l.sp.oven, 0)} °C</b><span>Реально сейчас</span><b class="live ${a && Math.abs(a.oven - l.sp.oven) > 6 ? 'bad' : ''}">${a ? fmt(a.oven, 1) + ' °C' : '—'}</b></div>` : '<div class="m">Ожидает задачу</div>'}</div>`;
   }).join(''));
-  set('pipe', STAGES.map((s) => {
+  const stg = STAGES.filter(vis);
+  set('pipe', stg.map((s) => {
     const lv = plant.stageState(s.id);
     const n = plant.sensors.filter((x) => x.st === s.id).length;
     return `<div class="stage ${lv}"><i></i><b>${s.name}</b><small>${lv === 'act' ? 'тревога' : lv === 'watch' ? 'внимание' : 'в норме'} · ${n} парам.</small></div>`;
-  }).join(''), STAGES.map((s) => plant.stageState(s.id)).join());
+  }).join(''), st.ln + stg.map((s) => plant.stageState(s.id)).join());
 
-  set('sens', plant.sensors.map((s) => {
+  set('sens', plant.sensors.filter(vis).map((s) => {
     const lv = plant.status(s);
-    const norm = s.one === 'hi' ? `допуск ≤ ${fmt(s.max, s.dec)}` : `норма ${fmt(s.min, s.dec)}…${fmt(s.max, s.dec)}`;
+    const norm = normText(s);
     return `<button class="sc ${lv}" data-sens="${s.id}"><div class="n">${esc(s.name)}<i></i></div>
       <div class="v">${fmt(s.value, s.dec)}<small>${esc(s.unit)}</small></div><div class="r">${norm}</div>${spark(s)}</button>`;
   }).join(''));
@@ -143,8 +140,18 @@ function paintCenter() {
 document.addEventListener('click', (e) => {
   const a = e.target.closest('[data-ack]');
   if (a) { (a.dataset.ack.startsWith('ln:') ? ops : plant).acknowledge(a.dataset.ack, a.dataset.how); st.sig = {}; paintCenter(); return; }
+  const lf = e.target.closest('[data-ln]');
+  if (lf) { st.ln = lf.dataset.ln; st.sig = {}; viewCenter($('#view')); return; }
+  const ge = e.target.closest('[data-go-eq]');
+  if (ge) { go('equip'); return; }
   const sc = e.target.closest('[data-sc]');
-  if (sc) { plant.inject(sc.dataset.sc); return; }
+  if (sc) { plant.inject(sc.dataset.sc); if (st.tab === 'equip') { const m = SCENARIOS[sc.dataset.sc]; if (m) { const hit = SCENES[m.ln].findIndex((x) => Object.keys(m.set).some((k) => k !== 'reset' && JSON.stringify(x.fn(plant).hs).includes('"' + k + '"'))); if (hit >= 0 && (st.eq.ln !== m.ln || st.eq.i !== hit)) { st.eq = { ln: m.ln, i: hit }; viewEquip($('#view')); } } toast('Сценарий: ' + (m ? m.label : 'сброс')); } return; }
+  const eln = e.target.closest('[data-eln]');
+  if (eln) { st.eq = { ln: eln.dataset.eln, i: 0 }; viewEquip($('#view')); return; }
+  const esc_ = e.target.closest('[data-esc]');
+  if (esc_) { st.eq.i = +esc_.dataset.esc; viewEquip($('#view')); return; }
+  const ez = e.target.closest('[data-ez]');
+  if (ez) { plant.setZones(+ez.dataset.ez); viewEquip($('#view')); return; }
   const se = e.target.closest('[data-sens]');
   if (se) { openSensor(se.dataset.sens); return; }
   const tb = e.target.closest('[data-tab]');
@@ -547,8 +554,28 @@ function viewShift(v) {
 }
 
 /* ---------- Ещё и журнал ---------- */
+function viewEquip(v) {
+  const scs = SCENES[st.eq.ln];
+  const sc = scs[st.eq.i] || scs[0];
+  const sceneSens = [...sc.fn(plant).hs].map((h) => h[0]);
+  v.innerHTML = `
+    <h2>Оборудование в разрезе и датчики</h2>
+    <p class="note" style="margin:0 0 10px">Схемы показывают, из чего состоят линии порошковых и жидких красок и где ставятся датчики. Точки на схеме живые: цвет и значение берутся из имитатора. Нажмите на точку, чтобы открыть график. Состав оборудования и места датчиков в рабочей системе рисуются под вашу линию.</p>
+    <div class="row" id="eqln" style="margin-bottom:8px">${Object.entries(LINES).map(([k, n]) => `<button class="chip" data-eln="${k}" aria-pressed="${st.eq.ln === k}">${n}</button>`).join('')}</div>
+    <div class="row" id="eqsc" style="margin-bottom:8px">${scs.map((x, i) => `<button class="chip" data-esc="${i}" aria-pressed="${i === st.eq.i}">${i + 1}. ${x.name}</button>`).join('')}</div>
+    ${sc.id === 'p1' ? `<div class="row" style="align-items:center;margin-bottom:8px"><b style="font-size:13.5px">Зон цилиндра экструдера:</b>${[2, 3, 4, 5, 6].map((n) => `<button class="chip" data-ez="${n}" aria-pressed="${plant.zones === n}">${n}</button>`).join('')}<span class="note">датчик ставится на каждую зону</span></div>` : ''}
+    <div class="eqwrap card" id="eqhost" style="padding:0;overflow-x:auto">${equipSvg(sc, plant)}</div>
+    <div class="row" style="margin:8px 0 2px;align-items:center"><span class="pill g">норма</span><span class="pill w">внимание</span><span class="pill d">тревога</span><span class="note">датчиков на этой схеме: ${sceneSens.length}</span></div>
+    <h2>Из чего состоит</h2>
+    <div class="eqinfo">${sc.info.map(([n, d]) => `<div class="card"><b>${esc(n)}</b><p class="note" style="margin:4px 0 0;font-size:13.5px">${esc(d)}</p></div>`).join('')}</div>
+    <p class="note" style="margin-top:10px">Ориентиры по параметрам типовые для отрасли, нормы в демо условные. На предприятии их задаёт технолог по регламенту и оборудованию.</p>
+    <h2>Показать на демо</h2>
+    <div class="row">${Object.entries(SCENARIOS).filter(([, s]) => s.ln === st.eq.ln).map(([k, s]) => `<button class="chip" data-sc="${k}">${s.label}</button>`).join('')}<button class="chip" data-sc="reset">Сбросить</button></div>`;
+  paintEquip($('#eqhost'), plant);
+}
+
 function viewMore(v) {
-  const m = [['premix', 'Премиксы', 'Очередь малых и больших премиксов, корректировки'], ['color', 'Цвет', 'Коррекция цвета: график a*b*, колорант и % добавки'], ['capacity', 'Мощность и масштаб', 'Линии, датчики, агенты, хранение и расчёт мощности сервера'], ['vision', 'Визуальный контроль', 'Лента и чипсы: излом, вкрапления, толщина, температура по длине'], ['chem', 'Состав и нагрев', 'Опционально: прогноз результата при смещении ингредиентов и нагреве'], ['batches', 'Партии', 'Готовая продукция, паспорт качества и этикетка'], ['analytics', 'Аналитика', 'Выпуск, отходы, простои и корректировки по линиям'], ['journal', 'Журнал', 'Все действия людей и отклонения, выгрузка в CSV'], ['roles', 'Роли и доступ', 'Права каждой роли настраиваются индивидуально'], ['helper', 'Помощник', 'Подсказки технологу по текущему состоянию'], ['system', 'Система', 'Модули, масштаб нейросети, схема, демо и рабочая версия']].filter(([k]) => tabOk(k));
+  const m = [['vision', 'Визуальный контроль', 'Лента и чипсы: излом, вкрапления, толщина, температура по длине'], ['capacity', 'Мощность и масштаб', 'Линии, датчики, агенты, хранение и расчёт мощности сервера'], ['equip', 'Оборудование в разрезе', 'Порошковая и жидкая линии: из чего состоят, где стоят датчики, сценарии отклонений'], ['premix', 'Премиксы', 'Очередь малых и больших премиксов, корректировки'], ['color', 'Цвет', 'Коррекция цвета: график a*b*, колорант и % добавки'], ['chem', 'Состав и нагрев', 'Опционально: прогноз результата при смещении ингредиентов и нагреве'], ['batches', 'Партии', 'Готовая продукция, паспорт качества и этикетка'], ['analytics', 'Аналитика', 'Выпуск, отходы, простои и корректировки по линиям'], ['journal', 'Журнал', 'Все действия людей и отклонения, выгрузка в CSV'], ['roles', 'Роли и доступ', 'Права каждой роли настраиваются индивидуально'], ['helper', 'Помощник', 'Подсказки технологу по текущему состоянию'], ['system', 'Система', 'Модули, масштаб нейросети, схема, демо и рабочая версия']].filter(([k]) => tabOk(k));
   v.innerHTML = `<h2>Разделы</h2><div class="menu">${m.map(([k, n, d]) => `<button data-go="${k}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>`;
   v.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => go(b.dataset.go)));
 }
@@ -723,13 +750,20 @@ function paintChem() {
 
 /* ---------- цикл ---------- */
 function tick() {
-  plant.step(Date.now());
+  if (!window.nap?.hold) plant.step(Date.now());
   const n = allItems().filter((i) => !ackOf(i.key)).length;
   const b = $('#bellN'); b.hidden = !n; b.textContent = n;
   paintCenter();
   paintLines();
+  if (st.tab === 'equip') { const h = $('#eqhost'); if (h) paintEquip(h, plant); }
 }
 setInterval(tick, plant.settings.tickSec * 1000);
 initWho();
 go('center');
 tick();
+
+// Для показа и записи скриншотов: ускоренная перемотка имитатора (в рабочей системе не используется)
+window.nap = {
+  plant,
+  ff(sec) { window.nap.hold = true; for (let k = 0; k < sec / plant.settings.tickSec; k++) plant.step(plant.t + plant.settings.tickSec * 1000); st.sig = {}; paintCenter(); if (st.tab === 'equip') { const h = $('#eqhost'); if (h) paintEquip(h, plant); } },
+};

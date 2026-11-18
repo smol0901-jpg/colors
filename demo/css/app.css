@@ -185,6 +185,10 @@ table.tab td.tt{font-weight:800}
 .stack{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}.stack i{display:block;height:100%}
 table.cmpt{font-size:13.5px}table.cmpt th,table.cmpt td{padding:6px 8px}
 
+.eqinfo{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.eqwrap svg{display:block;min-width:960px;width:100%;height:auto}
+.eqwrap{background:#f4f8f5}
+
 /* визуальный контроль */
 .vframe{max-width:640px}
 .vcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
