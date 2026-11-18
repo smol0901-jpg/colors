@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Коррекция цвета добавлением: расчёт по данным спектрофотометра</title>
+<meta name="description" content="Введите L*a*b* эталона и образца, размер замеса и пробы: инструмент подскажет, какого колоранта и сколько добавить. Приборы: сферический d/8°, 45°/0°, многоугловой, колориметр и ваш.">
+<meta name="theme-color" content="#14202e">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14202e;--ink2:#4a5868;--paper:#f5f6f8;--card:#fff;--line:#dde2e8;--y:#f2b705;--b:#1f5fbf;--ok:#1b8a4b;--warn:#a86a00;--bad:#c0291f;--maxw:1180px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eef1f5;--ink2:#a9b4c2;--paper:#0f1722;--card:#17212e;--line:#2a3646;--ok:#46d391;--warn:#f6c453;--bad:#ff7a70}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16.5px/1.55 "Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:inherit}button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+h1,h2,h3,h4{line-height:1.15;margin:0;letter-spacing:-.02em;font-weight:800}h1{font-size:clamp(32px,5.6vw,54px)}h2{font-size:clamp(24px,3.6vw,34px);margin-bottom:10px}h3{font-size:19px;margin-bottom:6px}h4{font-size:15px;margin-bottom:6px}
+p{margin:0 0 10px}.lead{font-size:clamp(17px,2vw,19.5px);color:var(--ink2);max-width:72ch}.small{font-size:13.5px;color:var(--ink2)}
+section{padding:46px 0;border-top:1px solid var(--line)}
+header.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:56px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none}.brand i{width:22px;height:22px;border-radius:6px;background:var(--ink);position:relative}.brand i::before,.brand i::after{content:"";position:absolute;background:var(--y);left:50%;top:50%;transform:translate(-50%,-50%);border-radius:2px}.brand i::before{width:12px;height:3px}.brand i::after{width:3px;height:12px}
+nav{display:flex;gap:16px;font-size:14px;align-items:center;flex-wrap:wrap}nav a{text-decoration:none;color:var(--ink2)}nav a:hover{color:var(--ink)}@media(max-width:760px){nav a.opt{display:none}}
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;background:var(--ink);color:var(--paper);text-decoration:none;padding:11px 18px;border-radius:10px;font-weight:700;border:1px solid var(--ink)}.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.hero{border-top:0;padding:46px 0 24px}.hero h1 span{color:var(--b)}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero h1 span{color:#7fb0ff}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.chips span{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ink2)}
+.step{display:flex;gap:10px;align-items:center;margin:0 0 10px}.step b{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:14px;flex:none}.step h3{margin:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}@media(max-width:960px){.layout{grid-template-columns:1fr}}
+.stack{display:grid;gap:14px}
+.insts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ic{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;display:grid;gap:2px}.ic b{font-size:14px;line-height:1.2}.ic span{font-size:12px;color:var(--ink2)}.ic.on{border-color:var(--b);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent);background:var(--card)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}.seg button{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:6px 13px;font-size:13.5px;font-weight:600}.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.two{grid-template-columns:1fr}}
+.labs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.lab{display:grid;gap:2px;font-size:12px;color:var(--ink2);font-weight:600}
+input{border:1px solid var(--line);background:var(--paper);border-radius:9px;padding:8px 10px;width:100%;min-width:0}input:focus{outline:2px solid var(--b);outline-offset:1px}
+.ang{border:1px dashed var(--line);border-radius:12px;padding:10px;margin-top:8px}.angh{font-weight:800;font-size:13px;margin-bottom:6px;color:var(--ink2)}
+.sizes{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sizes label,.row3 label{display:grid;gap:3px;font-size:13px;font-weight:600;color:var(--ink2)}.row3{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.colr{display:grid;grid-template-columns:1fr 112px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}.colr:last-child{border:0}
+.ck{display:flex;gap:9px;align-items:center;cursor:pointer}.ck input{width:18px;height:18px;flex:none}.ck i{width:18px;height:18px;border-radius:5px;border:1px solid #0003;flex:none}.ck b{display:block;font-size:14px;line-height:1.15}.ck em{font-style:normal;font-size:11.5px;color:var(--ink2)}
+.cont{display:grid;gap:2px;font-size:11px;color:var(--ink2)}.cont input{padding:6px 8px}
+.sw3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.sw3>div{display:grid;gap:3px}.sw3 i{height:62px;border-radius:12px;border:1px solid #0002;display:block}.sw3 span{font-size:12.5px;font-weight:700}.sw3 em{font-style:normal;font-size:11.5px;color:var(--ink2)}
+.kp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.kpi{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--ink) 3%,var(--card))}.kpi span{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);font-weight:600}.kpi b{display:block;font-size:22px;line-height:1.2}.kpi em{font-style:normal;font-size:12px;color:var(--ink2)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+.note,.warn.box,div.warn{border-radius:12px;padding:10px 12px;margin-top:10px;font-size:14.5px;border:1px solid var(--line)}div.warn{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 10%,transparent);color:var(--ink)}.note.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent);color:var(--ink)}
+.xw{overflow-x:auto}.tab{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}.tab th,.tab td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}.tab th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}.tab em{font-style:normal;color:var(--ink2);font-size:12px}.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;border:1px solid #0003}
+.sn{width:74px;padding:5px 7px}
+.plane svg{width:100%;max-width:420px;display:block}
+.act{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 8px}
+details{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 16px;margin-top:14px}details summary{cursor:pointer;font-weight:800}
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:16px}.tips div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}.tips b{display:block;margin-bottom:4px}.tips p{font-size:14px;color:var(--ink2);margin:0}
+.calrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:8px}.calrow label{display:grid;gap:3px;font-size:12px;color:var(--ink2);font-weight:600}
+footer{padding:44px 0 56px;border-top:1px solid var(--line)}
+@media print{header.top,nav,.act,#insts,details,footer{display:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="../index.html"><i></i>Цвет и контроль</a>
+<nav><a class="opt" href="#tool">Инструмент</a><a class="opt" href="#how">Как замерять</a><a href="../program/index.html">Программа</a><a href="../agent/index.html">ИИ-агент</a><a href="../index.html">← На сайт</a></nav></div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+  <p class="small" style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">Инструмент технолога</p>
+  <h1>Коррекция цвета: <span>что и сколько добавить</span></h1>
+  <p class="lead" style="margin-top:12px">Введите значения со спектрофотометра (L*a*b* эталона и образца или готовое отклонение), размер замеса или пробы и, если нужно, содержание пигмента в рецептуре. Инструмент подберёт добавки и покажет прогноз. Замес уже сделан, поэтому убрать лишнее нельзя: расчёт только добавляет.</p>
+  <div class="chips"><span>5 типов приборов, включая ваш</span><span>ΔE по CIEDE2000</span><span>данные остаются в браузере</span><span>работает офлайн</span></div>
+  <div class="act"><button class="btn" id="demo" type="button">Подставить пример</button><a class="btn ghost" href="#how">Как правильно замерить</a></div>
+</div></section>
+
+<section id="tool"><div class="wrap">
+  <div class="layout">
+    <div class="stack">
+      <div class="panel"><div class="step"><b>1</b><h3>Прибор</h3></div><div class="insts" id="insts"></div><div id="instNote" style="margin-top:8px"></div><div id="geo" style="margin-top:8px"></div></div>
+      <div class="panel"><div class="step"><b>2</b><h3>Данные</h3></div>
+        <div class="seg" id="modeSeg"></div><div class="seg" id="btSeg" style="margin-top:8px"></div>
+        <div id="labs" style="margin-top:10px"></div>
+        <h4 style="margin-top:14px">Размеры</h4><div class="sizes" id="sizes"></div></div>
+      <div class="panel"><div class="step"><b>3</b><h3>Колоранты</h3></div>
+        <p class="small">Отметьте, чем можно корректировать. В поле «в рецепте, %» укажите содержание пигмента в рецептуре: тогда добавка пересчитается и в % к его количеству.</p>
+        <div class="seg" style="align-items:center"><span class="small" style="margin-right:4px">Не больше колорантов в добавке:</span><span class="seg" id="nseg"></span></div>
+        <div id="cols" style="margin-top:6px"></div></div>
+    </div>
+    <div class="stack" style="position:sticky;top:70px"><div class="panel"><div class="step"><b>4</b><h3>Результат</h3></div><div id="res"></div></div></div>
+  </div>
+
+  <details><summary>Калибровка чувствительности колорантов</summary>
+    <p class="small" style="margin-top:8px">Таблица показывает, как меняются L*a*b* при добавке +0,1 % колоранта к массе замеса. Значения по умолчанию типовые и приблизительные: у каждого производства своя база и свои пигменты. Лучше всего определить их по собственным пробным добавкам. Данные сохраняются только в этом браузере.</p>
+    <div class="xw" id="calTab"></div>
+    <h4 style="margin-top:14px">Определить по пробной добавке</h4>
+    <div class="calrow"><label>Колорант<select id="calSel"></select></label><label>Добавлено, % к массе<input id="calAdd" inputmode="decimal" placeholder="0,2"></label></div>
+    <div class="calrow"><label>До: L*<input id="cb0" inputmode="decimal"></label><label>До: a*<input id="cb1" inputmode="decimal"></label><label>До: b*<input id="cb2" inputmode="decimal"></label></div>
+    <div class="calrow"><label>После: L*<input id="ca0" inputmode="decimal"></label><label>После: a*<input id="ca1" inputmode="decimal"></label><label>После: b*<input id="ca2" inputmode="decimal"></label></div>
+    <div class="act"><button class="btn" id="calApply" type="button">Сохранить чувствительность</button><button class="btn ghost" id="calReset" type="button">Вернуть типовые</button></div><p class="small" id="calMsg"></p>
+  </details>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>Как правильно замерить</h2>
+  <p class="lead">Точность коррекции ограничена точностью замера. Эти привычки убирают большую часть ошибок.</p>
+  <div class="tips">
+    <div><b>Одинаковые условия</b><p>Эталон и образец измеряйте одним прибором, в одном режиме (SCI или SCE), с одним источником света и наблюдателем, например D65/10°.</p></div>
+    <div><b>Одинаково отверждённая панель</b><p>Образец наносите и отверждайте по одному режиму и на одинаковой подложке. Недоотверждение само сдвигает цвет и блеск.</p></div>
+    <div><b>Несколько замеров</b><p>Берите 3–5 замеров в разных местах панели с поворотом и усредняйте. Откалибруйте прибор перед сменой.</p></div>
+    <div><b>Блеск и фактура</b><p>Если блеск образца и эталона разный, цвет сравнивать корректно только в режиме SCI. На фактурных поверхностях разброс больше.</p></div>
+    <div><b>Малая проба сначала</b><p>Прежде чем добавлять в замес, проверьте расчёт на малой пробе и перемерьте. При большой добавке делайте в два шага.</p></div>
+    <div><b>Что считает инструмент</b><p>Линейную модель: добавки складываются по вкладу каждого колоранта. Она хороша для небольших добавок и средних тонов.</p></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><h3>Нужен инструмент под ваше производство?</h3>
+<p class="lead" style="font-size:16.5px">В рабочей версии чувствительности берутся из вашей базы колорантов и истории корректировок, прибор подключается напрямую, а результат записывается в паспорт партии.</p>
+<div class="act"><a class="btn" href="../program/index.html">Программа под ваше производство</a><a class="btn ghost" href="../index.html#contact">Обсудить</a><a class="btn ghost" href="../index.html">← На сайт</a></div>
+<p class="small" style="max-width:80ch">Расчёт ориентировочный и не заменяет решения технолога. Названия пигментов даны по международному Colour Index.</p></div></footer>
+<script src="../pwa.js"></script>
+<script type="module" src="correction.js"></script>
+</body>
+</html>

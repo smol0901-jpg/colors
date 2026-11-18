@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ИИ-агент контроля линий: спросите, и он покажет доказательства</title>
+<meta name="description" content="Интерактивная демонстрация ИИ-агента для линий порошковой краски: датчики, вибрация, температуры зон, камера над лентой чипсов, прогноз поломок и цена бездействия.">
+<meta name="theme-color" content="#14202e">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2314202e'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='%23f2b705' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14202e;--ink2:#4a5868;--paper:#f5f6f8;--card:#fff;--line:#dde2e8;--y:#f2b705;--b:#1f5fbf;--g:#2e9e5b;--r:#d6342c;--ok:#1b8a4b;--warn:#a86a00;--bad:#c0291f;--maxw:1180px}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#eef1f5;--ink2:#a9b4c2;--paper:#0f1722;--card:#17212e;--line:#2a3646;--ok:#46d391;--warn:#f6c453;--bad:#ff7a70}}
+:root[data-theme="dark"]{--ink:#eef1f5;--ink2:#a9b4c2;--paper:#0f1722;--card:#17212e;--line:#2a3646;--ok:#46d391;--warn:#f6c453;--bad:#ff7a70}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 "Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+a{color:inherit}button{font:inherit;color:inherit;cursor:pointer}button:disabled{cursor:wait;opacity:.55}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+h1,h2,h3{line-height:1.12;margin:0;letter-spacing:-.02em;font-weight:800}
+h1{font-size:clamp(34px,6vw,58px)}h2{font-size:clamp(24px,3.6vw,36px);margin-bottom:12px}h3{font-size:19px;margin-bottom:6px}
+p{margin:0 0 12px}.lead{font-size:clamp(17px,2vw,20px);color:var(--ink2);max-width:68ch}
+section{padding:56px 0;border-top:1px solid var(--line)}
+.mini{font-size:12.5px;color:var(--ink2)}
+header.top{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px;height:56px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none}.brand i{width:22px;height:22px;border-radius:6px;background:var(--ink);position:relative}.brand i::before,.brand i::after{content:"";position:absolute;background:var(--y);left:50%;top:50%;transform:translate(-50%,-50%);border-radius:2px}.brand i::before{width:12px;height:3px}.brand i::after{width:3px;height:12px}
+nav{display:flex;gap:16px;font-size:14px;align-items:center;flex-wrap:wrap}nav a{text-decoration:none;color:var(--ink2)}nav a:hover{color:var(--ink)}
+.tbtn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:5px 10px;font-size:14px}
+@media(max-width:820px){nav a.opt{display:none}}
+.hero{padding:56px 0 40px;border-top:0}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+.hero h1 span{color:var(--b)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero h1 span{color:#7fb0ff}}
+:root[data-theme="dark"] .hero h1 span{color:#7fb0ff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}.chips span{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ink2)}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.cta{display:inline-flex;gap:8px;align-items:center;background:var(--ink);color:var(--paper);text-decoration:none;padding:12px 20px;border-radius:10px;font-weight:700;border:0}
+.cta.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+/* статусы */
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid currentColor;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;white-space:nowrap}.pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.p-ok{color:var(--ok)}.p-warn{color:var(--warn)}.p-bad{color:var(--bad)}
+.t2-ok,.hl-ok{color:var(--ok)}.t2-warn,.hl-warn{color:var(--warn)}.t2-bad,.hl-bad{color:var(--bad)}
+.bg-ok{background:#2fbf71}.bg-warn{background:#f2b705}.bg-bad{background:#e2483d}
+.t-ok{color:#46d391}.t-warn{color:#f6c453}.t-bad{color:#ff7a70}
+/* парк */
+.fleet{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:22px}
+@media(max-width:1000px){.fleet{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.fleet{grid-template-columns:1fr}}
+.fc{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:7px;transition:border-color .15s,transform .15s}.fc:hover:not(:disabled){border-color:var(--b);transform:translateY(-1px)}.fc.on{border-color:var(--b);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent)}
+.fc-h{display:flex;justify-content:space-between;align-items:center;gap:6px}.fc-p{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink2)}.fc-p i{width:12px;height:12px;border-radius:50%;border:1px solid var(--line);flex:none}
+.fc-v{display:flex;justify-content:space-between;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}.fc-t .chart{height:34px;width:100%;display:block;color:var(--ink)}
+.fc-f{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink2)}.fc-f b{font-size:22px}
+/* лента и сценарий */
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:18px}@media(max-width:860px){.two{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.ph{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--line);font-weight:700;font-size:15px}.ph .mini{font-weight:500}
+.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#e2483d;margin-right:6px;animation:pl 1.4s infinite}@keyframes pl{50%{opacity:.25}}
+#feed{list-style:none;margin:0;padding:0;min-height:236px}#feed li{border-bottom:1px solid var(--line);animation:inn .35s}#feed li:last-child{border:0}
+@keyframes inn{from{opacity:0;transform:translateY(-6px)}}
+#feed button,#jlist button{width:100%;display:grid;grid-template-columns:auto auto 1fr;gap:10px;align-items:center;padding:10px 16px;text-align:left;background:none;border:0}#feed button:hover:not(:disabled),#jlist button:hover{background:color-mix(in srgb,var(--ink) 5%,transparent)}
+.ft{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums}.fb{border:1px solid currentColor;border-radius:6px;padding:0 6px;font-size:12px;font-weight:700}.fx{font-size:14px}
+#scList{list-style:none;margin:0;padding:12px 16px;display:grid;gap:8px}#scList li{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--ink2)}#scList li span{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-size:12px;flex:none}
+#scList li.now{color:var(--ink);font-weight:700}#scList li.now span{background:var(--y);border-color:var(--y);color:#14202e}#scList li.done span{background:var(--ok);border-color:var(--ok);color:#fff}
+.scf{padding:4px 16px 16px}.scf .cta{width:100%;justify-content:center}
+/* консоль */
+.cons{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}@media(max-width:960px){.cons{grid-template-columns:1fr}}
+#chat{height:560px;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.msg{display:flex;gap:10px;max-width:100%}.msg.me{justify-content:flex-end}.msg .b{border-radius:14px;padding:10px 14px;max-width:100%;min-width:0}
+.msg.me .b{background:var(--ink);color:var(--paper);border-bottom-right-radius:4px;max-width:85%}
+.msg.bot .b{background:color-mix(in srgb,var(--ink) 5%,var(--card));border:1px solid var(--line);border-bottom-left-radius:4px;flex:1}
+.av{width:34px;height:34px;border-radius:10px;background:var(--b);color:#fff;display:grid;place-items:center;flex:none}
+.steps{display:grid;gap:4px;font-size:12.5px;color:var(--ink2);margin-bottom:8px}.steps span{display:flex;gap:7px;align-items:center}.steps.done{opacity:.8}.steps svg{color:var(--ok);flex:none}
+.steps u{width:11px;height:11px;border:2px solid var(--b);border-top-color:transparent;border-radius:50%;display:inline-block;animation:sp .7s linear infinite;flex:none}@keyframes sp{to{transform:rotate(360deg)}}
+.ttl{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;flex-wrap:wrap;margin-bottom:4px}.txt p{margin:0 0 8px;font-size:15px}
+.cur{display:inline-block;width:7px;height:15px;background:var(--b);margin-left:2px;vertical-align:-2px;animation:pl 1s infinite}
+.act{margin:8px 0;font-size:14px}.act ol{margin:4px 0 0;padding-left:20px;display:grid;gap:3px}
+.ev-f{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:8px;font-size:12px;color:var(--ink2);flex-wrap:wrap}.lnk{background:none;border:0;color:var(--b);font-weight:700;padding:0;text-decoration:underline;text-underline-offset:3px}
+:root[data-theme="dark"] .lnk{color:#7fb0ff}
+.ctl{border-top:1px solid var(--line);padding:12px 14px;display:grid;gap:10px}
+.pr{display:flex;flex-wrap:wrap;gap:6px}.pk{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;display:inline-flex;gap:6px;align-items:center}.pk i{width:8px;height:8px;border-radius:50%}.pk.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+#askForm{display:flex;gap:8px}#askIn{flex:1;min-width:0;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:10px;padding:11px 13px;font:inherit}#askIn:focus{outline:2px solid var(--b);outline-offset:1px}
+.snd{background:var(--b);color:#fff;border:0;border-radius:10px;padding:0 16px;display:grid;place-items:center}
+.sm-btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 10px;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
+/* анализатор */
+#anHead{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}.an-note{padding:12px 16px 0;margin:0;font-size:15px}#anBody{padding:0 0 12px}#anBody .act{padding:0 16px}#anBody .bd{margin:12px 12px 0}
+/* карточки данных */
+.bd{position:relative;border-radius:14px;overflow:hidden;color:#fff;isolation:isolate}.bd>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;filter:blur(2px) saturate(1.1);transform:scale(1.06)}.bd-s{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,16,24,.62),rgba(10,16,24,.82));z-index:-1}.bd-c{padding:12px;display:grid;gap:10px}
+.fleetbd{background:#15202d}
+.gg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.gg.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.gg.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:700px){.gg.g3,.gg.g5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:10px 12px;min-width:0}
+.gl.wide{grid-column:1/-1}.gl.w2{grid-column:span 2}
+.gl-h{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:rgba(255,255,255,.72);font-weight:600}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.gl-v{font-size:24px;font-weight:800;line-height:1.15;margin-top:3px;font-variant-numeric:tabular-nums}.gl-v small{font-size:12px;font-weight:500;color:rgba(255,255,255,.7);margin-left:4px}.gl-t{font-size:12px;color:rgba(255,255,255,.72);margin-top:2px}.gl-c{margin-top:6px}
+.chart{display:block;width:100%;height:auto;color:#fff}.xl{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.6);margin-top:2px}
+.bar{height:6px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}.bar i{display:block;height:100%;border-radius:99px}
+.gauge{display:flex;flex-direction:column;align-items:center;color:#fff}.gauge svg{width:100%;max-width:170px}.gv{font-size:20px;font-weight:800;margin-top:-4px}.gv small{font-size:12px;color:rgba(255,255,255,.7);font-weight:500}
+.zp{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;align-items:end}.zp>div{display:flex;flex-direction:column;align-items:center;gap:3px}.zb{position:relative;height:90px;width:100%;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}.zb i{position:absolute;left:0;right:0;bottom:0;opacity:.85}.zb b{position:absolute;left:0;right:0;height:2px;background:#fff}.zd{font-size:10.5px;font-weight:700}.zv{font-size:11.5px;font-weight:700}.zn{font-size:9.5px;color:rgba(255,255,255,.65);text-align:center}
+.rk{list-style:none;margin:0;padding:0;display:grid;gap:8px}.rk li{display:grid;grid-template-columns:1fr auto;gap:4px 8px;font-size:13px}.rk li .bar{grid-column:1/-1}.rk em{font-style:normal;color:rgba(255,255,255,.65)}
+.sc{margin-bottom:8px}.sc>div{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
+.lt{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:4px 10px;font-size:13px}.lt>span:nth-child(2),.lt>span:nth-child(3){font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.65)}.mini{color:inherit}.bd .mini{color:rgba(255,255,255,.65);margin:6px 0 0}
+.fl{list-style:none;margin:0;padding:0;display:grid;gap:8px}.fl li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 10px;font-size:13px}.fl li .bar{grid-column:1/-1}.fl em{font-style:normal;font-weight:700}
+.sm{display:grid;gap:10px}
+/* камера */
+.cam{margin:0}.cam-f{position:relative;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.2);background:#000}.cam-f img{width:100%;display:block;aspect-ratio:8/5;object-fit:cover}
+.cam-hud{position:absolute;inset:0;pointer-events:none;font-size:11px;font-weight:600}.cam-hud .c{position:absolute;width:14px;height:14px;border-color:rgba(255,255,255,.85);border-style:solid;border-width:0}.tl{left:8px;top:8px;border-left-width:2px!important;border-top-width:2px!important}.tr{right:8px;top:8px;border-right-width:2px!important;border-top-width:2px!important}.bl{left:8px;bottom:8px;border-left-width:2px!important;border-bottom-width:2px!important}.br{right:8px;bottom:8px;border-right-width:2px!important;border-bottom-width:2px!important}
+.cam-hud .box{position:absolute;border:2px solid;border-radius:3px;animation:bx .5s both}.box.k-inclusion{border-color:#ff5a4d;background:rgba(255,90,77,.12)}.box.k-discoloration,.box.k-thickness{border-color:#f6c453;background:rgba(246,196,83,.1)}@keyframes bx{from{opacity:0;transform:scale(1.3)}}
+.box span{position:absolute;left:-2px;top:-17px;background:#ff5a4d;color:#fff;padding:0 4px;border-radius:3px;white-space:nowrap;font-size:10px}.box.k-discoloration span,.box.k-thickness span{background:#f6c453;color:#222}
+.cam-id{position:absolute;left:26px;top:9px;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.55);color:#fff;padding:1px 7px;border-radius:5px}.cam-id i{width:7px;height:7px;border-radius:50%;background:#e2483d;animation:pl 1.2s infinite}.cam-ral{position:absolute;right:26px;bottom:9px;background:rgba(0,0,0,.55);color:#fff;padding:1px 7px;border-radius:5px}
+.cam figcaption{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;color:rgba(255,255,255,.8);margin-top:6px;flex-wrap:wrap}
+/* как работает */
+.flow{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}@media(max-width:1000px){.flow{grid-template-columns:1fr 1fr}}@media(max-width:560px){.flow{grid-template-columns:1fr}}
+.flow li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}.fh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.fh span{width:36px;height:36px;border-radius:10px;background:color-mix(in srgb,var(--b) 14%,transparent);color:var(--b);display:grid;place-items:center}.fh em{font-style:normal;color:var(--ink2);font-size:12px}.flow b{font-size:15px}.flow p{font-size:13.5px;color:var(--ink2);margin:4px 0 0}
+#rules{overflow:auto;margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}#rules table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}#rules th,#rules td{padding:9px 14px;text-align:left;border-bottom:1px solid var(--line)}#rules th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}#rules tr:last-child td{border:0}
+/* журнал */
+#jlist{list-style:none;margin:0;padding:0;max-height:360px;overflow:auto}#jlist li{border-bottom:1px solid var(--line)}#jlist li:last-child{border:0}#jlist button{grid-template-columns:auto auto auto auto 1fr}.jt{font-size:12.5px;color:var(--ink2)}.jq{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.empty{padding:20px 16px;color:var(--ink2);font-size:14px}
+@media(max-width:700px){#jlist button{grid-template-columns:auto 1fr auto}.jq,.jt{display:none}}
+dialog{border:0;border-radius:18px;padding:0;max-width:min(760px,94vw);width:100%;background:var(--card);color:var(--ink);box-shadow:0 30px 80px #0008}dialog::backdrop{background:#0009}
+#dlgBody{padding:20px;max-height:80vh;overflow:auto}#dlgX{position:absolute;right:12px;top:10px;border:0;background:none;font-size:24px;line-height:1}
+.note{font-size:13px;color:var(--ink2);margin-top:14px;max-width:84ch}
+footer{padding:44px 0 56px;border-top:1px solid var(--line)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body id="top">
+<header class="top"><div class="wrap">
+  <a class="brand" href="../index.html"><i></i>Цвет и контроль</a>
+  <nav>
+    <a class="opt" href="#fleet">Линии</a><a class="opt" href="#console">Агент</a><a class="opt" href="#how">Как работает</a><a class="opt" href="#journal">Журнал</a>
+    <a href="../index.html#equip">Оборудование</a><a href="../demo/index.html">Демо системы</a><a href="../program/index.html">Программа</a><a href="../correction/index.html">Коррекция цвета</a><a href="../index.html">← На сайт</a>
+    <button class="tbtn" id="thBtn" type="button" aria-label="Сменить тему">Тема</button>
+  </nav></div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+  <div class="eyebrow">ИИ-агент · 5 линий · демонстрация</div>
+  <h1>Агент контроля линий: <span>спросите, и он покажет доказательства</span></h1>
+  <p class="lead" style="margin-top:14px">Агент круглосуточно опрашивает датчики экструдеров, слушает вибрацию шнеков, следит за температурой зон и проверяет кадры ленты чипсов на вкрапления. На вопрос мастера он отвечает выводом, подтверждением с датчиков и снимком с камеры и сохраняет проверку в журнал.</p>
+  <div class="chips"><span>Данные пяти линий имитированы</span><span>190 датчиков</span><span>5 камер · 2448×2048</span><span>опрос 1 с · кадр каждые 0,5 с</span></div>
+  <div class="btns"><button class="cta" id="heroGo" type="button">Запустить демонстрацию смены</button><a class="cta ghost" href="#console">Задать свой вопрос</a></div>
+  <div class="fleet" id="fleet" aria-label="Состояние линий"></div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Агент сообщает сам</h2>
+  <p class="lead">Не нужно ходить по цеху и ждать, пока вопрос зададут: агент присылает предупреждение, как только видит отклонение. Нажмите на событие, чтобы увидеть доказательства.</p>
+  <div class="two">
+    <div class="panel"><div class="ph"><span>Лента событий</span><span class="mini live">LIVE · демо</span></div><ul id="feed"></ul></div>
+    <div class="panel"><div class="ph"><span>Сценарий показа</span><span class="mini" id="scTime"></span></div><ol id="scList"></ol><div class="scf"><button class="cta" id="scBtn" type="button"></button></div></div>
+  </div>
+</div></section>
+
+<section id="console"><div class="wrap">
+  <h2>Консоль агента</h2>
+  <p class="lead">Выберите линию и тему или спросите своими словами: «что с третьей линией», «вибрация на всех», «прогноз поломок», «покажи камеру пятой», «сколько потеряем, если не реагировать».</p>
+  <div class="cons">
+    <div class="panel">
+      <div class="ph"><span style="display:flex;gap:10px;align-items:center"><span class="av" style="width:30px;height:30px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V4a3 3 0 0 0-3 0zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></span>Агент линий <span class="mini live">онлайн · 5 линий</span></span>
+        <span><button class="sm-btn" id="skip" type="button" hidden>Сразу ответ</button><button class="sm-btn" id="sumBtn" type="button">Сводка по цеху</button></span></div>
+      <div id="chat" role="log" aria-label="Диалог с агентом"></div>
+      <div class="ctl">
+        <div class="pr" id="linePick" aria-label="Линия"></div>
+        <div class="pr" id="topicPick" aria-label="Тема"></div>
+        <form id="askForm"><input id="askIn" type="text" placeholder="Спросите: «что с третьей линией», «вибрация на всех», «прогноз поломок»…" autocomplete="off" aria-label="Вопрос агенту"><button class="snd" type="submit" aria-label="Отправить"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-7z"/></svg></button></form>
+        <div><button class="sm-btn" id="askAskTopic" type="button">Спросить про выбранную линию и тему</button></div>
+      </div>
+    </div>
+    <div class="panel" id="analyzer"><div class="ph"><span>Анализатор</span><span class="mini">доказательства по выбранной линии и теме</span></div><div id="anHead"></div><div id="anBody"></div></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>Как агент приходит к выводу</h2>
+  <p class="lead">Агент не «угадывает»: каждый вывод опирается на измерения и прозрачные правила. Мастер видит, какие датчики и какой кадр подтвердили проблему, и может проверить сам.</p>
+  <ol class="flow" id="flow"></ol>
+  <div id="rules"></div>
+  <p class="note">Пороги стартовые; на внедрении настраиваются под ваши экструдеры, рецептуры и историю отказов. Статус линии — худший из её параметров. Деньги в «цене бездействия» — демо-оценка (брак 420 ₽/кг, упущенная маржа 140 ₽/кг): на предприятии считаются по вашим цифрам.</p>
+</div></section>
+
+<section id="journal"><div class="wrap">
+  <h2>Журнал проверок</h2>
+  <p class="lead">Каждый ответ агента сохраняется: время, вопрос, вывод и рекомендации. Журнал хранится в вашем браузере, его можно выгрузить в CSV.</p>
+  <div class="panel" style="margin-top:16px"><div class="ph"><span id="jcount"></span><span style="display:flex;gap:8px"><button class="sm-btn" id="jcsv" type="button">Выгрузить CSV</button><button class="sm-btn" id="jclr" type="button">Очистить</button></span></div><ul id="jlist"></ul></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <h3>Это демонстрация принципа</h3>
+  <p class="lead" style="font-size:16px">В рабочей версии агент подключается к реальным датчикам, камерам и вашим технологическим картам, работает на вашем сервере без интернета и может понимать письменную и устную речь на русском. Состав агента, пороги и состав камер определяются при составлении технического задания.</p>
+  <div class="btns"><a class="cta" href="../index.html#contact">Обсудить внедрение</a><a class="cta ghost" href="../demo/index.html">Демо системы управления</a><a class="cta ghost" href="../index.html">← На сайт</a></div>
+</div></footer>
+
+<dialog id="dlg"><button id="dlgX" type="button" aria-label="Закрыть">×</button><div id="dlgBody"></div></dialog>
+<script type="module" src="agent-ui.js"></script>
+<script src="../pwa.js"></script>
+</body>
+</html>
