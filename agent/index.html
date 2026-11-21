@@ -122,13 +122,32 @@ dialog{border:0;border-radius:18px;padding:0;max-width:min(760px,94vw);width:100
 .note{font-size:13px;color:var(--ink2);margin-top:14px;max-width:84ch}
 footer{padding:44px 0 56px;border-top:1px solid var(--line)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* команда и память */
+.rcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}@media(max-width:760px){.rcs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rc{text-align:left;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;display:grid;gap:2px}.rc b{font-size:15px}.rc span{font-size:12px;color:var(--ink2)}.rc.on{border-color:var(--b);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent)}.rc:disabled{opacity:.6;cursor:wait}
+#acct{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.av2{width:38px;height:38px;border-radius:12px;background:var(--b);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}.perm{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.perm span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 9px}.perm .y{color:var(--ok);border-color:var(--ok)}.perm .n{color:var(--ink2);opacity:.7}
+.scs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}@media(max-width:900px){.scs{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.scs{grid-template-columns:1fr}}
+.sc{text-align:left;border:1px dashed var(--b);background:color-mix(in srgb,var(--b) 6%,var(--card));border-radius:14px;padding:11px 13px;display:grid;gap:2px}.sc b{font-size:14.5px}.sc span{font-size:12.5px;color:var(--ink2)}.sc:hover{background:color-mix(in srgb,var(--b) 12%,var(--card))}
+#narr{margin-top:12px;border:1px solid var(--b);border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--b) 8%,var(--card))}#narr .nn{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);font-weight:700}#narr .nt{font-size:16px;font-weight:700;margin:3px 0 8px}#narr .nb{height:5px;border-radius:99px;background:var(--line);overflow:hidden}#narr .np{height:100%;width:0;background:var(--b);transition:width .6s}
+.tgrid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;margin-top:16px;align-items:start}@media(max-width:960px){.tgrid{grid-template-columns:1fr}}
+.ctl2{display:grid;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}.ctl2 .r{display:grid;grid-template-columns:1fr 1fr 90px;gap:8px}@media(max-width:560px){.ctl2 .r{grid-template-columns:1fr 1fr}}
+select,.ctl2 input{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;padding:8px 10px;font:inherit;width:100%;min-width:0}
+#tl{list-style:none;margin:0;padding:6px 14px 10px;max-height:520px;overflow:auto}.ev{display:grid;grid-template-columns:18px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.ev:last-child{border:0}.ev[data-new="1"]{animation:inn .5s}
+.dt{width:12px;height:12px;border-radius:50%;margin-top:5px;background:var(--ok)}.dt.ai{background:#e2483d;animation:pl 1.2s infinite}.dt.pending{background:#f2b705}
+.eh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px}.tierb{font-size:11px;border-radius:6px;padding:0 6px;border:1px solid var(--line);color:var(--ink2)}.tierb.deep{background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chips2 button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600}.chips2 button:hover{border-color:var(--b)}.chips2 .yes{background:var(--ok);color:#fff;border-color:var(--ok)}
+#impact{padding:14px 16px;display:grid;gap:12px}.ih{display:grid;gap:2px}.rr{display:flex;justify-content:space-between;font-size:14px}.rbar{position:relative;height:9px;border-radius:99px;background:var(--line);overflow:hidden;margin:4px 0 2px}.rbar .fl{position:absolute;left:0;top:0;bottom:0;border-radius:99px;transition:width .8s}.rbar .mk{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);z-index:2;opacity:.6}.wts{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;font-weight:700}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}@media(max-width:760px){.tiers{grid-template-columns:1fr}}
+.tcard{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:14px;transition:.3s;position:relative}.tcard.on{border-color:var(--b);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent);transform:translateY(-2px)}.tcard h4{margin:0 0 2px}.tcard .yr{font-size:12px;color:var(--ink2);font-weight:700;text-transform:uppercase;letter-spacing:.05em}.tcard p{font-size:13.5px;color:var(--ink2);margin:6px 0}.tbar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.tbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#1f5fbf,#46d391)}
+.agebox{margin-top:14px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--card)}.agebox input[type=range]{width:100%;accent-color:var(--b)}
 </style>
 </head>
 <body id="top">
 <header class="top"><div class="wrap">
   <a class="brand" href="../index.html"><i></i>Цвет и контроль</a>
   <nav>
-    <a class="opt" href="#fleet">Линии</a><a class="opt" href="#console">Агент</a><a class="opt" href="#how">Как работает</a><a class="opt" href="#journal">Журнал</a>
+    <a class="opt" href="#fleet">Линии</a><a class="opt" href="#console">Агент</a><a class="opt" href="#team">Команда и память</a><a class="opt" href="#how">Как работает</a><a class="opt" href="#journal">Журнал</a>
     <a href="../index.html#equip">Оборудование</a><a href="../demo/index.html">Демо системы</a><a href="../program/index.html">Программа</a><a href="../correction/index.html">Коррекция цвета</a><a href="../index.html">← На сайт</a>
     <button class="tbtn" id="thBtn" type="button" aria-label="Сменить тему">Тема</button>
   </nav></div></header>
@@ -171,6 +190,29 @@ footer{padding:44px 0 56px;border-top:1px solid var(--line)}
   </div>
 </div></section>
 
+<section id="team"><div class="wrap">
+  <h2>Команда и память агента</h2>
+  <p class="lead">У каждого сотрудника свой вход и роль: оператор, техник, технолог, руководитель. Они оставляют комментарии по линии, а агент спрашивает причину остановок и сбоев. Ответ попадает в память линии только после подтверждения технолога, и тогда пересчитывается прогноз. Выберите роль или запустите сценарий.</p>
+  <div class="rcs" id="roleBar"></div><div id="acct"></div>
+  <div class="scs" id="scnBar"></div>
+  <div id="narr" hidden><div class="nn"></div><div class="nt"></div><div class="nb"><div class="np"></div></div></div>
+  <div class="tgrid">
+    <div class="panel"><div class="ph"><span>Журнал линии</span><span class="pr" id="lineBar2" style="display:flex;gap:6px"></span></div>
+      <ul id="tl"></ul>
+      <form id="cmtForm" class="ctl2"><div class="r"><select id="kind" aria-label="Тип записи"></select><select id="cause" aria-label="Причина"></select><input id="mins" inputmode="numeric" placeholder="мин" aria-label="Минут"></div><div style="display:flex;gap:8px"><input id="cmt" placeholder="Комментарий по линии: что произошло?" aria-label="Комментарий"><button class="snd" type="submit" aria-label="Добавить">Добавить</button></div><button type="button" class="sm-btn" id="tReset" style="justify-self:start">Сбросить демо</button></form></div>
+    <div class="panel"><div class="ph"><span>Как это меняет прогноз</span><span class="mini">метка — прогноз без записей</span></div><div id="impact"></div></div>
+  </div>
+  <h3 style="margin-top:34px">Три уровня памяти</h3>
+  <p class="lead" style="font-size:16.5px">Агент помнит каждую линию годами. Чем старше запись, тем компактнее её хранение: события и подтверждённые причины остаются, а секундные показания заменяются сводками.</p>
+  <div class="tiers">
+    <div class="tcard" data-t="act"><div class="yr">до 5+ лет</div><h4>Активная память</h4><p>Все события, причины, ремонты и режимы. Быстрый доступ, учитывается в прогнозе.</p><div class="tbar"><i style="width:100%"></i></div><p class="mini">объём: 100 %</p></div>
+    <div class="tcard" data-t="arc"><div class="yr">ещё 5+ лет</div><h4>Архив</h4><p>События целиком, показания датчиков сжаты до суточных сводок. Открывается медленнее.</p><div class="tbar"><i style="width:22%"></i></div><p class="mini">объём: в разы меньше</p></div>
+    <div class="tcard" data-t="deep"><div class="yr">дальше</div><h4>Глубокий архив</h4><p>Только события, поломки и итоги. Поднимается по запросу, например при разборе старой рекламации.</p><div class="tbar"><i style="width:5%"></i></div><p class="mini">объём: минимальный</p></div>
+  </div>
+  <div class="agebox"><label for="age" style="font-weight:700">Возраст записи: <span id="ageL">сейчас</span></label><input id="age" type="range" min="0" max="15" value="0"><div id="ageEx" class="small" style="margin-top:6px"></div></div>
+  <p class="note">Это демонстрация: вход имитирован (пароль не нужен), данные остаются в вашем браузере. В рабочей версии логины и пароли, роли и память хранятся на вашем сервере, а сроки хранения настраиваются под ваши требования. Размеры уровней показаны схематично.</p>
+</div></section>
+
 <section id="how"><div class="wrap">
   <h2>Как агент приходит к выводу</h2>
   <p class="lead">Агент не «угадывает»: каждый вывод опирается на измерения и прозрачные правила. Мастер видит, какие датчики и какой кадр подтвердили проблему, и может проверить сам.</p>
@@ -194,6 +236,7 @@ footer{padding:44px 0 56px;border-top:1px solid var(--line)}
 
 <dialog id="dlg"><button id="dlgX" type="button" aria-label="Закрыть">×</button><div id="dlgBody"></div></dialog>
 <script type="module" src="agent-ui.js"></script>
+<script type="module" src="team.js"></script>
 <script src="../pwa.js"></script>
 </body>
 </html>

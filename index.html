@@ -370,6 +370,19 @@ body.pm main>section.cur{display:block}
 .prog-card ul{margin:8px 0 14px;padding-left:20px;display:grid;gap:6px;color:var(--ink2)}
 .inst{font:inherit;font-size:14px;font-weight:700;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 14px;cursor:pointer}
 .offline::after{content:"Нет сети: работает сохранённая версия";position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 14px;border-radius:999px;font-size:13px;z-index:50}
+
+/* ---- память агента ---- */
+.mflow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:22px;counter-reset:m}@media(max-width:900px){.mflow{grid-template-columns:1fr 1fr}}@media(max-width:520px){.mflow{grid-template-columns:1fr}}
+.mflow>div{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;animation:mact 10s infinite;animation-delay:calc(var(--i)*2s)}
+.mflow>div::before{counter-increment:m;content:counter(m);position:absolute;right:12px;top:8px;font-size:26px;font-weight:800;color:color-mix(in srgb,var(--ink) 12%,transparent)}
+.mflow b{display:block;font-size:15px;margin-bottom:4px}.mflow p{font-size:13.5px;color:var(--ink2);margin:0}
+@keyframes mact{0%,18%{border-color:var(--b);box-shadow:0 0 0 3px color-mix(in srgb,var(--b) 22%,transparent);transform:translateY(-3px)}22%,100%{border-color:var(--line);box-shadow:none;transform:none}}
+.rolet{width:100%;border-collapse:collapse;font-size:14.5px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:620px}.rolet th,.rolet td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}.rolet th{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2);background:color-mix(in srgb,var(--ink) 4%,var(--card))}.rolet tr:last-child td{border:0}.rolet td:first-child{font-weight:800}
+.mtiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}@media(max-width:760px){.mtiers{grid-template-columns:1fr}}
+.mt{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}.mt h3{margin-bottom:2px}.mt .yr{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}.mt p{font-size:14px;color:var(--ink2)}.mt .bar2{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.mt .bar2 i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#1f5fbf,#46d391)}
+.mt .fall{position:absolute;right:16px;top:14px;display:flex;gap:4px}.mt .fall i{width:7px;height:7px;border-radius:50%;background:var(--b);opacity:.2;animation:mfall 3s infinite;animation-delay:calc(var(--j)*.4s)}@keyframes mfall{0%{opacity:.9;transform:translateY(-4px)}60%,100%{opacity:0;transform:translateY(10px)}}
+.story{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:18px}.story .box ol{margin:8px 0 0;padding-left:20px;font-size:14.5px;color:var(--ink2);display:grid;gap:4px}
+@media(prefers-reduced-motion:reduce){.mflow>div,.mt .fall i{animation:none}}
 </style>
 </head>
 <body>
@@ -385,6 +398,7 @@ body.pm main>section.cur{display:block}
       <a href="#expertise">Экспертиза</a>
       <a href="#system">Система</a>
       <a href="agent/index.html">ИИ-агент</a>
+      <a href="#memory">Память и роли</a>
       <a href="program/index.html">Программа</a>
       <a href="#control">Контроль</a>
       <a href="#equip">Оборудование</a>
@@ -823,15 +837,16 @@ body.pm main>section.cur{display:block}
 
 <section id="correction">
   <div class="wrap">
-    <h2>Инструмент коррекции цвета по спектрофотометру</h2>
-    <p class="lead">Введите L*a*b* эталона и образца (или готовое отклонение с прибора), размер замеса или пробы и содержание пигмента в рецептуре. Инструмент подскажет, какого колоранта и сколько добавить, и покажет прогноз. Замес уже сделан, поэтому расчёт только добавляет.</p>
-    <figure class="shot" style="margin-top:22px"><a href="correction/index.html"><img src="img/system/color-correction-tool.webp" alt="Инструмент коррекции цвета: выбор прибора, ввод данных, расчёт добавок и прогноз" loading="lazy"></a><figcaption>Скриншот инструмента: выбор прибора, данные, колоранты и результат с прогнозом</figcaption></figure>
+    <h2>Инструмент коррекции цвета: бесплатный и мощный</h2>
+    <p class="lead">Введите L*a*b* эталона и образца со спектрофотометра (или готовое отклонение), размер замеса или пробы и содержание пигмента в рецептуре. Инструмент подберёт добавки, предложит несколько вариантов с ценой и покажет прогноз. После добавки вводите новый замер: модель сама уточняется под ваш замес. Бесплатно, без регистрации, работает офлайн.</p>
+    <figure class="shot" style="margin-top:22px"><a href="correction/index.html"><img src="img/system/color-correction-tool.webp" alt="Инструмент коррекции цвета: выбор прибора, данные, колоранты, варианты добавок с ценой и прогноз" loading="lazy"></a><figcaption>Скриншот инструмента: прибор, данные, варианты добавок с ценой, прогноз и карта a*–b*</figcaption></figure>
     <div class="eq-lists">
-      <div class="box"><h3>Приборы</h3><ul><li>ваш спектрофотометр с настройкой режима и допуска</li><li>сферический d/8° (SCI и SCE)</li><li>геометрия 45°/0°, многоугловой, колориметр</li></ul></div>
-      <div class="box"><h3>Что считает</h3><ul><li>ΔE по CIEDE2000 до и после добавки</li><li>% к массе замеса, граммы на пробу и килограммы на замес</li><li>% к количеству пигмента в рецептуре</li><li>калибровка по вашим пробным добавкам</li></ul></div>
+      <div class="box"><h3>Приборы и данные</h3><ul><li>профиль BYK spectro2guide: L*a*b* и блеск 60° с экрана, серия замеров с усреднением, ΔE по CIE94 как на приборе</li><li>другой ваш прибор, сферический d/8° (SCI и SCE), 45°/0°, многоугловой, колориметр</li><li>эталон и образец или готовое отклонение ΔL Δa Δb</li><li>проверка метамерии под вторым источником света</li><li>профили базы: светлая, средняя, тёмная</li></ul></div>
+      <div class="box"><h3>Что считает</h3><ul><li>ΔE по CIEDE2000 и ΔE76, разбор по светлоте, насыщенности и оттенку</li><li>до 4 вариантов добавки с ценой, до 10 пигментов в одной добавке</li><li>«Свои добавки»: вводите, сколько и чего планируете добавить, и видите прогноз цвета и ΔE</li><li>% к массе замеса, граммы на пробу и килограммы на замес с учётом точности весов</li><li>% к количеству пигмента в рецептуре</li><li>нелинейная модель для больших добавок</li></ul></div>
+      <div class="box"><h3>Итерации и память</h3><ul><li>после шага вводите замер: чувствительности колорантов уточняются</li><li>свои колоранты, цены и калибровка по пробным добавкам</li><li>история коррекций и аналитика: шаги, попадание в допуск, частые колоранты</li><li>протокол для печати, выгрузка CSV и перенос данных между устройствами</li></ul></div>
     </div>
     <a class="cta" href="correction/index.html">Открыть инструмент</a>
-    <p class="small" style="margin-top:12px;max-width:84ch">Расчёт ориентировочный и не заменяет решения технолога. Данные остаются в браузере.</p>
+    <p class="small" style="margin-top:12px;max-width:84ch">Расчёт ориентировочный и не заменяет решения технолога. Данные остаются в браузере. Типовые чувствительности колорантов приблизительные: для точного результата откалибруйте их по своим добавкам.</p>
   </div>
 </section>
 
@@ -882,6 +897,47 @@ body.pm main>section.cur{display:block}
     </div>
     <a class="cta" href="agent/index.html">Открыть агента на отдельной странице</a>
     <p class="small" style="margin-top:12px;max-width:84ch">Демонстрация: данные пяти линий имитированы. В рабочей версии агент подключается к вашим датчикам, камерам и технологическим картам и работает на вашем сервере.</p>
+  </div>
+</section>
+
+<section id="memory">
+  <div class="wrap">
+    <h2>Команда и память агента: он знает каждую линию</h2>
+    <p class="lead">У каждого сотрудника свой вход и роль. Оператор и техник оставляют комментарии по линии, а агент сам спрашивает причину остановок и сбоев. Ответ попадает в память только после подтверждения технолога, а затем учитывается в прогнозе. Так агент понимает не только цифры датчиков, но и то, что происходило на линии физически.</p>
+    <div class="mflow" aria-label="Как запись попадает в память">
+      <div style="--i:0"><b>Событие</b><p>Агент видит остановку, просадку скорости или рост вибрации</p></div>
+      <div style="--i:1"><b>Вопрос человеку</b><p>«Линия 3 стояла 22 минуты. Причина?»</p></div>
+      <div style="--i:2"><b>Ответ</b><p>Оператор или техник выбирает причину или пишет своими словами</p></div>
+      <div style="--i:3"><b>Подтверждение</b><p>Технолог подтверждает или отклоняет ответ</p></div>
+      <div style="--i:4"><b>Память и прогноз</b><p>Запись в памяти линии, прогноз пересчитан</p></div>
+    </div>
+    <div class="two" style="margin-top:26px">
+      <figure class="shot"><img src="img/system/team-journal.webp" alt="Журнал линии с записями по ролям и пересчитанный прогноз" loading="lazy"><figcaption>Скриншот демо: журнал линии, подтверждение технолога и пересчёт прогноза</figcaption></figure>
+      <figure class="shot"><img src="img/system/team-memory.webp" alt="Три уровня памяти агента" loading="lazy"><figcaption>Скриншот демо: три уровня памяти, активная, архив и глубокий архив</figcaption></figure>
+    </div>
+    <h3 style="margin-top:30px">Роли и права</h3>
+    <div class="xwrap"><table class="rolet"><thead><tr><th>Роль</th><th>Что делает</th><th>Что видит</th><th>Может подтверждать в память</th></tr></thead><tbody>
+      <tr><td>Оператор</td><td>отмечает остановки и сложности, отвечает на вопросы агента</td><td>свою линию и её журнал</td><td>нет, ответ ждёт технолога</td></tr>
+      <tr><td>Техник</td><td>фиксирует ремонты и замены, отвечает на технические вопросы</td><td>линии и оборудование участка</td><td>нет, запись ждёт технолога</td></tr>
+      <tr><td>Технолог</td><td>подтверждает причины и режимы, фиксирует смену режима</td><td>все линии участка и прогнозы</td><td>да</td></tr>
+      <tr><td>Руководитель</td><td>смотрит сводки, потери и тренды, оставляет комментарии</td><td>все линии, сводки и итоги</td><td>нет</td></tr>
+    </tbody></table></div>
+    <h3 style="margin-top:30px">Три уровня памяти</h3>
+    <p class="lead" style="font-size:17px">Агент помнит каждую линию годами. Чем старше запись, тем компактнее хранение: события и подтверждённые причины остаются, а секундные показания заменяются сводками.</p>
+    <div class="mtiers">
+      <div class="mt"><span class="fall"><i style="--j:0"></i><i style="--j:1"></i><i style="--j:2"></i></span><div class="yr">до 5+ лет</div><h3>Активная память</h3><p>Все события, причины, ремонты и режимы. Быстрый доступ, учитывается в прогнозе.</p><div class="bar2"><i style="width:100%"></i></div></div>
+      <div class="mt"><div class="yr">ещё 5+ лет</div><h3>Архив</h3><p>События целиком, показания датчиков сжаты до суточных сводок. Открывается медленнее.</p><div class="bar2"><i style="width:22%"></i></div></div>
+      <div class="mt"><div class="yr">дальше</div><h3>Глубокий архив</h3><p>Только события, поломки и итоги, в разы меньше по объёму. Поднимается по запросу, например при разборе старой рекламации.</p><div class="bar2"><i style="width:5%"></i></div></div>
+    </div>
+    <h3 style="margin-top:30px">Сценарии из демонстрации</h3>
+    <div class="story">
+      <div class="box"><h3>Неожиданная остановка</h3><ol><li>Агент видит простой 22 минуты и спрашивает причину</li><li>Оператор выбирает «забит фильтр»</li><li>Технолог подтверждает, запись идёт в память</li><li>Риск повторной остановки в прогнозе растёт</li></ol></div>
+      <div class="box"><h3>Замена подшипника</h3><ol><li>Техник записывает замену</li><li>Пока запись не подтверждена, она учитывается с весом 60 %</li><li>После подтверждения риск износа падает, ресурс узла сброшен</li></ol></div>
+      <div class="box"><h3>Смена режима</h3><ol><li>Технолог фиксирует новый режим под цвет</li><li>Агент знает, что сдвиг температуры ожидаемый</li><li>Ложная тревога не поднимается</li></ol></div>
+      <div class="box"><h3>Спорная причина</h3><ol><li>Оператор называет одну причину, а датчики показывают другую</li><li>Агент просит технолога проверить</li><li>Технолог отклоняет ответ и записывает верную причину</li></ol></div>
+    </div>
+    <div class="btns" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px"><a class="cta" href="agent/index.html#team">Попробовать в демо</a><a class="cta ghost" href="program/index.html">Программа под ваше производство</a></div>
+    <p class="small" style="margin-top:12px;max-width:84ch">В демонстрации вход имитирован и данные хранятся только в браузере. В рабочей версии логины, пароли, роли и память хранятся на вашем сервере, а сроки хранения настраиваются под ваши требования.</p>
   </div>
 </section>
 

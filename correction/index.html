@@ -56,6 +56,19 @@ details{border:1px solid var(--line);border-radius:14px;background:var(--card);p
 .calrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:8px}.calrow label{display:grid;gap:3px;font-size:12px;color:var(--ink2);font-weight:600}
 footer{padding:44px 0 56px;border-top:1px solid var(--line)}
 @media print{header.top,nav,.act,#insts,details,footer{display:none}}
+
+.vars{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0 8px}.vr{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:8px 10px;display:grid;gap:1px}.vr b{font-size:13px}.vr span{font-size:12px;color:var(--ink2)}.vr em{font-style:normal;font-size:12px;font-weight:700}.vr.on{border-color:var(--b);background:var(--card);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent)}
+.bdw{margin-top:10px;font-size:14px;padding:9px 12px;border-radius:12px;background:color-mix(in srgb,var(--ink) 4%,var(--card));border:1px solid var(--line)}
+.stl{margin:0;padding-left:18px;display:grid;gap:8px;font-size:14px}
+.hb{display:grid;grid-template-columns:150px 1fr 28px;gap:10px;align-items:center;font-size:13.5px;margin:4px 0}.rbar2{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.rbar2 i{display:block;height:100%;background:var(--b);border-radius:99px}
+.kp.k4{grid-template-columns:repeat(4,1fr)}@media(max-width:700px){.kp.k4{grid-template-columns:1fr 1fr}}
+.badge{display:inline-flex;gap:6px;align-items:center;background:color-mix(in srgb,var(--ok) 14%,transparent);color:var(--ok);border:1px solid var(--ok);border-radius:999px;padding:3px 12px;font-size:13px;font-weight:700}
+.meta4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.meta4 label{display:grid;gap:3px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.pt td{font-size:13.5px}.pt td:nth-child(odd){color:var(--ink2);width:18%}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}.tabs a{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 13px;font-size:13.5px;font-weight:600;text-decoration:none}
+body.pp>*:not(main){display:none!important}body.pp main>section:not(#protoS){display:none!important}body.pp #protoS{display:block!important;border:0}body.pp .act{display:none}
+@media print{body:not(.pp) header.top{display:none}}
+.plgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin:12px 0}.plr{display:grid;grid-template-columns:16px 1fr 82px;gap:8px;align-items:center;font-size:13.5px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--paper)}.plr i{width:14px;height:14px;border-radius:4px;border:1px solid #0003}.plr input{padding:5px 7px}
 </style>
 </head>
 <body>
@@ -64,39 +77,39 @@ footer{padding:44px 0 56px;border-top:1px solid var(--line)}
 
 <main>
 <section class="hero"><div class="wrap">
-  <p class="small" style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">Инструмент технолога</p>
+  <p style="margin:0 0 10px"><span class="badge">Бесплатно · без регистрации · работает офлайн</span></p>
   <h1>Коррекция цвета: <span>что и сколько добавить</span></h1>
-  <p class="lead" style="margin-top:12px">Введите значения со спектрофотометра (L*a*b* эталона и образца или готовое отклонение), размер замеса или пробы и, если нужно, содержание пигмента в рецептуре. Инструмент подберёт добавки и покажет прогноз. Замес уже сделан, поэтому убрать лишнее нельзя: расчёт только добавляет.</p>
-  <div class="chips"><span>5 типов приборов, включая ваш</span><span>ΔE по CIEDE2000</span><span>данные остаются в браузере</span><span>работает офлайн</span></div>
-  <div class="act"><button class="btn" id="demo" type="button">Подставить пример</button><a class="btn ghost" href="#how">Как правильно замерить</a></div>
+  <p class="lead" style="margin-top:12px">Введите значения со спектрофотометра (L*a*b* эталона и образца или готовое отклонение), размер замеса или пробы и, если нужно, содержание пигмента в рецептуре. Инструмент подберёт добавки, предложит несколько вариантов с ценой и покажет прогноз. После добавки введите новый замер, и модель сама уточнится под ваш замес. Замес уже сделан, поэтому по умолчанию расчёт только добавляет.</p>
+  <div class="chips"><span>профиль BYK spectro2guide и ещё 5 типов приборов</span><span>до 10 пигментов в добавке</span><span>серия замеров и блеск</span><span>CIEDE2000</span><span>самообучение по итерациям</span><span>варианты с ценой</span><span>метамерия</span><span>протокол и история</span><span>данные только в браузере</span></div>
+  <div class="act"><button class="btn" data-demo="0" type="button">Пример с прибора: красный</button><button class="btn ghost" data-demo="1" type="button">Пример: большое отклонение</button><button class="btn ghost" data-demo="2" type="button">Пример: синий</button><a class="btn ghost" href="#how">Как правильно замерить</a></div><div class="tabs"><a href="#tool">Расчёт</a><a href="#plan">Свои добавки</a><a href="#iter">Итерации</a><a href="#histS">История</a><a href="#calS">Калибровка</a><a href="#protoS">Протокол</a></div>
 </div></section>
 
 <section id="tool"><div class="wrap">
   <div class="layout">
     <div class="stack">
       <div class="panel"><div class="step"><b>1</b><h3>Прибор</h3></div><div class="insts" id="insts"></div><div id="instNote" style="margin-top:8px"></div><div id="geo" style="margin-top:8px"></div></div>
-      <div class="panel"><div class="step"><b>2</b><h3>Данные</h3></div>
-        <div class="seg" id="modeSeg"></div><div class="seg" id="btSeg" style="margin-top:8px"></div>
-        <div id="labs" style="margin-top:10px"></div>
-        <h4 style="margin-top:14px">Размеры</h4><div class="sizes" id="sizes"></div></div>
-      <div class="panel"><div class="step"><b>3</b><h3>Колоранты</h3></div>
-        <p class="small">Отметьте, чем можно корректировать. В поле «в рецепте, %» укажите содержание пигмента в рецептуре: тогда добавка пересчитается и в % к его количеству.</p>
-        <div class="seg" style="align-items:center"><span class="small" style="margin-right:4px">Не больше колорантов в добавке:</span><span class="seg" id="nseg"></span></div>
-        <div id="cols" style="margin-top:6px"></div></div>
+      <div class="panel"><div class="step"><b>2</b><h3>Данные</h3></div><div class="seg" id="modeSeg"></div><div class="seg" id="btSeg" style="margin-top:8px"></div><div id="labs" style="margin-top:10px"></div><h4 style="margin-top:14px">Размеры и весы</h4><div class="sizes" id="sizes"></div></div>
+      <div class="panel"><div class="step"><b>3</b><h3>Условия и колоранты</h3></div><div id="settings"></div><p class="small" style="margin-top:10px">Отметьте, чем можно корректировать. В поле «в рецепте, %» укажите содержание пигмента: добавка пересчитается и в % к его количеству.</p><div id="cols" style="margin-top:6px"></div></div>
     </div>
     <div class="stack" style="position:sticky;top:70px"><div class="panel"><div class="step"><b>4</b><h3>Результат</h3></div><div id="res"></div></div></div>
   </div>
-
-  <details><summary>Калибровка чувствительности колорантов</summary>
-    <p class="small" style="margin-top:8px">Таблица показывает, как меняются L*a*b* при добавке +0,1 % колоранта к массе замеса. Значения по умолчанию типовые и приблизительные: у каждого производства своя база и свои пигменты. Лучше всего определить их по собственным пробным добавкам. Данные сохраняются только в этом браузере.</p>
-    <div class="xw" id="calTab"></div>
-    <h4 style="margin-top:14px">Определить по пробной добавке</h4>
-    <div class="calrow"><label>Колорант<select id="calSel"></select></label><label>Добавлено, % к массе<input id="calAdd" inputmode="decimal" placeholder="0,2"></label></div>
-    <div class="calrow"><label>До: L*<input id="cb0" inputmode="decimal"></label><label>До: a*<input id="cb1" inputmode="decimal"></label><label>До: b*<input id="cb2" inputmode="decimal"></label></div>
-    <div class="calrow"><label>После: L*<input id="ca0" inputmode="decimal"></label><label>После: a*<input id="ca1" inputmode="decimal"></label><label>После: b*<input id="ca2" inputmode="decimal"></label></div>
-    <div class="act"><button class="btn" id="calApply" type="button">Сохранить чувствительность</button><button class="btn ghost" id="calReset" type="button">Вернуть типовые</button></div><p class="small" id="calMsg"></p>
-  </details>
 </div></section>
+
+<section id="plan"><div class="wrap"><h2>Свои добавки: что будет, если добавить моё</h2><p class="lead">Введите, сколько какого пигмента вы планируете добавить (в %, граммах на замес или граммах на пробу). Инструмент сразу покажет прогноз цвета, ΔE, отличие от эталона и стоимость. Если до допуска не хватает, предложит, что добавить ещё. Можно взять за основу рекомендацию расчёта и поправить её.</p>
+<div class="layout" style="margin-top:14px"><div class="panel"><div class="step"><b>A</b><h3>Мой план добавок</h3></div><div id="planBox"></div></div><div class="panel"><div class="step"><b>B</b><h3>Прогноз</h3></div><div id="planOut"></div></div></div></div></section>
+
+<section id="iter"><div class="wrap"><h2>Итерации: добавили, замерили, модель уточнилась</h2><p class="lead">Нажмите «Применить как шаг» в результате, добавьте колоранты в замес и введите новый замер. Инструмент сравнит прогноз с фактом, уточнит чувствительности использованных колорантов и сразу пересчитает следующий шаг. Так коррекция сходится за меньшее число шагов.</p><div class="panel" style="margin-top:14px"><div id="steps"></div></div></div></section>
+
+<section id="histS"><div class="wrap"><h2>История и аналитика</h2><p class="lead">Завершённые коррекции сохраняются в браузере. По ним видно, сколько шагов обычно нужно, как часто цвет попадает в допуск и какие колоранты используются чаще.</p><div class="panel" style="margin-top:14px"><div id="hist"></div></div></div></section>
+
+<section id="calS"><div class="wrap"><h2>Калибровка и свои колоранты</h2>
+  <p class="lead">Таблица показывает, как меняются L*a*b* при добавке +0,1 % колоранта к массе замеса для выбранной базы. Типовые значения приблизительные, у каждого производства своя база. Меняйте их вручную, определяйте по пробной добавке или позволяйте модели обучаться по итерациям. Цены в ₽/кг нужны для расчёта стоимости добавки.</p>
+  <div class="layout" style="margin-top:14px"><div class="panel"><h4>Чувствительности и цены</h4><div class="xw" id="calTab"></div></div>
+  <div class="stack"><div class="panel"><h4>Определить по пробной добавке</h4><div class="calrow"><label>Колорант<select id="calSel"></select></label><label>Добавлено, % к массе<input id="calAdd" inputmode="decimal" placeholder="0,2"></label></div><div class="calrow"><label>До: L*<input id="cb0" inputmode="decimal"></label><label>До: a*<input id="cb1" inputmode="decimal"></label><label>До: b*<input id="cb2" inputmode="decimal"></label></div><div class="calrow"><label>После: L*<input id="ca0" inputmode="decimal"></label><label>После: a*<input id="ca1" inputmode="decimal"></label><label>После: b*<input id="ca2" inputmode="decimal"></label></div><div class="act"><button class="btn" id="calApply" type="button">Сохранить чувствительность</button><button class="btn ghost" id="calReset" type="button">Вернуть типовые</button></div></div>
+  <div class="panel"><h4>Свой колорант</h4><div class="calrow"><label>Название<input id="cn" placeholder="например, фиолетовый"></label><label>ΔL* на +0,1 %<input id="cs0" inputmode="decimal"></label><label>Δa*<input id="cs1" inputmode="decimal"></label><label>Δb*<input id="cs2" inputmode="decimal"></label><label>₽/кг<input id="cpr" inputmode="decimal"></label></div><div class="act"><button class="btn" id="addCol" type="button">Добавить</button></div></div>
+  <div class="panel"><h4>Перенос данных</h4><p class="small">Калибровку, цены, свои колоранты и историю можно выгрузить в файл и загрузить на другом устройстве.</p><div class="act"><button class="btn ghost" id="expJson" type="button">Выгрузить файл</button><button class="btn ghost" id="impJson" type="button">Загрузить файл</button><input type="file" id="impFile" accept="application/json" hidden></div><p class="small" id="calMsg"></p></div></div></div></div></section>
+
+<section id="protoS"><div class="wrap"><h2>Протокол коррекции</h2><p class="lead">Заполните данные партии и распечатайте протокол с расчётом, шагами и местом для подписи технолога.</p><div class="panel" style="margin-top:14px"><div class="meta4" id="meta"></div><div id="proto" style="margin-top:14px"></div><div class="act"><button class="btn" id="print" type="button">Печать протокола</button></div></div></div></section>
 
 <section id="how"><div class="wrap">
   <h2>Как правильно замерить</h2>
