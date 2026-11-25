@@ -30,7 +30,7 @@ nav{display:flex;gap:16px;font-size:14px;align-items:center;flex-wrap:wrap}nav a
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}.chips span{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--ink2)}
 .step{display:flex;gap:10px;align-items:center;margin:0 0 10px}.step b{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:14px;flex:none}.step h3{margin:0}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}@media(max-width:960px){.layout{grid-template-columns:1fr}}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}@media(max-width:960px){.layout{grid-template-columns:minmax(0,1fr)}}
 .stack{display:grid;gap:14px}
 .insts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .ic{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;display:grid;gap:2px}.ic b{font-size:14px;line-height:1.2}.ic span{font-size:12px;color:var(--ink2)}.ic.on{border-color:var(--b);box-shadow:0 0 0 2px color-mix(in srgb,var(--b) 25%,transparent);background:var(--card)}
@@ -69,6 +69,14 @@ footer{padding:44px 0 56px;border-top:1px solid var(--line)}
 body.pp>*:not(main){display:none!important}body.pp main>section:not(#protoS){display:none!important}body.pp #protoS{display:block!important;border:0}body.pp .act{display:none}
 @media print{body:not(.pp) header.top{display:none}}
 .plgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin:12px 0}.plr{display:grid;grid-template-columns:16px 1fr 82px;gap:8px;align-items:center;font-size:13.5px;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--paper)}.plr i{width:14px;height:14px;border-radius:4px;border:1px solid #0003}.plr input{padding:5px 7px}
+.zb{display:inline-block;border-radius:999px;padding:2px 10px;font-size:12.5px;font-weight:700;border:1px solid}.z-ok{color:var(--ok);border-color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}.z-warn{color:var(--warn);border-color:var(--warn);background:color-mix(in srgb,var(--warn) 14%,transparent)}.z-bad{color:var(--bad);border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,transparent)}
+.zt-ok{color:var(--ok)}.zt-warn{color:var(--warn)}.zt-bad{color:var(--bad)}.zlegend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.kpi .zb{margin:2px 0}
+.zd{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:4px}.zd.z-ok{background:var(--ok)}.zd.z-warn{background:#e29a12}.zd.z-bad{background:var(--bad)}
+.lr{display:grid;grid-template-columns:14px 118px 1fr 84px 24px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line)}@media(max-width:560px){.lr{grid-template-columns:14px 1fr 84px 24px}.lr input[type=range]{grid-column:1/-1;order:5}}
+.lr i{width:14px;height:14px;border-radius:4px;border:1px solid #0003}.lr .ln{font-size:13.5px;font-weight:600}.lr input[type=range]{width:100%;accent-color:var(--b)}.lr .lv{padding:5px 7px;text-align:right}.lx{border:1px solid var(--line);background:var(--paper);border-radius:6px;width:24px;height:24px;line-height:1;padding:0}
+.pbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0 6px}.plotw svg{width:100%;height:auto;display:block;border-radius:14px}.plotw{user-select:none}.doseb svg{width:100%;height:auto;display:block}
+select{max-width:100%}
+.stack,.panel{min-width:0}.xw{max-width:100%;overflow-x:auto}.panel .tab{min-width:0}#calTab .tab{min-width:420px}#proto{max-width:100%;overflow-x:auto}.tab.pt{min-width:0}.tab.pt td,.tab.pt th{padding:6px 8px}.insts{grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr))}
 </style>
 </head>
 <body>
@@ -81,7 +89,7 @@ body.pp>*:not(main){display:none!important}body.pp main>section:not(#protoS){dis
   <h1>Коррекция цвета: <span>что и сколько добавить</span></h1>
   <p class="lead" style="margin-top:12px">Введите значения со спектрофотометра (L*a*b* эталона и образца или готовое отклонение), размер замеса или пробы и, если нужно, содержание пигмента в рецептуре. Инструмент подберёт добавки, предложит несколько вариантов с ценой и покажет прогноз. После добавки введите новый замер, и модель сама уточнится под ваш замес. Замес уже сделан, поэтому по умолчанию расчёт только добавляет.</p>
   <div class="chips"><span>профиль BYK spectro2guide и ещё 5 типов приборов</span><span>до 10 пигментов в добавке</span><span>серия замеров и блеск</span><span>CIEDE2000</span><span>самообучение по итерациям</span><span>варианты с ценой</span><span>метамерия</span><span>протокол и история</span><span>данные только в браузере</span></div>
-  <div class="act"><button class="btn" data-demo="0" type="button">Пример с прибора: красный</button><button class="btn ghost" data-demo="1" type="button">Пример: большое отклонение</button><button class="btn ghost" data-demo="2" type="button">Пример: синий</button><a class="btn ghost" href="#how">Как правильно замерить</a></div><div class="tabs"><a href="#tool">Расчёт</a><a href="#plan">Свои добавки</a><a href="#iter">Итерации</a><a href="#histS">История</a><a href="#calS">Калибровка</a><a href="#protoS">Протокол</a></div>
+  <div class="act"><button class="btn" data-demo="0" type="button">Пример с прибора: красный</button><button class="btn ghost" data-demo="1" type="button">Пример: большое отклонение</button><button class="btn ghost" data-demo="2" type="button">Пример: синий</button><a class="btn ghost" href="#how">Как правильно замерить</a></div><div class="tabs"><a href="#tool">Расчёт</a><a href="#iter">Итерации</a><a href="#histS">История</a><a href="#calS">Калибровка</a><a href="#protoS">Протокол</a></div>
 </div></section>
 
 <section id="tool"><div class="wrap">
@@ -94,9 +102,6 @@ body.pp>*:not(main){display:none!important}body.pp main>section:not(#protoS){dis
     <div class="stack" style="position:sticky;top:70px"><div class="panel"><div class="step"><b>4</b><h3>Результат</h3></div><div id="res"></div></div></div>
   </div>
 </div></section>
-
-<section id="plan"><div class="wrap"><h2>Свои добавки: что будет, если добавить моё</h2><p class="lead">Введите, сколько какого пигмента вы планируете добавить (в %, граммах на замес или граммах на пробу). Инструмент сразу покажет прогноз цвета, ΔE, отличие от эталона и стоимость. Если до допуска не хватает, предложит, что добавить ещё. Можно взять за основу рекомендацию расчёта и поправить её.</p>
-<div class="layout" style="margin-top:14px"><div class="panel"><div class="step"><b>A</b><h3>Мой план добавок</h3></div><div id="planBox"></div></div><div class="panel"><div class="step"><b>B</b><h3>Прогноз</h3></div><div id="planOut"></div></div></div></div></section>
 
 <section id="iter"><div class="wrap"><h2>Итерации: добавили, замерили, модель уточнилась</h2><p class="lead">Нажмите «Применить как шаг» в результате, добавьте колоранты в замес и введите новый замер. Инструмент сравнит прогноз с фактом, уточнит чувствительности использованных колорантов и сразу пересчитает следующий шаг. Так коррекция сходится за меньшее число шагов.</p><div class="panel" style="margin-top:14px"><div id="steps"></div></div></div></section>
 

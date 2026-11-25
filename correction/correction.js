@@ -72,7 +72,7 @@ const X0 = 40; // насыщение: при добавке 4 % эффект в�
 const K1 = 'cik-corr2', store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } } };
 const P = store.get(K1 + '-p', {});
 const S = {
-  inst: P.inst || 'byk', metric: P.metric || '94', geo: 'SCI', mode: 'pair', bt: 'made', maxN: 3, profile: P.profile || 'mid', nonlin: P.nonlin !== false, learn: P.learn !== false,
+  inst: P.inst || 'byk', metric: P.metric || '94', riskK: P.riskK || 1.5, dirty: false, view: null, model: null, geo: 'SCI', mode: 'pair', bt: 'made', maxN: 3, profile: P.profile || 'mid', nonlin: P.nonlin !== false, learn: P.learn !== false,
   myName: P.myName || '', myNoise: P.myNoise || 0.15, tol: P.tol || 1.0, kL: 1, kC: 1, kH: 1,
   std: [[43.47, 21.65, 19.67], [43.47, 21.65, 19.67], [43.47, 21.65, 19.67]], smp: [[42.62, 20.02, 19.9], [42.62, 20.02, 19.9], [42.62, 20.02, 19.9]], del: [[1.3, 1.2, 1.8], [1.3, 1.2, 1.8], [1.3, 1.2, 1.8]],
   ill2: { on: false, std: [45.0, -8.4, 14.5], smp: [46.2, -7.0, 16.6] },
@@ -84,7 +84,7 @@ const S = {
 const colors = () => [...COL0, ...S.custom.map((c) => ({ ...c, kind: 'c' }))];
 colors().forEach((c) => { if (S.allowed[c.id] === undefined) S.allowed[c.id] = true; });
 const inst = () => INST.find((i) => i.id === S.inst);
-const persist = () => store.set(K1 + '-p', { inst: S.inst, profile: S.profile, nonlin: S.nonlin, learn: S.learn, metric: S.metric, myName: S.myName, myNoise: S.myNoise, tol: S.tol, sensP: S.sensP, custom: S.custom, price: S.price, meta: S.meta });
+const persist = () => store.set(K1 + '-p', { inst: S.inst, profile: S.profile, nonlin: S.nonlin, learn: S.learn, metric: S.metric, riskK: S.riskK, myName: S.myName, myNoise: S.myNoise, tol: S.tol, sensP: S.sensP, custom: S.custom, price: S.price, meta: S.meta });
 const saveSteps = () => store.set(K1 + '-steps', S.steps), saveHist = () => store.set(K1 + '-hist', S.hist);
 function sens(id) {
   const o = S.sensP[S.profile]?.[id]; if (o) return o;
@@ -176,52 +176,163 @@ function renderStatic() {
   $('#labs').innerHTML = lh;
   $('#sizes').innerHTML = `<label>Размер замеса, кг<input id="batchKg" inputmode="decimal" value="${num(S.batchKg)}"></label><label>Размер пробы, кг<input id="sampleKg" inputmode="decimal" value="${num(S.sampleKg)}"></label><label>Точность весов, замес, г<input id="resB" inputmode="decimal" value="${num(S.resB)}"></label><label>Точность весов, проба, г<input id="resS" inputmode="decimal" value="${num(S.resS)}"></label>`;
   $('#settings').innerHTML = `<div class="seg" style="align-items:center"><span class="small">База:</span>${Object.entries(PROFILES).map(([k, v]) => `<button type="button" data-prof="${k}" aria-pressed="${S.profile === k}">${v.n}</button>`).join('')}</div>
-   <div class="seg" style="align-items:center;margin-top:8px"><span class="small">Формула ΔE:</span>${[['00', 'CIEDE2000'], ['94', 'CIE94 (как на BYK)'], ['ab', 'ΔE*ab']].map(([k, n]) => `<button type="button" data-met="${k}" aria-pressed="${S.metric === k}">${n}</button>`).join('')}</div><div class="seg" style="align-items:center;margin-top:8px"><span class="small">Допуск ΔE00:</span>${[0.5, 1, 1.5, 2].map((t) => `<button type="button" data-tol="${t}" aria-pressed="${S.tol === t}">${num(t)}</button>`).join('')}<span class="small">Пигментов в добавке (до 10):</span>${[1, 2, 3, 4, 5, 6, 8, 10].map((n) => `<button type="button" data-n="${n}" aria-pressed="${S.maxN === n}">${n}</button>`).join('')}</div>
+   <div class="seg" style="align-items:center;margin-top:8px"><span class="small">Формула ΔE:</span>${[['00', 'CIEDE2000'], ['94', 'CIE94 (как на BYK)'], ['ab', 'ΔE*ab']].map(([k, n]) => `<button type="button" data-met="${k}" aria-pressed="${S.metric === k}">${n}</button>`).join('')}</div><div class="seg" style="align-items:center;margin-top:8px"><span class="small">Допуск ΔE00:</span>${[0.5, 1, 1.5, 2].map((t) => `<button type="button" data-tol="${t}" aria-pressed="${S.tol === t}">${num(t)}</button>`).join('')}<span class="small">Жёлтая зона (риск) до:</span>${[1.25, 1.5, 2, 3].map((t) => `<button type="button" data-rk="${t}" aria-pressed="${S.riskK === t}">×${String(t).replace('.', ',')}</button>`).join('')}<span class="small">Пигментов в добавке (до 10):</span>${[1, 2, 3, 4, 5, 6, 8, 10].map((n) => `<button type="button" data-n="${n}" aria-pressed="${S.maxN === n}">${n}</button>`).join('')}</div>
    <div class="seg" style="margin-top:8px"><label class="ck"><input type="checkbox" id="nonlin" ${S.nonlin ? 'checked' : ''}><span><b>Нелинейная модель</b><em>большие добавки действуют слабее линейного расчёта</em></span></label><label class="ck"><input type="checkbox" id="learn" ${S.learn ? 'checked' : ''}><span><b>Самообучение по итерациям</b><em>после замера модель уточняет чувствительности</em></span></label></div>`;
   $('#cols').innerHTML = colors().map((c) => `<div class="colr"><label class="ck"><input type="checkbox" data-allow="${c.id}" ${S.allowed[c.id] ? 'checked' : ''}><i style="background:${c.c}"></i><span><b>${esc(c.n)}</b><em>${esc(c.ci || 'свой')}</em></span></label><label class="cont">в рецепте, %<input inputmode="decimal" data-cont="${c.id}" value="${S.content[c.id] != null ? num(S.content[c.id]) : ''}" placeholder="—"></label></div>`).join('');
   renderCal(); renderMeta();
 }
-function result() {
-  const out = $('#res'), I = inst(), noise = I.editable ? S.myNoise : I.noise;
+const zone = (v) => (v <= S.tol ? 'ok' : v <= S.tol * S.riskK ? 'warn' : 'bad');
+const ZL = { ok: 'в допуске', warn: 'риск', bad: 'вне допуска' };
+const zbadge = (v) => `<span class="zb z-${zone(v)}">${ZL[zone(v)]}</span>`;
+const unitP = (p) => String(+(S.plan.unit === 'pct' ? p : S.plan.unit === 'gb' ? (p / 100) * S.batchKg * 1000 : (p / 100) * S.sampleKg * 1000).toFixed(4)).replace('.', ',');
+const toP = (x) => (S.plan.unit === 'pct' ? x : S.plan.unit === 'gb' ? (x / (S.batchKg * 1000)) * 100 : (x / (S.sampleKg * 1000)) * 100);
+const shortName = (id) => { const c = colors().find((q) => q.id === id); return c ? c.sh || c.n.split(' ')[0] : id; };
+
+function result(keep) {
+  const out = $('#res'), I = inst();
   const raw = [...S.std.slice(0, I.angles), ...(S.mode === 'pair' ? S.smp.slice(0, I.angles) : S.del.slice(0, I.angles)), ...(S.ill2.on ? [S.ill2.std, S.ill2.smp] : [])].flat();
   if (raw.some((v) => !Number.isFinite(v)) || !(S.batchKg > 0)) { out.innerHTML = '<div class="warn">Заполните значения L*, a*, b* и размер замеса.</div>'; return; }
-  const { rows, before, vars } = calc(), r0 = rows[0], tolOk = before <= S.tol;
-  out._vars = vars; S.variant = Math.min(S.variant, Math.max(0, vars.length - 1));
+  const { rows, before, vars } = calc(), r0 = rows[0];
+  if (S.view) S.view.auto = true;
+  out._vars = vars; out._rows = rows; out._before = before; S.variant = Math.min(S.variant, Math.max(0, vars.length - 1));
   const best = vars[S.variant], bd = breakdown(r0.tgt, r0.cur);
-  let h = `<div class="sw3">${[['Эталон', r0.tgt], ['Сейчас', r0.cur], ['После добавки (прогноз)', best ? best.pred[0] : r0.cur]].map(([t, l]) => `<div><i style="background:${lab2rgb(...l)}"></i><span>${t}</span><em>L ${nf(l[0], 1)} · a ${nf(l[1], 1)} · b ${nf(l[2], 1)}</em></div>`).join('')}</div>`;
-  const cls = (v) => (v > S.tol * 1.5 ? 'bad' : v > S.tol ? 'warn' : 'ok');
-  h += `<div class="kp"><div class="kpi"><span>Отклонение сейчас</span><b class="${cls(before)}">ΔE00 ${nf(before)}</b><em>ΔE\u200b00 ${nf(de00(...r0.tgt, ...r0.cur))} · ΔE\u200b94 ${nf(de94(r0.tgt, r0.cur))} · ΔE*\u200bab ${nf(de76(r0.tgt, r0.cur))}<br>допуск ${num(S.tol)}</em></div>${best ? `<div class="kpi"><span>После добавки, прогноз</span><b class="${cls(best.sc)}">ΔE00 ${nf(best.sc)}</b><em>${best.sc <= S.tol ? 'в допуске' : 'вне допуска'}, проверить на пробе</em></div>` : ''}</div>`;
+  if (!keep) { S.dirty = false; S.plan.v = {}; if (best) best.lines.forEach((l) => (S.plan.v[l.id] = unitP(l.p))); }
+  let h = `<div class="sw3">${[['Эталон', r0.tgt, 'swT'], ['Сейчас', r0.cur, 'swC'], ['После добавки (живой прогноз)', r0.cur, 'swP']].map(([t, l, id]) => `<div><i id="${id}" style="background:${lab2rgb(...l)}"></i><span>${t}</span><em id="${id}t">L ${nf(l[0], 1)} · a ${nf(l[1], 1)} · b ${nf(l[2], 1)}</em></div>`).join('')}</div>`;
+  h += `<div class="kp"><div class="kpi"><span>Отклонение сейчас</span><b class="zt-${zone(before)}">ΔE00 ${nf(before)}</b>${zbadge(before)}<em>ΔE\u200b00 ${nf(de00(...r0.tgt, ...r0.cur))} · ΔE\u200b94 ${nf(de94(r0.tgt, r0.cur))} · ΔE*\u200bab ${nf(de76(r0.tgt, r0.cur))}</em></div><div class="kpi" id="kpP"></div></div>`;
+  h += `<div class="zlegend"><span class="zb z-ok">в допуске ≤ ${num(S.tol)}</span><span class="zb z-warn">риск ${num(S.tol)}…${nf(S.tol * S.riskK, 2)}</span><span class="zb z-bad">вне допуска > ${nf(S.tol * S.riskK, 2)}</span></div>`;
   const tx = (v, a, b, t) => (Math.abs(v) < 0.15 ? '' : `${v > 0 ? a : b} на ${nf(Math.abs(v), 1)}${t}`);
   const parts = [tx(bd.dL, 'светлее', 'темнее', ' ед. L*'), tx(bd.dC, 'насыщеннее', 'тусклее', ' ед. C*'), tx(bd.dH, 'оттенок смещён', 'оттенок смещён', ' ед. H*')].filter(Boolean);
   h += `<div class="bdw"><b>Чем образец отличается от эталона:</b> ${parts.length ? parts.join(', ') : 'различий нет'}.${S.ill2.on ? ` Под источником A: ΔE00 ${nf(ddE(rows[rows.length - 1], rows[rows.length - 1].cur))}.` : ''}</div>`;
   { const ge = pf(S.gl.std), gs = pf(S.gl.smp); if (Number.isFinite(ge) && Number.isFinite(gs) && Math.abs(ge - gs) > 5) h += `<div class="warn">Блеск образца и эталона отличается на ${nf(Math.abs(ge - gs), 1)} GU. При разном блеске цвет сравнивается неточно: сначала выровняйте блеск (режим отверждения, текстура).</div>`; }
-  if (tolOk) h += `<div class="note ok">Цвет в допуске ΔE00 ≤ ${num(S.tol)}. Корректировка не нужна.</div>`;
-  if (!best) { out.innerHTML = h + '<div class="warn">Добавлением с выбранными колорантами приблизить цвет не получается. Выберите больше колорантов или проверьте значения.</div>'; return; }
-  h += `<div class="vars">${vars.map((v, i) => `<button type="button" class="vr ${i === S.variant ? 'on' : ''}" data-var="${i}"><b>Вариант ${i + 1}</b><span>${v.lines.map((l) => (() => { const c = colors().find((q) => q.id === l.id); return c.sh || c.n.split(' ')[0]; })()).join(' + ')}</span><em>ΔE00 ${nf(v.sc)} · ${nf(v.cost, 0)} ₽</em></button>`).join('')}</div>`;
-  const total = best.lines.reduce((a, l) => a + Math.abs(l.p), 0);
-  h += `<div class="xw"><table class="tab res"><thead><tr><th>Колорант</th><th>% к массе замеса</th><th>На пробу ${nf(S.sampleKg, S.sampleKg < 1 ? 2 : 1)} кг</th><th>На замес ${nf(S.batchKg, 0)} кг</th><th>К рецептуре</th></tr></thead><tbody>${best.lines.map((l) => {
-    const c = colors().find((x) => x.id === l.id), cont = S.content[l.id], sg = l.p >= 0 ? '+' : '−', gS = (S.sampleKg * 1000 * Math.abs(l.p)) / 100;
-    return `<tr><td><i class="dot" style="background:${c.c}"></i><b>${esc(c.n)}</b> <em>${esc(c.ci || '')}</em></td><td><b>${sg}${fmtP(Math.abs(l.p))} %</b></td><td>${sg}${nf(Math.round(gS / S.resS) * S.resS, S.resS < 1 ? 2 : 0)} г</td><td>${sg}${massStr((S.batchKg * l.p) / 100)}</td><td>${cont > 0 ? sg + nf(Math.abs(l.p) / cont * 100, 1) + ' % от количества в рецепте' : '<span class="small">укажите % в рецепте</span>'}</td></tr>`;
-  }).join('')}</tbody></table></div><p class="small">Стоимость добавки по вашим ценам: <b>${nf(best.cost, 0)} ₽</b>${S.bt === 'made' ? '. Замес готов, поэтому расчёт только добавляет.' : '.'}</p>`;
-  const w = [];
-  if (total > 1.5) w.push('Суммарная добавка больше 1,5 % — вне зоны, где расчёт точен. Делайте в два шага: сначала половину, затем новый замер.'); else if (total > 0.6) w.push('Добавка заметная. Сначала сделайте пробу на малой массе и перемерьте.');
-  if (S.ill2.on) { const dA = ddE(rows[rows.length - 1], best.pred[rows.length - 1]), dD = ddE(rows[0], best.pred[0]); if (dA > dD + 0.6) w.push(`Под источником A остаётся ΔE00 ${nf(dA)}: возможна метамерия (цвет совпадает при одном свете и расходится при другом). Попробуйте другие колоранты.`); }
-  const rr = [r0.tgt[0] - best.pred[0][0], r0.tgt[1] - best.pred[0][1], r0.tgt[2] - best.pred[0][2]], hint = [];
-  if (rr[0] > 0.7) hint.push('останется темнее эталона: осветлить можно только белым'); if (rr[0] < -0.7) hint.push('останется светлее эталона');
-  if (rr[1] > 0.7) hint.push('не хватает красного'); if (rr[1] < -0.7) hint.push('не хватает зелёного'); if (rr[2] > 0.7) hint.push('не хватает жёлтого'); if (rr[2] < -0.7) hint.push('не хватает синего');
-  if (best.sc > S.tol && hint.length) w.push('Полностью исправить добавкой не получается: ' + hint.join('; ') + '. Увеличьте число колорантов или выберите другие.');
-  h += w.map((x) => `<div class="warn">${x}</div>`).join('') + plane(rows, best);
-  h += `<div class="act"><button class="btn" id="applyStep" type="button">Применить как шаг и ввести новый замер</button><button class="btn ghost" id="copy" type="button">Скопировать</button><button class="btn ghost" id="share" type="button">Ссылка на расчёт</button></div><p class="small">Расчёт ориентировочный. Окончательное решение и массы определяет технолог по результатам пробной добавки.</p>`;
+  if (before <= S.tol) h += `<div class="note ok">Цвет в допуске ΔE00 ≤ ${num(S.tol)}. Корректировка не нужна.</div>`;
+  if (!best) h += '<div class="warn">Автоподбор с выбранными колорантами не нашёл добавку. Можно задать свои значения ниже или выбрать больше колорантов.</div>';
+  else h += `<div class="vars">${vars.map((v, i) => `<button type="button" class="vr ${i === S.variant ? 'on' : ''}" data-var="${i}"><b>Вариант ${i + 1} <i class="zd z-${zone(v.sc)}"></i></b><span>${v.lines.map((l) => shortName(l.id)).join(' + ')}</span><em>ΔE00 ${nf(v.sc)} · ${nf(v.cost, 0)} ₽</em></button>`).join('')}</div>`;
+  h += `<h4 style="margin:14px 0 4px">Мой рецепт добавок: правьте значения, прогноз пересчитывается сразу</h4><div id="liveIn"></div><div id="liveOut"></div>`;
   out.innerHTML = h;
-  out._text = `Коррекция цвета · ${esc(S.meta.color)} ${esc(S.meta.batch)}\nОтклонение: ΔE00 ${nf(before)}\n` + best.lines.map((l) => { const c = colors().find((x) => x.id === l.id); return `- ${c.n}: ${l.p >= 0 ? '+' : '−'}${fmtP(Math.abs(l.p))} % (${massStr((S.batchKg * l.p) / 100)})`; }).join('\n') + `\nПрогноз: ΔE00 ${nf(best.sc)}`;
-  renderSteps(); renderProto(); planResult(); relabel();
+  renderLiveIn(); updateLive(); renderSteps(); renderProto(); relabel();
 }
-function plane(rows, best) {
-  const W = 360, H = 290, cx = W / 2, cy = H / 2, sc = 11, r0 = rows[0], t = r0.tgt, cur = r0.cur, pr = best.pred[0];
-  const X = (a) => cx + (a - t[1]) * sc, Y = (b) => cy - (b - t[2]) * sc;
-  let x0 = cur[1], y0 = cur[2];
-  const arrows = best.lines.map((l) => { const s = sens(l.id), f = eff(l.p * 10), vx = s[1] * f, vy = s[2] * f, c = colors().find((q) => q.id === l.id).c; const a = `<line x1="${X(x0)}" y1="${Y(y0)}" x2="${X(x0 + vx)}" y2="${Y(y0 + vy)}" stroke="${c === '#f4f5f6' ? '#cfd6dd' : c}" stroke-width="3" stroke-linecap="round"/>`; x0 += vx; y0 += vy; return a; }).join('');
-  return `<h4 style="margin:16px 0 6px">Где цвет на плоскости a*–b*</h4><div class="plane"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Положение эталона, образца и прогноза на плоскости a*b*"><rect width="${W}" height="${H}" fill="#10202c" rx="14"/>${[-10, -5, 0, 5, 10].map((g) => `<line x1="${cx + g * sc}" x2="${cx + g * sc}" y1="10" y2="${H - 10}" stroke="#fff" stroke-opacity="${g ? 0.08 : 0.25}"/><line y1="${cy + g * sc}" y2="${cy + g * sc}" x1="10" x2="${W - 10}" stroke="#fff" stroke-opacity="${g ? 0.08 : 0.25}"/>`).join('')}<circle cx="${cx}" cy="${cy}" r="${S.tol * sc}" fill="none" stroke="#46d391" stroke-dasharray="3 3" stroke-opacity=".8"/>${arrows}<circle cx="${X(cur[1])}" cy="${Y(cur[2])}" r="6" fill="#ff7a70" stroke="#10202c" stroke-width="2"/><text x="${X(cur[1]) + 9}" y="${Y(cur[2]) - 8}" font-size="11" fill="#ff7a70">сейчас</text><circle cx="${X(pr[1])}" cy="${Y(pr[2])}" r="5" fill="#f6c453" stroke="#10202c" stroke-width="2"/><text x="${X(pr[1]) + 9}" y="${Y(pr[2]) + 14}" font-size="11" fill="#f6c453">прогноз</text><circle cx="${cx}" cy="${cy}" r="6" fill="#46d391" stroke="#10202c" stroke-width="2"/><text x="${cx + 9}" y="${cy - 8}" font-size="11" fill="#46d391">эталон</text><text x="${W - 14}" y="${cy - 5}" text-anchor="end" font-size="10" fill="#fff" fill-opacity=".6">+a* красный</text><text x="${cx + 4}" y="22" font-size="10" fill="#fff" fill-opacity=".6">+b* жёлтый</text><text x="14" y="${cy - 5}" font-size="10" fill="#fff" fill-opacity=".6">зелёный</text><text x="${cx + 4}" y="${H - 12}" font-size="10" fill="#fff" fill-opacity=".6">синий</text></svg><p class="small" style="margin:6px 0 0">Стрелки: вклад каждого колоранта. Пунктир: допуск вокруг эталона.</p></div>`;
+
+/* ---------- живой рецепт добавок ---------- */
+const UNITS = { pct: '% к массе замеса', gb: 'г на замес', gs: 'г на пробу' };
+function planLines() {
+  const out = [];
+  for (const [id, v] of Object.entries(S.plan.v)) { const x = pf(v); if (!Number.isFinite(x) || x === 0) continue; const p = toP(x); out.push({ id, p: S.bt === 'made' ? Math.max(0, p) : p }); }
+  return out.filter((l) => l.p !== 0);
+}
+function renderLiveIn() {
+  const box = $('#liveIn'); if (!box) return;
+  const ids = Object.keys(S.plan.v), free = colors().filter((c) => !ids.includes(c.id));
+  const rows = ids.map((id) => { const c = colors().find((q) => q.id === id); if (!c) return ''; const p = toP(pf(S.plan.v[id]) || 0), mx = Math.max(0.5, Math.abs(p) * 2.2);
+    return `<div class="lr" data-row="${id}"><i style="background:${c.c}"></i><span class="ln">${esc(c.sh || c.n)}</span><input type="range" min="${S.bt === 'made' ? 0 : -mx}" max="${mx}" step="0.005" value="${Number.isFinite(p) ? p : 0}" data-psl="${id}" aria-label="${esc(c.n)}, % к массе"><input class="lv" inputmode="decimal" data-plan="${id}" value="${S.plan.v[id] ?? ''}" aria-label="${esc(c.n)}"><button type="button" class="lx" data-prm="${id}" aria-label="Убрать">×</button></div>`; }).join('');
+  box.innerHTML = `<div class="seg" style="margin-bottom:8px">${Object.entries(UNITS).map(([k, n]) => `<button type="button" data-punit="${k}" aria-pressed="${S.plan.unit === k}">${n}</button>`).join('')}</div>
+   <div class="lrows">${rows || '<p class="small">Добавьте пигмент или нажмите «К рекомендации».</p>'}</div>
+   <div class="act" style="margin:8px 0"><select id="padd" aria-label="Добавить пигмент"><option value="">+ добавить пигмент (до 10)</option>${free.map((c) => `<option value="${c.id}">${esc(c.n)}</option>`).join('')}</select><button class="btn ghost" id="planFill" type="button">К рекомендации</button><button class="btn ghost" id="planClear" type="button">Очистить</button></div>
+   <div class="seg" style="align-items:center"><span class="small">Дозу всего рецепта:</span>${[0.5, 0.75, 1.25, 1.5, 2].map((m) => `<button type="button" data-pscale="${m}">×${String(m).replace('.', ',')}</button>`).join('')}</div>`;
+}
+function liveModel() {
+  const rows = $('#res')._rows || problem(), lines = planLines(), ids = lines.map((l) => l.id), xs = lines.map((l) => l.p * 10);
+  const pred = ids.length ? predict(rows, ids, xs) : rows.map((r) => r.cur.slice());
+  const sc = wmean(rows, (r, k) => ddE(r, pred[k])), total = lines.reduce((a, l) => a + Math.abs(l.p), 0), cost = lines.reduce((a, l) => a + ((S.batchKg * Math.abs(l.p)) / 100) * price(l.id), 0);
+  return { rows, lines, ids, xs, pred, sc, total, cost };
+}
+function updateLive() {
+  const out = $('#liveOut'); if (!out) return;
+  const M = liveModel(), r0 = M.rows[0], before = $('#res')._before, p0 = M.pred[0], bd = breakdown(r0.tgt, p0);
+  $('#swP').style.background = lab2rgb(...p0); $('#swPt').textContent = `L ${nf(p0[0], 1)} · a ${nf(p0[1], 1)} · b ${nf(p0[2], 1)}`;
+  const kp = `<span>Будет после добавки</span><b class="zt-${zone(M.sc)}">ΔE00 ${nf(M.sc)}</b>${zbadge(M.sc)}<em>${M.sc < before ? 'лучше на ' + nf(before - M.sc, 2) : M.sc > before ? 'хуже на ' + nf(M.sc - before, 2) : 'без изменений'} · проверить на пробе</em>`;
+  $('#kpP').innerHTML = kp;
+  const w = [];
+  if (S.bt === 'made' && Object.values(S.plan.v).some((v) => pf(v) < 0)) w.push('Замес готов, убрать пигмент нельзя: отрицательные значения не учтены.');
+  if (M.lines.length > 10) w.push('Больше 10 пигментов в одной добавке: лучше сократить.');
+  if (M.total > 1.5) w.push('Суммарная добавка больше 1,5 %: расчёт менее точен, делайте в два шага.'); else if (M.total > 0.6) w.push('Добавка заметная: сначала сделайте пробу на малой массе.');
+  const tab = M.lines.length ? `<div class="xw"><table class="tab"><thead><tr><th>Пигмент</th><th>% к массе</th><th>На пробу</th><th>На замес</th><th>К рецептуре</th></tr></thead><tbody>${M.lines.map((l) => { const c = colors().find((q) => q.id === l.id), cont = S.content[l.id], sg = l.p >= 0 ? '+' : '−'; return `<tr><td><i class="dot" style="background:${c.c}"></i>${esc(c.n)}</td><td>${sg}${fmtP(Math.abs(l.p))} %</td><td>${sg}${nf(Math.round(((S.sampleKg * 1000 * Math.abs(l.p)) / 100) / S.resS) * S.resS, S.resS < 1 ? 2 : 0)} г</td><td>${sg}${massStr((S.batchKg * l.p) / 100)}</td><td>${cont > 0 ? sg + nf(Math.abs(l.p) / cont * 100, 1) + ' %' : '<span class="small">% в рецепте не указан</span>'}</td></tr>`; }).join('')}</tbody></table></div><p class="small">Всего ${nf(M.total, 3)} % к массе, стоимость ${nf(M.cost, 0)} ₽.</p>` : '';
+  out.innerHTML = `<div class="bdw">После добавок относительно эталона: ${[Math.abs(bd.dL) < 0.15 ? '' : `${bd.dL > 0 ? 'светлее' : 'темнее'} на ${nf(Math.abs(bd.dL), 1)} L*`, Math.abs(bd.dC) < 0.15 ? '' : `${bd.dC > 0 ? 'насыщеннее' : 'тусклее'} на ${nf(Math.abs(bd.dC), 1)} C*`, Math.abs(bd.dH) < 0.15 ? '' : `оттенок смещён на ${nf(Math.abs(bd.dH), 1)} H*`].filter(Boolean).join(', ') || 'различий нет'}.</div>${w.map((x) => `<div class="warn">${x}</div>`).join('')}${tab}
+   <div class="pbar"><b>Карта цвета и масштаб</b><span class="seg"><button type="button" data-pz="out" aria-label="Отдалить">−</button><button type="button" data-pz="in" aria-label="Приблизить">+</button><button type="button" data-pz="fit">По точкам</button><button type="button" data-pz="2">±2</button><button type="button" data-pz="5">±5</button></span></div><div id="plotHost" class="plotw"></div><p class="small" id="plotNote"></p>
+   <div id="doseC"></div>
+   <div class="act"><button class="btn" id="planStep" type="button">Применить мой рецепт как шаг и ввести новый замер</button><button class="btn ghost" id="copy" type="button">Скопировать</button><button class="btn ghost" id="share" type="button">Ссылка на расчёт</button></div><p class="small">Расчёт ориентировочный. Окончательное решение и массы определяет технолог по результатам пробной добавки.</p>`;
+  $('#res')._text = `Коррекция цвета · ${S.meta.color} ${S.meta.batch}\nОтклонение: ΔE00 ${nf(before)}\n` + M.lines.map((l) => `- ${colors().find((x) => x.id === l.id).n}: ${l.p >= 0 ? '+' : '−'}${fmtP(Math.abs(l.p))} % (${massStr((S.batchKg * l.p) / 100)})`).join('\n') + `\nПрогноз: ΔE00 ${nf(M.sc)} (${ZL[zone(M.sc)]})`;
+  S.model = M; setupPlot(); drawPlot(); drawDose(M);
+  const st = M.lines.length ? '' : ''; $('#res')._lines = M.lines; $('#res')._after = M.sc;
+  renderProto(); relabel(out); relabel($('#kpP'));
+}
+
+/* ---------- карта цвета: масштаб, зоны, зум ---------- */
+const Z = { W: 520, H: 360, x0: 130, x1: 504, y0: 26, y1: 326, lx: 78 };
+const NICE = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50];
+const zoneCache = {};
+function contour(level, tgt) {
+  const key = [level, S.metric, tgt.join(), S.kL, S.kC, S.kH].join('|'); if (zoneCache[key]) return zoneCache[key];
+  const f = (da, db, dL = 0) => ddE({ tgt }, [tgt[0] + dL, tgt[1] + da, tgt[2] + db]), pts = [];
+  for (let i = 0; i < 72; i++) { const th = (i / 72) * 2 * Math.PI, c = Math.cos(th), s = Math.sin(th); let lo = 0, hi = 80; for (let k = 0; k < 28; k++) { const m = (lo + hi) / 2; if (f(m * c, m * s) > level) hi = m; else lo = m; } pts.push([lo * c, lo * s]); }
+  return (zoneCache[key] = pts);
+}
+function lRadius(level, tgt) { const f = (dL) => ddE({ tgt }, [tgt[0] + dL, tgt[1], tgt[2]]); let lo = 0, hi = 90; for (let k = 0; k < 28; k++) { const m = (lo + hi) / 2; if (f(m) > level) hi = m; else lo = m; } return lo; }
+function fitView(M) {
+  const t = M.rows[0].tgt, pts = [[0, 0], [M.rows[0].cur[1] - t[1], M.rows[0].cur[2] - t[2]], [M.pred[0][1] - t[1], M.pred[0][2] - t[2]]];
+  let x = M.rows[0].cur.slice(1); M.lines.forEach((l) => { const s = sens(l.id), f = eff(l.p * 10); x = [x[0] + s[1] * f, x[1] + s[2] * f]; pts.push([x[0] - t[1], x[1] - t[2]]); });
+  const r = contour(S.tol * S.riskK, t), ry = Math.max(...r.map((p) => Math.hypot(p[0], p[1])));
+  const ex = Math.max(...pts.map((p) => Math.abs(p[0])), ry * 0.6) * 1.3 + 0.2, ey = Math.max(...pts.map((p) => Math.abs(p[1])), ry * 0.6) * 1.3 + 0.2;
+  const k = Math.max(3, Math.min(400, Math.min((Z.x1 - Z.x0) / 2 / ex, (Z.y1 - Z.y0) / 2 / ey)));
+  return { cx: 0, cy: 0, k };
+}
+function setupPlot() {
+  const host = $('#plotHost'); if (!host) return;
+  if (!S.view) S.view = { auto: true, ...fitView(S.model) };
+  if (S.view.auto) Object.assign(S.view, fitView(S.model));
+  if (host._ready) return; host._ready = true;
+  const pts = new Map();
+  const toU = (e) => { const r = host.getBoundingClientRect(), sx = Z.W / r.width; return { u: (e.clientX - r.left) * sx, v: (e.clientY - r.top) * sx }; };
+  const zoomAt = (u, v, f) => { const V = S.view, ca = V.cx + (u - (Z.x0 + Z.x1) / 2) / V.k, cb = V.cy - (v - (Z.y0 + Z.y1) / 2) / V.k; V.k = Math.max(2, Math.min(800, V.k * f)); V.cx = ca - (u - (Z.x0 + Z.x1) / 2) / V.k; V.cy = cb + (v - (Z.y0 + Z.y1) / 2) / V.k; V.auto = false; drawPlot(); };
+  host.addEventListener('wheel', (e) => { e.preventDefault(); const p = toU(e); zoomAt(p.u, p.v, e.deltaY < 0 ? 1.2 : 1 / 1.2); }, { passive: false });
+  host.addEventListener('pointerdown', (e) => { host.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); host._last = null; });
+  host.addEventListener('pointermove', (e) => {
+    if (!pts.has(e.pointerId)) return; const prev = pts.get(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const r = host.getBoundingClientRect(), sx = Z.W / r.width, V = S.view;
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (host._d) { const p = toU({ clientX: (a.x + b.x) / 2, clientY: (a.y + b.y) / 2 }); zoomAt(p.u, p.v, d / host._d); } host._d = d; }
+    else { V.cx -= ((e.clientX - prev.x) * sx) / V.k; V.cy += ((e.clientY - prev.y) * sx) / V.k; V.auto = false; drawPlot(); }
+  });
+  const up = (e) => { pts.delete(e.pointerId); host._d = 0; }; host.addEventListener('pointerup', up); host.addEventListener('pointercancel', up);
+}
+function drawPlot() {
+  const host = $('#plotHost'), M = S.model; if (!host || !M) return;
+  const V = S.view, t = M.rows[0].tgt, cur = M.rows[0].cur, pr = M.pred[0], X = (da) => (Z.x0 + Z.x1) / 2 + (da - V.cx) * V.k, Y = (db) => (Z.y0 + Z.y1) / 2 - (db - V.cy) * V.k;
+  const step = NICE.find((n) => n * V.k >= 44) || 50, a0 = V.cx - (Z.x1 - Z.x0) / 2 / V.k, a1 = V.cx + (Z.x1 - Z.x0) / 2 / V.k, b0 = V.cy - (Z.y1 - Z.y0) / 2 / V.k, b1 = V.cy + (Z.y1 - Z.y0) / 2 / V.k;
+  const poly = (pts) => pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join('') + 'Z';
+  const g = [], gt = [];
+  for (let a = Math.ceil(a0 / step) * step; a <= a1; a += step) { g.push(`<line x1="${X(a)}" x2="${X(a)}" y1="${Z.y0}" y2="${Z.y1}" stroke="#fff" stroke-opacity="${Math.abs(a) < 1e-9 ? 0.45 : 0.1}"/>`); gt.push(`<text x="${X(a)}" y="${Z.y1 + 14}" font-size="10" text-anchor="middle" fill="#fff" fill-opacity=".8">${nf(a, step < 1 ? 2 : 0)}</text>`); }
+  for (let b = Math.ceil(b0 / step) * step; b <= b1; b += step) { g.push(`<line y1="${Y(b)}" y2="${Y(b)}" x1="${Z.x0}" x2="${Z.x1}" stroke="#fff" stroke-opacity="${Math.abs(b) < 1e-9 ? 0.45 : 0.1}"/>`); gt.push(`<text x="${Z.x0 - 6}" y="${Y(b) + 3}" font-size="10" text-anchor="end" fill="#fff" fill-opacity=".8">${nf(b, step < 1 ? 2 : 0)}</text>`); }
+  const inner = contour(S.tol, t), outer = contour(S.tol * S.riskK, t);
+  const pc = [[0, 0, 'эталон', '#46d391', 'e'], [cur[1] - t[1], cur[2] - t[2], 'сейчас', '#ff7a70', 'c'], [pr[1] - t[1], pr[2] - t[2], 'прогноз', '#f6c453', 'p']];
+  const sp = pc.map((p) => ({ ...p, sx: X(p[0]), sy: Y(p[1]) })).sort((u, v) => u.sy - v.sy); for (let i = 1; i < sp.length; i++) if (Math.abs(sp[i].sy - sp[i - 1].sy) < 14 && Math.abs(sp[i].sx - sp[i - 1].sx) < 70) sp[i].sy = sp[i - 1].sy + 14;
+  let ax = cur[1], ay = cur[2]; const arrows = M.lines.map((l) => { const s = sens(l.id), f = eff(l.p * 10), nx = ax + s[1] * f, ny = ay + s[2] * f, c = colors().find((q) => q.id === l.id).c, a = `<line x1="${X(ax - t[1])}" y1="${Y(ay - t[2])}" x2="${X(nx - t[1])}" y2="${Y(ny - t[2])}" stroke="${c === '#f4f5f6' ? '#cfd6dd' : c}" stroke-width="3" stroke-linecap="round"/>`; ax = nx; ay = ny; return a; }).join('');
+  // шкала L*
+  const Lg = lRadius(S.tol, t), Ly = lRadius(S.tol * S.riskK, t), dLc = cur[0] - t[0], dLp = pr[0] - t[0], Lr = Math.max(Ly * 1.6, Math.abs(dLc) * 1.3, Math.abs(dLp) * 1.3, 1.5), LY = (d) => (Z.y0 + Z.y1) / 2 - (d / Lr) * ((Z.y1 - Z.y0) / 2), Lstep = NICE.find((n) => (n / Lr) * ((Z.y1 - Z.y0) / 2) >= 28) || 50;
+  const band = (d0, d1, col, op) => `<rect x="${Z.lx - 7}" y="${LY(d1)}" width="14" height="${Math.max(0, LY(d0) - LY(d1))}" fill="${col}" fill-opacity="${op}"/>`;
+  const Lticks = []; for (let v = -Math.floor(Lr / Lstep) * Lstep; v <= Lr; v += Lstep) Lticks.push(`<line x1="${Z.lx + 7}" x2="${Z.lx + 12}" y1="${LY(v)}" y2="${LY(v)}" stroke="#fff" stroke-opacity=".5"/><text x="${Z.lx + 15}" y="${LY(v) + 3}" font-size="9.5" fill="#fff" fill-opacity=".75">${nf(v, Lstep < 1 ? 1 : 0)}</text>`);
+  const Lmark = (d, col, lab) => `<path d="M${Z.lx - 9},${LY(d)} l-8,-5 v10z" fill="${col}"/><text x="${Z.lx - 20}" y="${LY(d) + 3}" font-size="9.5" text-anchor="end" fill="${col}">${lab}</text>`;
+  host.innerHTML = `<svg viewBox="0 0 ${Z.W} ${Z.H}" role="img" aria-label="Карта цвета с зонами допуска, масштабом и прогнозом" style="touch-action:none;cursor:grab"><defs><clipPath id="pc"><rect x="${Z.x0}" y="${Z.y0}" width="${Z.x1 - Z.x0}" height="${Z.y1 - Z.y0}"/></clipPath></defs><rect width="${Z.W}" height="${Z.H}" rx="14" fill="#10202c"/>
+   <g clip-path="url(#pc)"><rect x="${Z.x0}" y="${Z.y0}" width="${Z.x1 - Z.x0}" height="${Z.y1 - Z.y0}" fill="#ff7a70" fill-opacity=".10"/><path d="${poly(outer)}" fill="#f6c453" fill-opacity=".22" stroke="#f6c453" stroke-width="1.5"/><path d="${poly(inner)}" fill="#46d391" fill-opacity=".28" stroke="#46d391" stroke-width="1.5"/>${g.join('')}${arrows}
+   ${pc.map((p) => `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${p[4] === 'e' ? 6 : 5.5}" fill="${p[3]}" stroke="#10202c" stroke-width="2"/>`).join('')}</g>
+   ${sp.map((p) => `<text x="${p.sx + 10 > Z.x1 - 50 ? p.sx - 10 : p.sx + 10}" y="${p.sy - 8}" font-size="11" font-weight="700" text-anchor="${p.sx + 10 > Z.x1 - 50 ? 'end' : 'start'}" fill="${p[3]}" stroke="#10202c" stroke-width="3" paint-order="stroke">${p[2]}</text>`).join('')}
+   ${gt.join('')}<rect x="${Z.x0}" y="${Z.y0}" width="${Z.x1 - Z.x0}" height="${Z.y1 - Z.y0}" fill="none" stroke="#fff" stroke-opacity=".3"/>
+   <text x="${Z.x1}" y="${Z.y1 + 30}" font-size="10" text-anchor="end" fill="#fff" fill-opacity=".75">Δa* (красный →)</text><text x="${Z.x1}" y="${Z.y0 - 8}" font-size="10" text-anchor="end" fill="#fff" fill-opacity=".75">Δb* (жёлтый ↑)</text>
+   <rect x="${Z.lx - 7}" y="${Z.y0}" width="14" height="${Z.y1 - Z.y0}" fill="#ff7a70" fill-opacity=".14"/>${band(-Ly, Ly, '#f6c453', 0.3)}${band(-Lg, Lg, '#46d391', 0.45)}<text x="${Z.lx}" y="${Z.y0 - 8}" font-size="10" text-anchor="middle" fill="#fff" fill-opacity=".75">ΔL*</text>${Lticks.join('')}${Lmark(0, '#46d391', '0')}${Math.abs(dLc) > 1e-6 ? Lmark(dLc, '#ff7a70', 'сейчас') : ''}${Lmark(dLp, '#f6c453', 'прогноз')}
+   <g transform="translate(${Z.x0 + 8} ${Z.y1 - 14})"><line x1="0" x2="${step * V.k}" y1="0" y2="0" stroke="#fff" stroke-width="2"/><path d="M0 -4v8M${step * V.k} -4v8" stroke="#fff" stroke-width="2"/><text x="${step * V.k + 6}" y="3.5" font-size="10.5" font-weight="700" fill="#fff">${nf(step, step < 1 ? 2 : 0)} ед. Lab</text></g></svg>`;
+  $('#plotNote').innerHTML = `Масштаб: одна сетка = ${nf(step, step < 1 ? 2 : 0)} ед. a*/b*. Приближайте колесом мыши, щипком или кнопками, двигайте перетаскиванием. Зоны: зелёная в допуске (ΔE ≤ ${num(S.tol)}), жёлтая риск (до ${nf(S.tol * S.riskK, 2)}), красная вне допуска. Эллипсы построены по выбранной формуле ΔE при L* эталона, слева шкала ΔL*.`; relabel($('#plotNote'));
+}
+function drawDose(M) {
+  const host = $('#doseC'); if (!host) return; if (!M.lines.length) { host.innerHTML = ''; return; }
+  const ms = Array.from({ length: 51 }, (_, i) => i * 0.04), vals = ms.map((m) => { const pred = predict(M.rows, M.ids, M.xs.map((x) => x * m)); return wmean(M.rows, (r, k) => ddE(r, pred[k])); });
+  const W = 520, H = 170, p = { l: 44, r: 12, t: 12, b: 26 }, ymax = Math.max(S.tol * S.riskK * 1.6, Math.min(Math.max(...vals), S.tol * S.riskK * 6)), x = (m) => p.l + (m / 2) * (W - p.l - p.r), y = (v) => H - p.b - (Math.min(v, ymax) / ymax) * (H - p.t - p.b);
+  const bi = vals.indexOf(Math.min(...vals));
+  host.innerHTML = `<h4 style="margin:14px 0 4px">Что будет, если добавить меньше или больше</h4><div class="doseb"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Отклонение в зависимости от дозы"><rect width="${W}" height="${H}" rx="12" fill="#10202c"/>
+   <rect x="${p.l}" y="${y(S.tol)}" width="${W - p.l - p.r}" height="${y(0) - y(S.tol)}" fill="#46d391" fill-opacity=".22"/><rect x="${p.l}" y="${y(S.tol * S.riskK)}" width="${W - p.l - p.r}" height="${y(S.tol) - y(S.tol * S.riskK)}" fill="#f6c453" fill-opacity=".2"/><rect x="${p.l}" y="${p.t}" width="${W - p.l - p.r}" height="${y(S.tol * S.riskK) - p.t}" fill="#ff7a70" fill-opacity=".12"/>
+   ${[0, 0.5, 1, 1.5, 2].map((m) => `<line x1="${x(m)}" x2="${x(m)}" y1="${p.t}" y2="${H - p.b}" stroke="#fff" stroke-opacity=".1"/><text x="${x(m)}" y="${H - 8}" font-size="10" text-anchor="middle" fill="#fff" fill-opacity=".75">×${String(m).replace('.', ',')}</text>`).join('')}
+   ${[0, S.tol, S.tol * S.riskK].map((v) => `<text x="${p.l - 6}" y="${y(v) + 3}" font-size="10" text-anchor="end" fill="#fff" fill-opacity=".75">${nf(v, 1)}</text>`).join('')}
+   <path d="${ms.map((m, i) => `${i ? 'L' : 'M'}${x(m).toFixed(1)},${y(vals[i]).toFixed(1)}`).join('')}" fill="none" stroke="#8fbcff" stroke-width="2.4"/>
+   <line x1="${x(1)}" x2="${x(1)}" y1="${p.t}" y2="${H - p.b}" stroke="#fff" stroke-dasharray="3 3"/><circle cx="${x(1)}" cy="${y(vals[25])}" r="5" fill="#fff" stroke="#10202c" stroke-width="2"/><text x="${x(1) + 8}" y="${y(vals[25]) - 8}" font-size="11" font-weight="700" fill="#fff">сейчас ${nf(vals[25], 2)}</text>
+   <circle cx="${x(ms[bi])}" cy="${y(vals[bi])}" r="4.5" fill="#46d391" stroke="#10202c" stroke-width="2"/></svg></div><p class="small">Показано, как меняется ΔE при дозе от 0 до ×2 от вашего рецепта. ${bi === 25 ? 'Ваша доза уже близка к лучшей.' : `Лучший результат примерно при ×${nf(ms[bi], 2)} от вашей дозы (ΔE ${nf(vals[bi], 2)}).`} При ×0,5 будет ΔE ${nf(vals[12], 2)}, при ×1,5 ${nf(vals[37], 2)}.</p>`;
+  relabel(host);
 }
 
 /* ---------- итерации, обучение, история ---------- */
@@ -281,48 +392,8 @@ function renderProto() {
   $('#proto').innerHTML = `<h3>Протокол коррекции цвета</h3><table class="tab pt"><tbody><tr><td>Дата</td><td>${new Date().toLocaleDateString('ru-RU')}</td><td>Линия</td><td>${esc(S.meta.line) || '—'}</td></tr><tr><td>№ партии</td><td>${esc(S.meta.batch) || '—'}</td><td>Цвет / RAL</td><td>${esc(S.meta.color) || '—'}</td></tr><tr><td>Прибор</td><td>${esc(inst().id === 'my' && S.myName ? S.myName : inst().name)}</td><td>Технолог</td><td>${esc(S.meta.tech) || '—'}</td></tr><tr><td>Размер замеса</td><td>${nf(S.batchKg, 0)} кг</td><td>Размер пробы</td><td>${nf(S.sampleKg, 2)} кг</td></tr><tr><td>Эталон L*a*b*</td><td>${S.std[0].map((x) => nf(x, 1)).join(' / ')}</td><td>Образец L*a*b*</td><td>${rows[0].cur.map((x) => nf(x, 1)).join(' / ')}</td></tr><tr><td>ΔE00 до</td><td>${nf(before)}</td><td>Допуск</td><td>${num(S.tol)}</td></tr></tbody></table>${v ? `<table class="tab pt" style="margin-top:10px"><thead><tr><th>Колорант</th><th>% к массе</th><th>Масса на замес</th><th>Масса на пробу, г</th><th>Подпись</th></tr></thead><tbody>${v.lines.map((l) => `<tr><td>${esc(colors().find((c) => c.id === l.id).n)}</td><td>${l.p >= 0 ? '+' : '−'}${fmtP(Math.abs(l.p))}</td><td>${massStr((S.batchKg * l.p) / 100)}</td><td>${nf((S.sampleKg * 1000 * Math.abs(l.p)) / 100, 2)}</td><td></td></tr>`).join('')}</tbody></table><p>Прогноз после добавки: ΔE00 ${nf(v.sc)}</p>` : ''}${S.steps.length ? `<p><b>Шаги:</b> ${S.steps.map((s, i) => `${i + 1}) ${s.applied.map((a) => (colors().find((c) => c.id === a.id)?.n || a.id) + ' ' + fmtP(a.p) + ' %').join(', ')}${s.after ? ' → ΔE00 ' + nf(s.deAfter) : ''}`).join('; ')}</p>` : ''}<p class="small">Расчёт ориентировочный. Подпись технолога: ____________________</p>`;
 }
 
-/* ---------- свои добавки: что будет, если ---------- */
-const UNITS = { pct: '% к массе замеса', gb: 'г на замес', gs: 'г на пробу' };
-function planLines() {
-  const u = S.plan.unit, out = [];
-  for (const [id, v] of Object.entries(S.plan.v)) {
-    const x = pf(v); if (!Number.isFinite(x) || x === 0) continue;
-    const p = u === 'pct' ? x : u === 'gb' ? (x / (S.batchKg * 1000)) * 100 : (x / (S.sampleKg * 1000)) * 100;
-    out.push({ id, p: S.bt === 'made' ? Math.max(0, p) : p, raw: p });
-  }
-  return out.filter((l) => l.p !== 0);
-}
-function renderPlan() {
-  const host = $('#planBox'); if (!host) return;
-  host.innerHTML = `<div class="seg">${Object.entries(UNITS).map(([k, n]) => `<button type="button" data-punit="${k}" aria-pressed="${S.plan.unit === k}">${n}</button>`).join('')}</div>
-   <div class="plgrid">${colors().map((c) => `<label class="plr"><i style="background:${c.c}"></i><span>${esc(c.sh || c.n)}</span><input inputmode="decimal" data-plan="${c.id}" value="${S.plan.v[c.id] ?? ''}" placeholder="0"></label>`).join('')}</div>
-   <div class="act"><button class="btn ghost" id="planFill" type="button">Взять рекомендацию</button><button class="btn ghost" id="planClear" type="button">Очистить</button></div>`;
-  planResult();
-}
-function planResult() {
-  const out = $('#planOut'); if (!out) return;
-  const rows = problem(), lines = planLines();
-  if (rows.flat().some((r) => r.cur?.some?.((v) => !Number.isFinite(v)))) { out.innerHTML = '<div class="warn">Заполните данные замера выше.</div>'; return; }
-  if (!lines.length) { out.innerHTML = '<p class="small">Введите, сколько какого пигмента вы планируете добавить, или нажмите «Взять рекомендацию». Здесь появится прогноз цвета.</p>'; return; }
-  const r0 = rows[0], ids = lines.map((l) => l.id), pred = predict(rows, ids, lines.map((l) => l.p * 10)), after = wmean(rows, (r, k) => ddE(r, pred[k])), before = wmean(rows, (r) => ddE(r, r.cur));
-  const total = lines.reduce((a, l) => a + Math.abs(l.p), 0), cost = lines.reduce((a, l) => a + ((S.batchKg * Math.abs(l.p)) / 100) * price(l.id), 0), bd = breakdown(r0.tgt, pred[0]);
-  const cls = (v) => (v > S.tol * 1.5 ? 'bad' : v > S.tol ? 'warn' : 'ok');
-  let h = `<div class="sw3">${[['Эталон', r0.tgt], ['Сейчас', r0.cur], ['С вашими добавками', pred[0]]].map(([t, l]) => `<div><i style="background:${lab2rgb(...l)}"></i><span>${t}</span><em>L ${nf(l[0], 1)} · a ${nf(l[1], 1)} · b ${nf(l[2], 1)}</em></div>`).join('')}</div>
-  <div class="kp"><div class="kpi"><span>Было</span><b class="${cls(before)}">ΔE00 ${nf(before)}</b></div><div class="kpi"><span>Будет, прогноз</span><b class="${cls(after)}">ΔE00 ${nf(after)}</b><em>${after <= S.tol ? 'в допуске' : 'вне допуска'}</em></div></div>
-  <div class="bdw">После добавок относительно эталона: ${[Math.abs(bd.dL) < 0.15 ? '' : `${bd.dL > 0 ? 'светлее' : 'темнее'} на ${nf(Math.abs(bd.dL), 1)} L*`, Math.abs(bd.dC) < 0.15 ? '' : `${bd.dC > 0 ? 'насыщеннее' : 'тусклее'} на ${nf(Math.abs(bd.dC), 1)} C*`, Math.abs(bd.dH) < 0.15 ? '' : `оттенок смещён на ${nf(Math.abs(bd.dH), 1)} H*`].filter(Boolean).join(', ') || 'различий нет'}.</div>
-  <div class="xw"><table class="tab"><thead><tr><th>Пигмент</th><th>% к массе</th><th>На замес</th><th>На пробу</th></tr></thead><tbody>${lines.map((l) => { const c = colors().find((q) => q.id === l.id); return `<tr><td><i class="dot" style="background:${c.c}"></i>${esc(c.n)}</td><td>${l.p >= 0 ? '+' : '−'}${fmtP(Math.abs(l.p))} %</td><td>${massStr((S.batchKg * l.p) / 100)}</td><td>${nf((S.sampleKg * 1000 * Math.abs(l.p)) / 100, 2)} г</td></tr>`; }).join('')}</tbody></table></div><p class="small">Всего ${nf(total, 3)} % к массе, стоимость ${nf(cost, 0)} ₽.</p>`;
-  const w = [];
-  if (lines.length > 10) w.push('Больше 10 пигментов в одной добавке: расчёт считается, но лучше сократить.');
-  if (S.bt === 'made' && Object.values(S.plan.v).some((v) => pf(v) < 0)) w.push('Замес готов, убрать пигмент нельзя: отрицательные значения не учтены.');
-  if (total > 1.5) w.push('Суммарная добавка больше 1,5 %: расчёт менее точен, делайте в два шага.');
-  h += w.map((x) => `<div class="warn">${x}</div>`).join('') + plane(rows, { lines: lines.map((l) => ({ id: l.id, p: l.p })), pred });
-  if (after > S.tol) { const rows2 = rows.map((r, k) => ({ ...r, cur: pred[k] })), c2 = calc({ rows: rows2, exclude: ids }), v = c2.vars[0]; if (v) h += `<div class="note"><b>Чтобы довести до допуска, можно ещё добавить:</b> ${v.lines.map((l) => `${esc(colors().find((q) => q.id === l.id).sh || '')} ${l.p >= 0 ? '+' : '−'}${fmtP(Math.abs(l.p))} %`).join(', ')} (прогноз ΔE00 ${nf(v.sc)}).<div class="act"><button class="btn ghost" id="planAddComp" type="button">Добавить это в план</button></div></div>`; out._comp = v; }
-  h += `<div class="act"><button class="btn" id="planStep" type="button">Применить мой план как шаг</button></div>`;
-  out.innerHTML = h; out._lines = lines; out._pred = pred; out._after = after; relabel(out);
-}
-
 /* ---------- события ---------- */
-const reflow = () => { syncSeries(); renderStatic(); result(); renderHist(); renderSteps(); renderPlan(); relabel(); };
+const reflow = () => { syncSeries(); renderStatic(); result(); renderHist(); renderSteps(); relabel(); };
 document.addEventListener('click', (e) => {
   const t = e.target.closest('button'); if (!t) return; const d = t.dataset;
   if (d.inst) { S.inst = d.inst; persist(); reflow(); } else if (d.mode) { S.mode = d.mode; reflow(); } else if (d.bt) { S.bt = d.bt; reflow(); }
@@ -330,11 +401,13 @@ document.addEventListener('click', (e) => {
   else if (d.tol) { S.tol = +d.tol; persist(); reflow(); } else if (d.var) { S.variant = +d.var; result(); }
   else if (d.demo !== undefined) demo(+d.demo); else if (t.id === 'copy') { navigator.clipboard && navigator.clipboard.writeText($('#res')._text || ''); t.textContent = 'Скопировано'; setTimeout(() => (t.textContent = 'Скопировать'), 1500); }
   else if (t.id === 'share') { const u = location.href.split('#')[0] + '#s=' + btoa(unescape(encodeURIComponent(JSON.stringify({ i: S.inst, m: S.mode, std: S.std, smp: S.smp, del: S.del, b: S.batchKg, s: S.sampleKg })))); navigator.clipboard && navigator.clipboard.writeText(u); t.textContent = 'Ссылка скопирована'; setTimeout(() => (t.textContent = 'Ссылка на расчёт'), 1800); }
-  else if (d.met) { S.metric = d.met; persist(); reflow(); } else if (d.punit) { const k = S.plan.unit; S.plan.unit = d.punit; const conv = (p) => (d.punit === 'pct' ? p : d.punit === 'gb' ? (p / 100) * S.batchKg * 1000 : (p / 100) * S.sampleKg * 1000), toP = (x) => (k === 'pct' ? x : k === 'gb' ? (x / (S.batchKg * 1000)) * 100 : (x / (S.sampleKg * 1000)) * 100); Object.keys(S.plan.v).forEach((id) => { const x = pf(S.plan.v[id]); if (Number.isFinite(x)) S.plan.v[id] = String(+conv(toP(x)).toFixed(4)).replace('.', ','); }); renderPlan(); }
-  else if (t.id === 'planFill') { const v = $('#res')._vars?.[S.variant]; if (v) { S.plan.unit = 'pct'; S.plan.v = {}; v.lines.forEach((l) => (S.plan.v[l.id] = String(+l.p.toFixed(4)).replace('.', ','))); renderPlan(); } }
-  else if (t.id === 'planClear') { S.plan.v = {}; renderPlan(); }
-  else if (t.id === 'planAddComp') { const c = $('#planOut')._comp; if (c) { const u = S.plan.unit; c.lines.forEach((l) => { const cur = pf(S.plan.v[l.id]) || 0, add = u === 'pct' ? l.p : u === 'gb' ? (l.p / 100) * S.batchKg * 1000 : (l.p / 100) * S.sampleKg * 1000; S.plan.v[l.id] = String(+(cur + add).toFixed(4)).replace('.', ','); }); renderPlan(); } }
-  else if (t.id === 'planStep') { const o = $('#planOut'); if (o._lines) applyStep({ lines: o._lines.map((l) => ({ id: l.id, p: l.p })), sc: o._after }); }
+  else if (d.met) { S.metric = d.met; persist(); reflow(); } else if (d.rk) { S.riskK = +d.rk; persist(); reflow(); }
+  else if (d.punit) { const old = S.plan.unit, ps = Object.fromEntries(Object.entries(S.plan.v).map(([id, v]) => [id, toP(pf(v) || 0)])); S.plan.unit = d.punit; Object.keys(ps).forEach((id) => (S.plan.v[id] = unitP(ps[id]))); renderLiveIn(); updateLive(); }
+  else if (t.id === 'planFill') { S.dirty = false; result(); } else if (t.id === 'planClear') { S.plan.v = {}; S.dirty = true; renderLiveIn(); updateLive(); }
+  else if (d.pscale) { const m = +d.pscale; Object.keys(S.plan.v).forEach((id) => { const x = pf(S.plan.v[id]); if (Number.isFinite(x)) S.plan.v[id] = String(+(x * m).toFixed(4)).replace('.', ','); }); S.dirty = true; renderLiveIn(); updateLive(); }
+  else if (d.prm) { delete S.plan.v[d.prm]; S.dirty = true; renderLiveIn(); updateLive(); }
+  else if (d.pz) { const V = S.view; if (!V) return; if (d.pz === 'fit') { V.auto = true; Object.assign(V, fitView(S.model)); } else if (d.pz === 'in' || d.pz === 'out') { V.k = Math.max(2, Math.min(800, V.k * (d.pz === 'in' ? 1.5 : 1 / 1.5))); V.auto = false; } else { V.k = (Z.x1 - Z.x0) / 2 / +d.pz; V.cx = 0; V.cy = 0; V.auto = false; } drawPlot(); }
+  else if (t.id === 'planStep') { const o = $('#res'); if (o._lines && o._lines.length) applyStep({ lines: o._lines.map((l) => ({ id: l.id, p: l.p })), sc: o._after }); }
   else if (t.id === 'serAdd') { if (S.series.std.length < 10) { S.series.std.push([NaN, NaN, NaN]); S.series.smp.push([NaN, NaN, NaN]); } reflow(); } else if (t.id === 'serDel') { if (S.series.std.length > 1) { S.series.std.pop(); S.series.smp.pop(); } reflow(); }
   else if (t.id === 'applyStep') applyStep(); else if (t.id === 'recStep') recordStep(); else if (t.id === 'cancelStep') { S.steps = S.steps.filter((s) => s.after); saveSteps(); renderSteps(); }
   else if (t.id === 'finish') finish(); else if (t.id === 'clearSteps') { S.steps = []; saveSteps(); renderSteps(); }
@@ -357,9 +430,11 @@ document.addEventListener('input', (e) => {
   else if (el.id === 'nonlin') { S.nonlin = el.checked; persist(); result(); } else if (el.id === 'learn') { S.learn = el.checked; persist(); renderSteps(); }
   else if (el.id === 'ill2on') { S.ill2.on = el.checked; reflow(); }
   else if (el.id === 'serOn') { S.series.on = el.checked; reflow(); }
-  else if (d.ser) { const [key, i, c] = d.ser.split('|'); S.series[key][+i][+c] = pf(el.value); syncSeries(); const ss = $('#serSum'); if (ss) ss.textContent = serSummary(); result(); relabel(); }
+  else if (d.ser) { const [key, i, c] = d.ser.split('|'); S.series[key][+i][+c] = pf(el.value); S.view = null; syncSeries(); const ss = $('#serSum'); if (ss) ss.textContent = serSummary(); result(); relabel(); }
   else if (d.gl) { S.gl[d.gl] = el.value; result(); relabel(); }
-  else if (d.plan) { S.plan.v[d.plan] = el.value; planResult(); }
+  else if (d.plan) { S.plan.v[d.plan] = el.value; S.dirty = true; const sl = $(`[data-psl="${d.plan}"]`); const p = toP(pf(el.value)); if (sl && Number.isFinite(p)) sl.value = p; updateLive(); }
+  else if (d.psl) { S.plan.v[d.psl] = unitP(+el.value); S.dirty = true; const ti = $(`[data-plan="${d.psl}"]`); if (ti) ti.value = S.plan.v[d.psl]; updateLive(); }
+  else if (el.id === 'padd') { if (el.value && Object.keys(S.plan.v).length < 10) { S.plan.v[el.value] = unitP(0.05); S.dirty = true; renderLiveIn(); updateLive(); } else if (el.value) { el.value = ''; } }
 });
 $('#impFile').addEventListener('change', (e) => { const f = e.target.files[0]; if (!f) return; f.text().then((tx) => { try { const o = JSON.parse(tx); if (o.sensP) S.sensP = o.sensP; if (o.custom) S.custom = o.custom; if (o.price) S.price = o.price; if (o.hist) { S.hist = o.hist; saveHist(); } persist(); colors().forEach((c) => { if (S.allowed[c.id] === undefined) S.allowed[c.id] = true; }); reflow(); $('#calMsg').textContent = 'Данные загружены.'; } catch { $('#calMsg').textContent = 'Не удалось прочитать файл.'; } }); });
 function expJson() { const b = new Blob([JSON.stringify({ v: 2, sensP: S.sensP, custom: S.custom, price: S.price, hist: S.hist }, null, 1)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'коррекция-цвета-данные.json'; a.click(); }
