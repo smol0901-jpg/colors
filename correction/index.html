@@ -77,6 +77,9 @@ body.pp>*:not(main){display:none!important}body.pp main>section:not(#protoS){dis
 .pbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:16px 0 6px}.plotw svg{width:100%;height:auto;display:block;border-radius:14px}.plotw{user-select:none}.doseb svg{width:100%;height:auto;display:block}
 select{max-width:100%}
 .stack,.panel{min-width:0}.xw{max-width:100%;overflow-x:auto}.panel .tab{min-width:0}#calTab .tab{min-width:420px}#proto{max-width:100%;overflow-x:auto}.tab.pt{min-width:0}.tab.pt td,.tab.pt th{padding:6px 8px}.insts{grid-template-columns:repeat(auto-fill,minmax(min(150px,100%),1fr))}
+.scgrid{display:grid;grid-template-columns:26px minmax(0,1fr) 62px 62px 62px 62px 26px;gap:6px;align-items:center;margin:4px 0}.scgrid.scgh{font-size:11.5px;color:var(--ink2);font-weight:600}.scgrid.al{grid-template-columns:1fr 1fr 26px}@media(max-width:700px){.scgrid{grid-template-columns:22px minmax(0,1fr) 22px;}.scgrid>input.sn{grid-column:span 1}.scgh{display:none}.scgrid .sn{width:100%}}
+.scc{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:8px 0;padding:8px 10px;border:1px dashed var(--line);border-radius:10px}.scc label{display:grid;gap:2px;font-size:12px;color:var(--ink2);font-weight:600}.scc .sn{width:80px}
+details.ang>summary{list-style:none}
 </style>
 </head>
 <body>
@@ -89,7 +92,7 @@ select{max-width:100%}
   <h1>Коррекция цвета: <span>что и сколько добавить</span></h1>
   <p class="lead" style="margin-top:12px">Введите значения со спектрофотометра (L*a*b* эталона и образца или готовое отклонение), размер замеса или пробы и, если нужно, содержание пигмента в рецептуре. Инструмент подберёт добавки, предложит несколько вариантов с ценой и покажет прогноз. После добавки введите новый замер, и модель сама уточнится под ваш замес. Замес уже сделан, поэтому по умолчанию расчёт только добавляет.</p>
   <div class="chips"><span>профиль BYK spectro2guide и ещё 5 типов приборов</span><span>до 10 пигментов в добавке</span><span>серия замеров и блеск</span><span>CIEDE2000</span><span>самообучение по итерациям</span><span>варианты с ценой</span><span>метамерия</span><span>протокол и история</span><span>данные только в браузере</span></div>
-  <div class="act"><button class="btn" data-demo="0" type="button">Пример с прибора: красный</button><button class="btn ghost" data-demo="1" type="button">Пример: большое отклонение</button><button class="btn ghost" data-demo="2" type="button">Пример: синий</button><a class="btn ghost" href="#how">Как правильно замерить</a></div><div class="tabs"><a href="#tool">Расчёт</a><a href="#iter">Итерации</a><a href="#histS">История</a><a href="#calS">Калибровка</a><a href="#protoS">Протокол</a></div>
+  <div class="act"><button class="btn" data-demo="0" type="button">Пример с прибора: красный</button><button class="btn ghost" data-demo="1" type="button">Пример: большое отклонение</button><button class="btn ghost" data-demo="2" type="button">Пример: синий</button><a class="btn ghost" href="#how">Как правильно замерить</a></div><div class="tabs"><a href="#tool">Расчёт</a><a href="#scen">Корректировки</a><a href="#blend">Бленд</a><a href="#iter">Итерации</a><a href="#histS">История</a><a href="#calS">Калибровка</a><a href="#protoS">Протокол</a></div>
 </div></section>
 
 <section id="tool"><div class="wrap">
@@ -102,6 +105,13 @@ select{max-width:100%}
     <div class="stack" style="position:sticky;top:70px"><div class="panel"><div class="step"><b>4</b><h3>Результат</h3></div><div id="res"></div></div></div>
   </div>
 </div></section>
+
+<section id="scen"><div class="wrap"><h2>Корректировки: сравнить свои варианты и откалибровать модель</h2>
+<p class="lead">Запишите корректировки так, как вы привыкли: «0,1% Ultram, 0,3% Chromoxid 17, +35% TiO2». Без знака «+» это процент к массе пробы или замеса. Со знаком «+» это процент от количества пигмента в рецептуре (вес × доля в ТТК × значение). Инструмент покажет прогноз по каждой строке. Если вы вводите замер после корректировки, он откалибрует модель по вашей реальной истории. Можно до 30 корректировок.</p>
+<div class="layout" style="margin-top:14px"><div class="panel"><div class="step"><b>1</b><h3>Мои корректировки</h3></div><div id="scIn"></div></div><div class="panel"><div class="step"><b>2</b><h3>Прогноз и калибровка</h3></div><div id="scOut"></div></div></div></div></section>
+
+<section id="blend"><div class="wrap"><h2>Бленд с другой партией</h2><p class="lead">Если есть другая партия, цвет или блеск которой лежит с другой стороны от эталона, смешайте две партии. Инструмент подберёт долю второй партии и покажет прогноз цвета, блеска и ΔE.</p>
+<div class="layout" style="margin-top:14px"><div class="panel"><div class="step"><b>1</b><h3>Вторая партия (В)</h3></div><div id="blendIn"></div></div><div class="panel"><div class="step"><b>2</b><h3>Результат смешения</h3></div><div id="blendOut"></div></div></div></div></section>
 
 <section id="iter"><div class="wrap"><h2>Итерации: добавили, замерили, модель уточнилась</h2><p class="lead">Нажмите «Применить как шаг» в результате, добавьте колоранты в замес и введите новый замер. Инструмент сравнит прогноз с фактом, уточнит чувствительности использованных колорантов и сразу пересчитает следующий шаг. Так коррекция сходится за меньшее число шагов.</p><div class="panel" style="margin-top:14px"><div id="steps"></div></div></div></section>
 
